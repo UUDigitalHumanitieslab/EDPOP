@@ -5,4 +5,4 @@ Creating a virtual research environment (VRE) from CERL resources. So far, this 
 Switch to a virtual environment with Python 3.5 installed. Run `pip install requirements.txt`.
 
 ## Running
-Run `python manage.py runserver`. Now the Django app should run on `localhost:8000`.
+Run `python manage.py createsuperuser`, provide an admin name, email and password. Then, run `python manage.py runserver`. Now the Django app should run on `localhost:8000`, and the admin should be available with the credentials provided. If migrations need to be applied, run `python manage.py migrate`.
