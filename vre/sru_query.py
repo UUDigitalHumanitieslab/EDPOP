@@ -31,28 +31,3 @@ def sru_query(url_string, query_string):
     payload['query'] = query_string
     response = requests.get(url_string, params = payload)
     return response
-
-
-def response_as_dict(requests_response):
-    ''' given the response in the requests package's format,
-    convert to dictionary '''
-    resp_dict = xmltodict.parse(requests_response.content)
-    return resp_dict
-
-
-def get_keys_recursively(key, var):
-    ''' given a dictionary parsed from xml, 
-    make a generator to yield all items with a key recursively
-    code from: https://stackoverflow.com/questions/9807634/find-all-occurrences-of-a-key-in-nested-python-dictionaries-and-lists
-    '''
-    if hasattr(var,'iteritems'):
-        for k, v in var.iteritems():
-            if k == key:
-                yield v
-            if isinstance(v, dict):
-                for result in gen_dict_extract(key, v):
-                    yield result
-            elif isinstance(v, list):
-                for d in v:
-                    for result in gen_dict_extract(key, d):
-                        yield result
