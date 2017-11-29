@@ -47,5 +47,7 @@ def load_translation_dictionary():
     for line in lines[1:]:
         print(line.split(",", 1))
         key, word = line.split(",", 1)
+        # Remove ending newlines
+        word = word.replace('\n', '')
         translationDictionary[key] = word
     return translationDictionary
