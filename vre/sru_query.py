@@ -31,21 +31,22 @@ def sru_query(url_string, query_string):
         'maximumRecords': '15'}
     payload['query'] = query_string
     response = requests.get(url_string, params = payload)
+    response.content = translate_sru_response_to_readable_text(response.content)
     return response
 
 def translate_sru_response_to_readable_text(response):
     translationDictionary = load_translation_dictionary()
     for key, word in translationDictionary.items():
-        response = response.replace(key, word)
+        print(response)
+        response = str(response).replace(key, word)
     return response
 
 def load_translation_dictionary():
     translationDictionary = {}
-    with open(os.path.abspath("../M21_fields.csv")) as dictionaryFile:
+    with open(os.path.abspath("M21_fields.csv")) as dictionaryFile:
         lines = dictionaryFile.readlines()
     # Skip the header line
     for line in lines[1:]:
-        print(line.split(",", 1))
         key, word = line.split(",", 1)
         # Remove ending newlines
         word = word.replace('\n', '')
