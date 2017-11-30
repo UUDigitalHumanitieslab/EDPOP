@@ -1,6 +1,7 @@
 import requests
 from lxml import etree
 import os
+import re
 
 
 def sru_explain(url_string):
@@ -31,14 +32,12 @@ def sru_query(url_string, query_string):
         'maximumRecords': '15'}
     payload['query'] = query_string
     response = requests.get(url_string, params = payload)
-    response.content = translate_sru_response_to_readable_text(response.content)
     return response
 
 def translate_sru_response_to_readable_text(response):
     translationDictionary = load_translation_dictionary()
     for key, word in translationDictionary.items():
-        print(response)
-        response = str(response).replace(key, word)
+        response = re.sub(r"\b{}\b".format(key), word, str(response))
     return response
 
 def load_translation_dictionary():
