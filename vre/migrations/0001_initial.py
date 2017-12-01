@@ -39,7 +39,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=200)),
                 ('project', models.CharField(max_length=200)),
-                ('members', models.ManyToManyField(related_name='resesarchgroup', to=settings.AUTH_USER_MODEL)),
+                ('members', models.ManyToManyField(related_name='researchgroup', to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'permissions': (('add_user_to_research_group', 'Can add user to a research group'),),
