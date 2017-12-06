@@ -10,4 +10,6 @@
 
 Showing existing items of collection here ...
 
-<p>{{ search_result.content }}</p>
+{% for datafield in search_result %}
+<p>{{ datafield }}</p>
+{%  endfor %}

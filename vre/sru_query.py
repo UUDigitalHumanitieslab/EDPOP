@@ -2,6 +2,7 @@ import requests
 from lxml import etree
 import os
 import re
+from bs4 import BeautifulSoup
 
 
 def sru_explain(url_string):
@@ -38,7 +39,14 @@ def translate_sru_response_to_readable_text(response):
     translationDictionary = load_translation_dictionary()
     for key, word in translationDictionary.items():
         response = re.sub(r"\b{}\b".format(key), word, str(response))
-    return response
+
+    soup = BeautifulSoup(response)
+    datafields = []
+    for word in sorted(translationDictionary.values()):
+        datafield = soup.find('datafield', tag=word)
+        if datafield:
+            datafields.append("{}: {}".format(word, datafield.content))
+    return datafields
 
 def load_translation_dictionary():
     translationDictionary = {}
@@ -51,3 +59,4 @@ def load_translation_dictionary():
         word = word.replace('\n', '')
         translationDictionary[key] = word
     return translationDictionary
+
