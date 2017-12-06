@@ -6,6 +6,9 @@ from .sru_query import sru_query, translate_sru_response_to_readable_text
 
 from .models import ResearchGroup, Collection
 
+CERL_SRU_URL = "http://sru.cerl.org/thesaurus"
+HPB_SRU_URL = "http://sru.gbv.de/hpb"
+
 
 # to do: link to detail view for the collections
 @login_required
@@ -19,9 +22,8 @@ def index(request):
 
 def collection_detail(request, collection_id):
     collection = get_object_or_404(Collection, pk=collection_id)
-    # TODO: insert querying and result showing in view
-    url_string = "http://sru.cerl.org/thesaurus"
-    url_string = "http://sru.gbv.de/hpb"
+    url_string = HPB_SRU_URL
+    # TODO actually retrieve query and use this as the querystring
     query_string = "utrecht"
     search_result = sru_query(url_string, query_string)
     search_result_translated = translate_sru_response_to_readable_text(search_result.content)
