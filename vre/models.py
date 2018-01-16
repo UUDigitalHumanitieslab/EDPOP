@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib import admin
 from django.contrib.auth.models import Group, User
 from django.contrib.auth.decorators import user_passes_test
+from django.contrib.postgres.fields import JSONField
 
 
 class ResearchGroup(models.Model):
@@ -44,7 +45,9 @@ class Record(models.Model):
     """
     uri = models.CharField(max_length=200)
     collection = models.ManyToManyField(Collection)
-    # open question: how to implement original content: json field?
+    content = JSONField()
+    annotation = models.CharField(max_length=200)
+
 
 '''
 class AnnotationAdmin(admin.modelAdmin):
