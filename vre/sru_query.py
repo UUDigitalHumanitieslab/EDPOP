@@ -2,7 +2,11 @@ import requests
 from lxml import etree
 import os
 import re
+import csv
+import json
 from bs4 import BeautifulSoup
+
+from . import hpb
 
 
 def sru_explain(url_string):
@@ -15,11 +19,6 @@ def parse_xml(response):
     parsed = etree.XML(response.content)
     return parsed
 
-
-def define_json(explain_response):
-    ''' given an explain response from an external SRU resource,
-        define how the jsonfield should be structured.
-    '''
 
 def sru_query(url_string, query_string):
     ''' given the url of a resource to query, and the query string,
@@ -35,28 +34,36 @@ def sru_query(url_string, query_string):
     response = requests.get(url_string, params = payload)
     return response
 
-def translate_sru_response_to_readable_text(response):
+
+def translate_sru_response_to_dict(response_content):
     translationDictionary = load_translation_dictionary()
     for key, word in translationDictionary.items():
-        response = re.sub(r"\b{}\b".format(key), word, str(response))
+        response_content = re.sub(r"\b{}\b".format(key), word, str(response_content))
+    soup = BeautifulSoup(response_content, 'lxml')
+    records = soup.find_all('record')
+    record_list = []
+    for record in records:
+        uris = record.find_all('datafield', tag='035')
+        # for multiple fields with tag "035", select one which does not start with a bracket
+        # HPB specific!!
+        uri = next((u for u in uris if not u.subfield.string.startswith("(")), None)
+        datafields = {}
+        for word in sorted(translationDictionary.values()):
+            datafield = record.find('datafield', tag=word)
+            if datafield:
+                datafields[word] = datafield.subfield.string
+        record_list.append({
+            'uri': uri.subfield.string, 
+            'datafields': datafields,
+            'selected_fields': hpb.return_selected_fields(datafields)})
+    return record_list
 
-    soup = BeautifulSoup(response)
-    datafields = []
-    for word in sorted(translationDictionary.values()):
-        datafield = soup.find('datafield', tag=word)
-        if datafield:
-            datafields.append("{}: {}".format(word, datafield.content))
-    return datafields
 
 def load_translation_dictionary():
     translationDictionary = {}
     with open(os.path.abspath("M21_fields.csv")) as dictionaryFile:
-        lines = dictionaryFile.readlines()
-    # Skip the header line
-    for line in lines[1:]:
-        key, word = line.split(",", 1)
-        # Remove ending newlines
-        word = word.replace('\n', '')
-        translationDictionary[key] = word
+        reader = csv.DictReader(dictionaryFile)
+        for row in reader:
+            translationDictionary[row['Tag number']] = row[' Tag description'].strip()
     return translationDictionary
 

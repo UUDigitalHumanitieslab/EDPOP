@@ -1,0 +1,9 @@
+<p>
+	{{ result }}
+	<b> {{ result.uri }} </b>
+	<ul>
+	{% for field, value in result.datafields.items %}
+		<li>{{ field }}: {{ value }} </li>
+	{%  endfor %}
+	</ul>
+</p>

@@ -1,5 +1,5 @@
 # EDPOP
-Creating a virtual research environment (VRE) from CERL resources. So far, this is a fairly vanilla Django application, with the only addition that there is a collection and record model in the application "VRE".
+Creating a virtual research environment (VRE) from CERL resources.
 
 ## Installing
 Switch to a virtual environment with Python 3.5+ installed, then:
@@ -9,6 +9,12 @@ pip install -r requirements.txt
 python manage.py migrate # create the database
 python manage.py createsuperuser # ask to specify a new admin name, email and password
 ```
+
+## PostgreSQL
+The project uses PostgreSQL, to make use of JSON fields (the format in which resources from external databases will be imported, and annotated).
+
+A guide for setting up PostgreSQL in Django can be found here:
+[][https://www.digitalocean.com/community/tutorials/how-to-use-postgresql-with-your-django-application-on-ubuntu-14-04]
 
 ## Running
 
