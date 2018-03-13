@@ -1,3 +1,6 @@
 django
 django-contrib-postgres
 psycopg2
+requests
+lxml
+beautifulsoup4
