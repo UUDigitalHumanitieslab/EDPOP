@@ -1,0 +1,11 @@
+
+
+#result_detail{
+	display: none;
+	position: absolute;
+}
+
+#close_panel{
+	position: relative;
+	right: 0;
+}

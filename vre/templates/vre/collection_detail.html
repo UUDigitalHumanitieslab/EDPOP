@@ -1,46 +1,60 @@
-{% load static %}
+<div class="container-fluid">
+    <h1>{{ collection.description}}</h1>
+    <h2> Search CERL HPB to add items </h2> 
 
-<h1>{{ collection.description}}</h1>
-<h2> Search CERL HPB to add items </h2>
-<form method="POST">
-{% csrf_token %}
-<input type="text" name="search" size="30"> <br> <br>
-<input type="submit" value="Search">
-</form>
+    <form method="POST" id="search">
+    {% csrf_token %}
+    <input type="text" name="search" size="30"> <br> <br>
+    <input type="submit" value="Search">
+    </form> 
 
-<!-- <form action="/create_post/" method="POST" id="post-form">
-	{% csrf_token %}
-	<input type="text" value="Test">
-	<input type="submit" value="Test">
-</form>
- -->
-{% if result_list %}
-<form method="POST">
-	{% csrf_token %}
-	<input type="submit" value="Add">
-<table>
-{% for result in result_list %}
-	<tr>
-		<td>
-			<input type="checkbox" name="selected_records" id="option{{result.uri}}" value={{forloop.counter0}}>
-		</td>
-		<td>
-			{% for field in result.selected_fields %}
-				{% if field.primary %}
-					<a href={% url 'item_detail' result %}> {{ field.value }} </a>
-				{% else %}
-					{{ field.name }}: {{ field.value }}
-			{% endif %}
-			{%  endfor %}
-		</td>
-	</tr>
-{% endfor %}
-</table>
-</form>
+    {% if result_list %}
+    <form method="POST" id="select_records">
+        {% csrf_token %}
+        <input type="submit" value="Add">
+        <table class="table table-striped">
+        {% for result, result_json in result_list %}
+            <tr>
+                <td>
+                    <input type="checkbox" id="{{forloop.counter0}}" data-content="{{result_json}}" value={{forloop.counter0}}>
+                </td>
+                <td>
+                    {% for field in result.selected_fields %}
+                        {% if field.primary %}
+                            <a id="field.name" href="javascript:show_detail()">{{ field.value }} </a>
+                        {% else %}
+                            {{ field.name }}: {{ field.value }}
+                    {% endif %}
+                    {%  endfor %}
+                </td>
+            </tr>
+        {% endfor %}
+        </table>    
+
+    </form>
 {% endif %}
+</div>
 
-<!-- <script
+<div class="panel panel-default" id="result_detail">
+    <div class="panel-head">
+        <b> {{ result.datafields.uri }} </b>
+        <button>Add to {{collection.description}}</button>
+        <button id="close_panel"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+    </div>
+    <div class="panel-body">
+        {% for field, value in result.datafields.items %}
+            {% if field is not 'uri' %}
+                <p>{{ field }}: {{ value }}</p>
+            {% endif %}
+        {%  endfor %}
+    </div>
+</div>
+
+{% load static %}
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="{% static "css/style.css" %}">
+<script
   src="https://code.jquery.com/jquery-3.3.1.min.js"
   integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
   crossorigin="anonymous"></script>
-<script src="{% static "vre/main.js"%}"></script> -->
+<script src="{% static "vre/main.js" %}"></script>

@@ -1,5 +1,8 @@
 from django import forms
 
 
-class AddMultipleItemsForm(forms.Form):
-    record = forms.MultipleChoiceField(choices=(('default', 'data')))
+class AddMultipleRecordsForm(forms.Form):
+    records = forms.MultipleChoiceField(
+        choices=(('default', 'data')), 
+        widget=forms.CheckboxSelectMultiple(attrs={'id': 'chosen-records'})
+    )

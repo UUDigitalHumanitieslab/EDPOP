@@ -56,7 +56,7 @@ ROOT_URLCONF = 'edpop.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [],#['./vre/templates/vre', './vre/templates/login'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
