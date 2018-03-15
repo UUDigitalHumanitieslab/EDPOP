@@ -1,0 +1,10 @@
+<p>
+	<b> {{ result.datafields.uri }} </b>
+	<ul>
+	{% for field, value in result.datafields.items %}
+		{% if field is not 'uri' %}
+			<li>{{ field }}: {{ value }} </li>
+		{% endif %}
+	{%  endfor %}
+	</ul>
+</p>

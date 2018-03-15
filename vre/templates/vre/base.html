@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang=en>
+    {% load static %}
+    <head>
+        <meta http-equiv="charset" content="utf-8">
+        <title>{% block title %}EDPOP VRE{% endblock %}</title>
+        {% block style %}
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="{% static "css/style.css" %}">
+        {% endblock style %}
+    </head>
+    <body>
+        {% block content %}{% endblock content %}
+        {% block scripts %}
+        <script
+          src="https://code.jquery.com/jquery-3.3.1.min.js"
+          integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+          crossorigin="anonymous"></script>
+          <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+        <script src="{% static "vre/main.js" %}"></script>
+        {% endblock scripts %}
+    </body>
+</html>

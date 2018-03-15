@@ -1,8 +1,11 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import Group, User
+from django.contrib.postgres import fields
 
-from .models import Collection, ResearchGroup
+from django_json_widget.widgets import JSONEditorWidget
+
+from .models import Collection, ResearchGroup, Record
 
 
 class ResearchGroupAdmin(admin.ModelAdmin):
@@ -10,8 +13,15 @@ class ResearchGroupAdmin(admin.ModelAdmin):
 
 
 class CollectionAdmin(admin.ModelAdmin):
-	filter_horizontal = ('managing_group',)
+    filter_horizontal = ('managing_group',)
+
+
+class RecordAdmin(admin.ModelAdmin):
+    formfield_overrides = {
+        fields.JSONField: {'widget': JSONEditorWidget},
+    }
 
 
 admin.site.register(Collection, CollectionAdmin)
 admin.site.register(ResearchGroup, ResearchGroupAdmin)
+admin.site.register(Record, RecordAdmin)

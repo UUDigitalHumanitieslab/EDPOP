@@ -46,7 +46,7 @@ class Record(models.Model):
     uri = models.CharField(max_length=200)
     collection = models.ManyToManyField(Collection)
     content = JSONField()
-    annotation = models.CharField(max_length=200)
+    annotation = models.CharField(max_length=200, blank=True)
 
 
 '''

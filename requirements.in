@@ -1,5 +1,6 @@
 django
 django-contrib-postgres
+django-json-widget
 psycopg2
 requests
 lxml

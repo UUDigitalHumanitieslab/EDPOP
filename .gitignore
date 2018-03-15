@@ -4,10 +4,6 @@
 # Virtual environment
 ENV/
 
-vre/__pycache__/
-vre/migrations/
-
 db*
 *__pycache*
-*migrations
 *-debug.log
