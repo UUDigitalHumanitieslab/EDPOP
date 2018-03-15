@@ -37,11 +37,12 @@ function show_detail(event) {
     var dataAsArray = _.toPairs(dataNoURI);
     var template = Handlebars.compile($('#item-fields').html());
     var target = $('#result_detail');
-    target.find('b').text(jsonData.uri);
-    target.find('.panel-body').html(template({fields: dataAsArray}));
-    $("#result_detail").show();
+    target.find('.modal-title').text(jsonData.uri);
+    target.find('.modal-body').html(template({fields: dataAsArray}));
+    $("#result_detail").modal('show');
 }
 
 $(function() {
     $('#select_records a').click(show_detail);
+    $('#result_detail').modal({show: false});
 });
