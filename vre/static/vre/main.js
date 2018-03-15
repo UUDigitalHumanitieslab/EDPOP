@@ -33,8 +33,9 @@ function show_detail(event) {
     event.preventDefault();
     var sisterCheckbox = $(this).parents('tr').find('input');
     var jsonData = sisterCheckbox.data('content');
-    var dataNoURI = _.omit(jsonData, 'uri');
-    var dataAsArray = _.toPairs(dataNoURI);
+    var dataAsArray = _(jsonData).omit('uri').map(function(value, key) {
+        return {key: key, value: value};
+    }).value();
     var template = Handlebars.compile($('#item-fields').html());
     var target = $('#result_detail');
     target.find('.modal-title').text(jsonData.uri);
