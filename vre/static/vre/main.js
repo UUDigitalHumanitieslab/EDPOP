@@ -29,6 +29,21 @@ function return_selected_records(event) {
     });
 }
 
-function show_detail() {
-    $("#result_detail").css("display", "inline");
+function show_detail(event) {
+    event.preventDefault();
+    var sisterCheckbox = $(this).parents('tr').find('input');
+    var jsonData = sisterCheckbox.data('content');
+    var dataAsArray = _(jsonData).omit('uri').map(function(value, key) {
+        return {key: key, value: value};
+    }).value();
+    var template = Handlebars.compile($('#item-fields').html());
+    var target = $('#result_detail');
+    target.find('.modal-title').text(jsonData.uri);
+    target.find('.modal-body').html(template({fields: dataAsArray}));
+    $("#result_detail").modal('show');
 }
+
+$(function() {
+    $('#select_records a').click(show_detail);
+    $('#result_detail').modal({show: false});
+});

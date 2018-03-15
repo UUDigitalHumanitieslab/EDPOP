@@ -18,12 +18,12 @@
         {% for result, result_json in result_list %}
             <tr>
                 <td>
-                    <input type="checkbox" id="{{forloop.counter0}}" data-content="{{result_json}}" value={{forloop.counter0}}>
+                    <input type="checkbox" data-content="{{result_json}}">
                 </td>
                 <td>
                     {% for field in result.selected_fields %}
                         {% if field.primary %}
-                            <a id="field.name" href="javascript:show_detail()">{{ field.value }} </a>
+                            <a id="field.name" href="#">{{ field.value }} </a>
                         {% else %}
                             {{ field.name }}: {{ field.value }}
                     {% endif %}
@@ -35,20 +35,7 @@
 
     </form>
 {% endif %}
+{% include "vre/item_detail.html" %}
 </div>
 
-<div class="panel panel-default" id="result_detail">
-    <div class="panel-head">
-        <b> {{ result.datafields.uri }} </b>
-        <button>Add to {{collection.description}}</button>
-        <button id="close_panel"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
-    </div>
-    <div class="panel-body">
-        {% for field, value in result.datafields.items %}
-            {% if field is not 'uri' %}
-                <p>{{ field }}: {{ value }}</p>
-            {% endif %}
-        {%  endfor %}
-    </div>
-</div>
 {% endblock content %}
