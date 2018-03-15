@@ -11,7 +11,7 @@ function getContent(index, item) {
 function return_selected_records(event) {
     event.preventDefault();
     var selected = $(this).find("input").filter(isChecked).map(getContent).get();
-    var csrftoken = getCookie('csrftoken');
+    var csrftoken = Cookies.get('csrftoken');
     $.ajax({
         url: 'add-selection',
         contentType:'application/json',
@@ -27,22 +27,6 @@ function return_selected_records(event) {
         headers: {'X-CSRFToken': csrftoken},
         method: 'POST'
     });
-}
-
-function getCookie(name) {
-    var cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        var cookies = document.cookie.split(';');
-        for (var i = 0; i < cookies.length; i++) {
-            var cookie = jQuery.trim(cookies[i]);
-            // Does this cookie string begin with the name we want?
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
 }
 
 function show_detail() {
