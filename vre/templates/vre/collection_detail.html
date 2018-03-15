@@ -1,12 +1,14 @@
+{% extends "vre/base.html" %}
+{% block content %}
 <div class="container-fluid">
     <h1>{{ collection.description}}</h1>
-    <h2> Search CERL HPB to add items </h2> 
+    <h2> Search CERL HPB to add items </h2>
 
     <form method="POST" id="search">
     {% csrf_token %}
     <input type="text" name="search" size="30"> <br> <br>
     <input type="submit" value="Search">
-    </form> 
+    </form>
 
     {% if result_list %}
     <form method="POST" id="select_records">
@@ -29,7 +31,7 @@
                 </td>
             </tr>
         {% endfor %}
-        </table>    
+        </table>
 
     </form>
 {% endif %}
@@ -49,12 +51,4 @@
         {%  endfor %}
     </div>
 </div>
-
-{% load static %}
-<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-<link rel="stylesheet" type="text/css" href="{% static "css/style.css" %}">
-<script
-  src="https://code.jquery.com/jquery-3.3.1.min.js"
-  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-  crossorigin="anonymous"></script>
-<script src="{% static "vre/main.js" %}"></script>
+{% endblock content %}
