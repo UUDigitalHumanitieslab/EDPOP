@@ -6,6 +6,7 @@ from rest_framework import routers
 from . import views, api
 
 api_router = routers.DefaultRouter()
+api_router.register(r'collections', api.CollectionViewSet, base_name='collection')
 
 urlpatterns = [
     url(r'^$', views.index, name='index'),
