@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 
 from .serializers import *
-from .models import Collection
+from .models import Collection, Record
 
 
 class CollectionViewSet(viewsets.ReadOnlyModelViewSet):
@@ -10,3 +10,8 @@ class CollectionViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         groups = self.request.user.researchgroups.all()
         return Collection.objects.filter(managing_group__in=groups)
+
+
+class RecordViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = RecordSerializer
+    queryset = Record.objects.all()

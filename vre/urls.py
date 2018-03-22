@@ -7,6 +7,7 @@ from . import views, api
 
 api_router = routers.DefaultRouter()
 api_router.register(r'collections', api.CollectionViewSet, base_name='collection')
+api_router.register(r'records', api.RecordViewSet)
 
 urlpatterns = [
     url(r'^$', views.index, name='index'),
