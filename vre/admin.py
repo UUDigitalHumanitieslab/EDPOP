@@ -5,7 +5,7 @@ from django.contrib.postgres import fields
 
 from django_json_widget.widgets import JSONEditorWidget
 
-from .models import Collection, ResearchGroup, Record
+from .models import Collection, ResearchGroup, Record, Annotation
 
 
 class ResearchGroupAdmin(admin.ModelAdmin):
@@ -22,6 +22,11 @@ class RecordAdmin(admin.ModelAdmin):
     }
 
 
+class AnnotationAdmin(admin.ModelAdmin):
+    pass
+
+
 admin.site.register(Collection, CollectionAdmin)
 admin.site.register(ResearchGroup, ResearchGroupAdmin)
 admin.site.register(Record, RecordAdmin)
+admin.site.register(Annotation, AnnotationAdmin)

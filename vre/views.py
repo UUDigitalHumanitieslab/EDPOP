@@ -7,7 +7,6 @@ from django.shortcuts import get_object_or_404, render, render_to_response
 
 from .sru_query import sru_query, translate_sru_response_to_dict
 from .models import Record, ResearchGroup, Collection
-from .forms import AddMultipleRecordsForm
 
 CERL_SRU_URL = "http://sru.cerl.org/thesaurus"
 HPB_SRU_URL = "http://sru.gbv.de/hpb"

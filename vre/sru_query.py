@@ -26,12 +26,14 @@ def sru_query(url_string, query_string):
     '''
     # allow passing of extra search parameters as kwargs?
     # or should this be the responsibility of the user?
-    payload = {'recordPacking': 'xml', 
+    payload = {
+        'recordPacking': 'xml', 
         'operation': 'searchRetrieve', 
-        'version': '1.1', 
-        'maximumRecords': '15'}
+        'version': '1.1',
+        'maximumRecords': 15
+    }
     payload['query'] = query_string
-    response = requests.get(url_string, params = payload)
+    response = requests.get(url_string, params=payload)
     return response
 
 
