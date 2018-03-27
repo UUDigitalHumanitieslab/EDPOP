@@ -15,3 +15,4 @@ class CollectionViewSet(viewsets.ReadOnlyModelViewSet):
 class RecordViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = RecordSerializer
     queryset = Record.objects.all()
+    filter_fields = ['uri', 'collection__id']

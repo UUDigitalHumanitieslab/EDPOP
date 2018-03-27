@@ -1,6 +1,7 @@
 django
 django-contrib-postgres
 django-json-widget
+django-filter
 djangorestframework
 psycopg2
 requests
