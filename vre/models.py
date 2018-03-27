@@ -45,8 +45,7 @@ class Record(models.Model):
     """
     uri = models.CharField(max_length=200)
     collection = models.ManyToManyField(Collection)
-    content = JSONField()
-    annotation = models.CharField(max_length=200, blank=True)
+    content = JSONField(default='VRE Record')
 
 
 '''
@@ -55,6 +54,7 @@ class AnnotationAdmin(admin.modelAdmin):
     # each group sharing the same record has their own annotation
     # they can see, but not edit other groups' annotations
     pass
+'''
 
 class Annotation(models.Model):
     """ Import the fields of a given record, and stores annotations to its fields,
@@ -65,4 +65,4 @@ class Annotation(models.Model):
     but multiple groups can add annotations."""
     record = models.ForeignKey(Record)
     managing_group = models.ForeignKey(ResearchGroup)
-'''
+    content = JSONField(default='VRE Annotation')
