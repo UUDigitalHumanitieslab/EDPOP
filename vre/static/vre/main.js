@@ -16,6 +16,12 @@ function addCSRFToken(ajaxOptions) {
     }, ajaxOptions);
 }
 
+// Override Backbone.sync so it always includes the CSRF token in requests.
+(function() {
+    var id = _.identity;
+    Backbone.sync = _.overArgs(Backbone.sync, [id, id, addCSRFToken]);
+}());
+
 function return_selected_records(event) {
     event.preventDefault();
     var selected = $(this).find("input").filter(isChecked).map(getContent).get();
