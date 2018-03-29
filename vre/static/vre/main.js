@@ -6,11 +6,20 @@ function getContent(index, item) {
     return $(item).data('content');
 }
 
+/**
+ * Insert the CSRF token header into $.ajax-compatible request options.
+ * Returns a new object, does not mutate the original object.
+ */
+function addCSRFToken(ajaxOptions) {
+    return _.defaultsDeep({
+        headers: {'X-CSRFToken': Cookies.get('csrftoken')},
+    }, ajaxOptions);
+}
+
 function return_selected_records(event) {
     event.preventDefault();
     var selected = $(this).find("input").filter(isChecked).map(getContent).get();
-    var csrftoken = Cookies.get('csrftoken');
-    $.ajax({
+    $.ajax(addCSRFToken({
         url: 'add-selection',
         contentType:'application/json',
         data: JSON.stringify(selected),
@@ -22,9 +31,8 @@ function return_selected_records(event) {
         error : function(xhr,errmsg,err) {
             console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
         },
-        headers: {'X-CSRFToken': csrftoken},
         method: 'POST'
-    });
+    }));
 }
 
 function show_detail(event) {
