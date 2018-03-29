@@ -41,6 +41,63 @@ function show_detail(event) {
     $("#result_detail").modal('show');
 }
 
+/**
+ * Perform the following transformation:
+ * (from)  {foo: 'bar', foobar: 'baz'}
+ * (to)    'foo=bar&foobar=baz'
+ */
+function objectAsUrlParams(object) {
+    return _(object).entries().invokeMap('join', '=').join('&');
+}
+
+/**
+ * Generic subclass that supports filtering at the backend.
+ */
+var APICollection = Backbone.Collection.extend({
+    query: function(options) {
+        var url = options.url || this.url;
+        var urlParts = [url, '?'];
+        if (options.filters) {
+            urlParts.push(objectAsUrlParams(options.filters));
+        }
+        var fetchOptions = _(options).omit(['filters']).extend({
+            url: urlParts.join(''),
+        }).value();
+        return this.fetch(fetchOptions);
+    },
+});
+
+var Records = APICollection.extend({
+    url: '/vre/api/records',
+});
+
+/**
+ * Representation of a single VRE collection.
+ */
+var Collection = Backbone.Model.extend({
+    getRecords: function() {
+        if (!this.records) {
+            this.records = new Records();
+            this.records.query({collection__id: this.id});
+        }
+        return this.records;
+    },
+});
+
+var Collections = APICollection.extend({
+    url: '/vre/api/collections',
+    model: Collection,
+}, {
+    /**
+     * Class method for retrieving only the collections the user can manage.
+     */
+    mine: function() {
+        var myCollections = new Collections();
+        myCollections.fetch({url: myCollections.url + '/mine'});
+        return myCollections;
+    },
+});
+
 $(function() {
     $("#select_records").submit(return_selected_records);
     $('#select_records a').click(show_detail);
