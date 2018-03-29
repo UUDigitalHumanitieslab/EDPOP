@@ -1,5 +1,3 @@
-$("#select_records").submit(return_selected_records);
-
 function isChecked(index, item) {
     return item.checked;
 }
@@ -44,6 +42,7 @@ function show_detail(event) {
 }
 
 $(function() {
+    $("#select_records").submit(return_selected_records);
     $('#select_records a').click(show_detail);
     $('#result_detail').modal({show: false});
 });
