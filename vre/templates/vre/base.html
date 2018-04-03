@@ -33,5 +33,8 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.3.3/backbone-min.js"></script>
         <script src="{% static "vre/main.js" %}"></script>
         {% endblock scripts %}
+        {% block templates %}
+        {% include "vre/client_templates.html" %}
+        {% endblock templates %}
     </body>
 </html>

@@ -48,7 +48,7 @@ function show_detail(event) {
     var dataAsArray = _(jsonData).omit('uri').map(function(value, key) {
         return {key: key, value: value};
     }).value();
-    var template = Handlebars.compile($('#item-fields').html());
+    var template = JST['item-fields'];
     var target = $('#result_detail');
     target.find('.modal-title').text(jsonData.uri);
     target.find('.modal-body').html(template({fields: dataAsArray}));
@@ -112,7 +112,14 @@ var Collections = APICollection.extend({
     },
 });
 
+// Global object to hold the templates, initialized at page load below.
+var JST = {};
+
 $(function() {
+    $('script[type="text/x-handlebars-template"]').each(function(i, element) {
+        $el = $(element);
+        JST[$el.prop('id')] = Handlebars.compile($el.html());
+    });
     $("#select_records").submit(return_selected_records);
     $('#select_records a').click(show_detail);
     $('#result_detail').modal({show: false});
