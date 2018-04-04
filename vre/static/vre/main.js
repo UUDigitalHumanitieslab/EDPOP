@@ -45,12 +45,16 @@ function show_detail(event) {
     event.preventDefault();
     var sisterCheckbox = $(this).parents('tr').find('input');
     var jsonData = sisterCheckbox.data('content');
-    var dataAsArray = _(jsonData).omit('uri').map(function(value, key) {
+    renderRecordDetail(jsonData);
+}
+
+function renderRecordDetail(attributes) {
+    var dataAsArray = _(attributes).omit('uri').map(function(value, key) {
         return {key: key, value: value};
     }).value();
     var template = JST['item-fields'];
     var target = $('#result_detail');
-    target.find('.modal-title').text(jsonData.uri);
+    target.find('.modal-title').text(attributes.uri);
     target.find('.modal-body').html(template({fields: dataAsArray}));
     $("#result_detail").modal('show');
 }
@@ -81,8 +85,13 @@ var APICollection = Backbone.Collection.extend({
     },
 });
 
+var Record = Backbone.Model.extend({
+    idAttribute: 'uri',
+});
+
 var Records = APICollection.extend({
     url: '/vre/api/records',
+    model: Record,
 });
 
 /**
@@ -109,6 +118,84 @@ var Collections = APICollection.extend({
         var myCollections = new Collections();
         myCollections.fetch({url: myCollections.url + '/mine'});
         return myCollections;
+    },
+});
+
+/**
+ * Intermediate class to enable lazy loading of templates.
+ * `JST` is uninitialized at the time of extension, so postpone fetching
+ * the template until it's needed.
+ */
+var LazyTemplateView = Backbone.View.extend({
+    template: function(context) {
+        this.template = JST[this.templateName];
+        return this.template(context);
+    },
+});
+
+var RecordListItemView = LazyTemplateView.extend({
+    tagName: 'tr',
+    templateName: 'record-list-item',
+    events: {
+        'change input': 'toggle',
+        'click a': 'display',
+    },
+    render: function() {
+        this.$el.html(this.template(this.model.attributes));
+        return this;
+    },
+    toggle: function(event) {
+        this.selected = event.target.checked;
+    },
+    display: function(event) {
+        renderRecordDetail(_.defaults(
+            {uri: this.model.get('uri')},
+            this.model.get('content'),
+        ));
+    },
+});
+
+var RecordListView = LazyTemplateView.extend({
+    tagName: 'form',
+    templateName: 'record-list',
+    events: {
+        submit: 'submitForm',
+    },
+    initialize: function(options) {
+        this.items = [];
+        this.render();
+        this.listenTo(this.collection, {
+            add: this.addItem,
+        });
+    },
+    render: function() {
+        this.$el.html(this.template({}));
+        this.$tbody = this.$('tbody');
+        this.renderItems();
+        return this;
+    },
+    renderItems: function() {
+        this.$tbody.empty();
+        this.collection.forEach(this.addItem.bind(this));
+        return this;
+    },
+    addItem: function(model, collection, options) {
+        var item = new RecordListItemView({model: model});
+        var index;
+        if (options && (index = options.index) != null && index !== this.items.length) {
+            // Insert at the front or in the middle.
+            this.items.splice(index, 0, item);
+            this.$('tr').eq(index).before(item.render().el);
+        } else {
+            // Append at the back.
+            this.items.push(item);
+            this.$tbody.append(item.render().el);
+        }
+        return this;
+    },
+    submitForm: function(event) {
+        // for now, this is a no-op
+        event.preventDefault();
     },
 });
 
