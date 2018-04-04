@@ -199,8 +199,29 @@ var RecordListView = LazyTemplateView.extend({
     },
 });
 
+var VRERouter = Backbone.Router.extend({
+    routes: {
+        ':id/': 'showCollection',
+    },
+    showCollection: function(id) {
+        // The if-condition is a bit of a hack, which can go away when we
+        // convert to client side routing entirely.
+        if ($('#select_records').length === 0) {
+            // We are not on the HPB search results page, so display the
+            // records in the current selection instead.
+            var collection = allCollections.get(id);
+            var records = collection.getRecords();
+            var recordsList = new RecordListView({collection: records});
+            recordsList.render().$el.insertAfter('#search');
+        }
+    },
+});
+
 // Global object to hold the templates, initialized at page load below.
 var JST = {};
+
+var allCollections = new Collections();
+var router = new VRERouter();
 
 $(function() {
     $('script[type="text/x-handlebars-template"]').each(function(i, element) {
@@ -210,4 +231,13 @@ $(function() {
     $("#select_records").submit(return_selected_records);
     $('#select_records a').click(show_detail);
     $('#result_detail').modal({show: false});
+    // We fetch the collections and ensure that we have them before we handle
+    // the route, because VRERouter.showCollection depends on them being
+    // available. This is something we can definitely improve upon.
+    allCollections.fetch().then(function() {
+        Backbone.history.start({
+            pushState: true,  // this enables matching the path of the URL
+            root: '/vre/',
+        });
+    });
 });
