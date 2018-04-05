@@ -52,6 +52,7 @@ def translate_sru_response_to_dict(response_content):
         datafields = {}
         for word in sorted(translationDictionary.values()):
             datafield = record.find('datafield', tag=word)
+            print(datafield)
             if datafield:
                 datafields[word] = datafield.subfield.string
             datafields['uri'] = uri.subfield.string
