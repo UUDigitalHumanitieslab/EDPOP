@@ -1,0 +1,23 @@
+{% verbatim %}
+<script type="text/x-handlebars-template" id="item-fields">
+    <table class="table table-striped">
+    {{#fields}}
+        <tr>
+            <th>{{key}}</th><td>{{value}}</td>
+        </tr>
+    {{/fields}}
+    </table>
+</script>
+
+<script type="text/x-handlebars-template" id="record-list">
+    <input type="submit" value="Add">
+    <table class="table table-striped">
+        <tbody></tbody>
+    </table>
+</script>
+
+<script type="text/x-handlebars-template" id="record-list-item">
+    <td><input type="checkbox"></td>
+    <td><a href="#">{{# content}}{{'Title Statement'}}{{/ content}}</a></td>
+</script>
+{% endverbatim %}

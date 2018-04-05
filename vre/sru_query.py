@@ -27,20 +27,22 @@ def sru_query(url_string, query_string):
     # allow passing of extra search parameters as kwargs?
     # or should this be the responsibility of the user?
     payload = {
-        'recordPacking': 'xml', 
-        'operation': 'searchRetrieve', 
+        'recordPacking': 'xml',
+        'operation': 'searchRetrieve',
         'version': '1.1',
         'maximumRecords': 15
     }
     payload['query'] = query_string
     response = requests.get(url_string, params=payload)
+    # the requests library guesses 'ISO-8859-1' but it really is 'UTF-8'
+    response.encoding = 'UTF-8'
     return response
 
 
 def translate_sru_response_to_dict(response_content):
     translationDictionary = load_translation_dictionary()
     for key, word in translationDictionary.items():
-        response_content = re.sub(r"\b{}\b".format(key), word, str(response_content))
+        response_content = re.sub(r"\b{}\b".format(key), word, response_content)
     soup = BeautifulSoup(response_content, 'lxml')
     records = soup.find_all('record')
     record_list = []

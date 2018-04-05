@@ -20,8 +20,8 @@ def index(request):
         managing_group__in=user_groups
     )
     return render(
-        request, 
-        'vre/index.html', 
+        request,
+        'vre/index.html',
         {'user_collections': set(user_collections)}
     )
 
@@ -40,7 +40,7 @@ def collection_detail(request, collection_id):
             except Exception as e:
                 print(e)
             result_list = translate_sru_response_to_dict(
-                search_result.content
+                search_result.text
             )
             results_json = [
                 json.dumps(record['datafields']) for record in result_list
@@ -48,7 +48,7 @@ def collection_detail(request, collection_id):
             combined_results = zip(result_list, results_json)
             response_dict.update({'result_list': combined_results})
             return render(
-                request, 
+                request,
                 'vre/collection_detail.html',
                 response_dict
             )
