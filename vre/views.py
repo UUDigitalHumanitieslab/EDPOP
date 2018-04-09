@@ -43,7 +43,7 @@ def collection_detail(request, collection_id):
                 search_result.text
             )
             results_json = [
-                json.dumps(record['datafields']) for record in result_list
+                json.dumps(record) for record in result_list
             ]
             combined_results = zip(result_list, results_json)
             response_dict.update({'result_list': combined_results})
@@ -58,7 +58,6 @@ def add_records_to_collection(request, collection_id):
     collection = get_object_or_404(Collection, pk=collection_id)
     selected_records = json.loads(request.body.decode())
     if selected_records:
-        print(selected_records)
         records_in_collection = [r.uri for r in collection.record_set.all()]
         for record in selected_records:
             uri = record["uri"]

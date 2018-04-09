@@ -21,13 +21,7 @@
                     <input type="checkbox" data-content="{{result_json}}">
                 </td>
                 <td>
-                    {% for field in result.selected_fields %}
-                        {% if field.primary %}
-                            <a id="field.name" href="#">{{ field.value }} </a>
-                        {% else %}
-                            {{ field.name }}: {{ field.value }}
-                        {% endif %}
-                    {%  endfor %}
+                    <a id="title" href="#"> {{ result.Title }} </a>
                 </td>
             </tr>
         {% endfor %}

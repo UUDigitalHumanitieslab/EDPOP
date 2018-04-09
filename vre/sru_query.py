@@ -1,12 +1,9 @@
 import requests
 from lxml import etree
+from operator import itemgetter
 import os
-import re
 import csv
-import json
 from bs4 import BeautifulSoup
-
-from . import hpb
 
 
 def sru_explain(url_string):
@@ -41,32 +38,32 @@ def sru_query(url_string, query_string):
 
 def translate_sru_response_to_dict(response_content):
     translationDictionary = load_translation_dictionary()
-    for key, word in translationDictionary.items():
-        response_content = re.sub(r"\b{}\b".format(key), word, response_content)
     soup = BeautifulSoup(response_content, 'lxml')
     records = soup.find_all('record')
     record_list = []
     for record in records:
-        uris = record.find_all('datafield', tag='035')
+        ids = record.find_all('datafield', tag='035')
         # for multiple fields with tag "035", select one which does not start with a bracket
         # HPB specific!!
-        uri = next((u for u in uris if not u.subfield.string.startswith("(")), None)
+        id = next((u.subfield.string for u in ids if not u.subfield.string.startswith("(")), None)
+        uri = "http://hpb.cerl.org/record/"+id
         datafields = {}
-        for word in sorted(translationDictionary.values()):
-            datafield = record.find('datafield', tag=word)
-            print(datafield)
+        for tag, description in sorted(translationDictionary.items(), key=itemgetter(1)):
+            datafield = record.find('datafield', tag=tag)
             if datafield:
-                datafields[word] = datafield.subfield.string
-            datafields['uri'] = uri.subfield.string
-        record_list.append({
-            'datafields': datafields,
-            'selected_fields': hpb.return_selected_fields(datafields)})
+                subfields = datafield.find_all('subfield')
+                if len(subfields)>1:
+                    datafields[description] = " ; ".join([sub.string for sub in subfields])
+                else:
+                    datafields[description] = datafield.subfield.string
+        datafields['uri'] = uri
+        record_list.append(datafields)
     return record_list
 
 
 def load_translation_dictionary():
     translationDictionary = {}
-    with open(os.path.abspath("M21_fields.csv")) as dictionaryFile:
+    with open(os.path.abspath("vre/M21_readable_fields.csv")) as dictionaryFile:
         reader = csv.DictReader(dictionaryFile)
         for row in reader:
             translationDictionary[row['Tag number']] = row[' Tag description'].strip()
