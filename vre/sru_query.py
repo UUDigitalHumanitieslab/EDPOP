@@ -48,7 +48,7 @@ def translate_sru_response_to_dict(response_content):
         id = next((u.subfield.string for u in ids if not u.subfield.string.startswith("(")), None)
         uri = "http://hpb.cerl.org/record/"+id
         datafields = {}
-        for tag, description in sorted(translationDictionary.items(), key=itemgetter(1)):
+        for tag, description in sorted(translationDictionary.items(), key=itemgetter(0)):
             datafield = record.find('datafield', tag=tag)
             if datafield:
                 subfields = datafield.find_all('subfield')
