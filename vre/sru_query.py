@@ -56,10 +56,9 @@ def translate_sru_response_to_dict(response_content):
             datafield = record.find('datafield', tag=word)
             if datafield:
                 datafields[word] = datafield.subfield.string
-            datafields['uri'] = uri.subfield.string
         record_list.append({
-            'datafields': datafields,
-            'selected_fields': hpb.return_selected_fields(datafields)})
+            'uri': uri.subfield.string,
+            'content': datafields})
     return record_list
 
 
