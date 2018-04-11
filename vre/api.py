@@ -2,7 +2,7 @@ from rest_framework import viewsets
 from rest_framework.decorators import list_route
 
 from .serializers import *
-from .models import Collection, Record
+from .models import *
 
 
 class ListMineMixin(object):
@@ -55,13 +55,28 @@ class ListMineMixin(object):
         return self.request.user.researchgroups.all()
 
 
+class ResearchGroupViewSet(ListMineMixin, viewsets.ReadOnlyModelViewSet):
+    serializer_class = ResearchGroupSerializer
+    queryset = ResearchGroup.objects.all()
+
+    def get_queryset_mine(self):
+        return self.get_groups()
+
+
 class CollectionViewSet(ListMineMixin, viewsets.ReadOnlyModelViewSet):
     serializer_class = CollectionSerializer
     queryset = Collection.objects.all()
     group_field = 'managing_group'
+    filter_fields = ['managing_group__id']
 
 
 class RecordViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = RecordSerializer
     queryset = Record.objects.all()
     filter_fields = ['uri', 'collection__id']
+
+
+class AnnotationViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = AnnotationSerializer
+    queryset = Annotation.objects.all()
+    filter_fields = ['record__id', 'record__uri']
