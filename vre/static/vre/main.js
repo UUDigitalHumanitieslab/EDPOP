@@ -75,10 +75,10 @@ var APICollection = Backbone.Collection.extend({
     query: function(options) {
         var url = options.url || this.url;
         var urlParts = [url, '?'];
-        if (options.filters) {
-            urlParts.push(objectAsUrlParams(options.filters));
+        if (options.params) {
+            urlParts.push(objectAsUrlParams(options.params));
         }
-        var fetchOptions = _(options).omit(['filters']).extend({
+        var fetchOptions = _(options).omit(['params']).extend({
             url: urlParts.join(''),
         }).value();
         return this.fetch(fetchOptions);
@@ -92,6 +92,10 @@ var Record = Backbone.Model.extend({
 var Records = APICollection.extend({
     url: '/vre/api/records',
     model: Record,
+});
+
+var HPBSearch = Records.extend({
+    url:'/vre/api/search'
 });
 
 /**
@@ -155,6 +159,25 @@ var RecordListItemView = LazyTemplateView.extend({
     },
 });
 
+var VRECollectionView = LazyTemplateView.extend({
+    templateName: 'select-multiple-collections',
+    initialize: function(options) {
+        this.data = allCollections.models.map(
+            d => {
+                var option = new Object();
+                option.id = d.attributes.id;
+                option.text = d.attributes.description;
+                return option;
+            }
+        );
+    },
+    render: function() {
+        this.$el.html(this.template({}));
+        this.$("#select-collections").select2({data: this.data});
+        return this;
+    }
+})
+
 var RecordListView = LazyTemplateView.extend({
     tagName: 'form',
     templateName: 'record-list',
@@ -199,6 +222,15 @@ var RecordListView = LazyTemplateView.extend({
     },
 });
 
+function submitSearch(event) {
+    event.preventDefault();
+    var searchTerm = $(event.target).find('input[name="search"]').val();
+    var results = new HPBSearch();
+    results.query({params:{search:searchTerm}});
+    var resultsView = new RecordListView({collection:results});
+    resultsView.render().$el.insertAfter('#search');
+}
+
 var VRERouter = Backbone.Router.extend({
     routes: {
         ':id/': 'showCollection',
@@ -223,6 +255,8 @@ var JST = {};
 var allCollections = new Collections();
 var router = new VRERouter();
 
+var selectCollections;
+
 $(function() {
     $('script[type="text/x-handlebars-template"]').each(function(i, element) {
         $el = $(element);
@@ -231,6 +265,7 @@ $(function() {
     $("#select_records").submit(return_selected_records);
     $('#select_records a').click(show_detail);
     $('#result_detail').modal({show: false});
+    $('#search').submit(submitSearch);
     // We fetch the collections and ensure that we have them before we handle
     // the route, because VRERouter.showCollection depends on them being
     // available. This is something we can definitely improve upon.

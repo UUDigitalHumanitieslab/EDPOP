@@ -10,6 +10,8 @@
 </script>
 
 <script type="text/x-handlebars-template" id="record-list">
+    <select name="collections" id="select-collections" multiple="multiple">
+    </select>
     <input type="submit" value="Add">
     <table class="table table-striped">
         <tbody></tbody>
@@ -20,4 +22,5 @@
     <td><input type="checkbox"></td>
     <td><a href="#">{{# content}}{{'Title Statement'}}{{/ content}}</a></td>
 </script>
+
 {% endverbatim %}
