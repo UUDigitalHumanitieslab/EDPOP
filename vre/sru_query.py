@@ -1,9 +1,10 @@
 import requests
 from lxml import etree
-from operator import itemgetter
 import os
 import csv
 from bs4 import BeautifulSoup
+
+HPB_URI = 'http://hpb.cerl.org/record/{}'
 
 
 def sru_explain(url_string):
@@ -46,9 +47,9 @@ def translate_sru_response_to_dict(response_content):
         # for multiple fields with tag "035", select one which does not start with a bracket
         # HPB specific!!
         id = next((u.subfield.string for u in ids if not u.subfield.string.startswith("(")), None)
-        uri = "http://hpb.cerl.org/record/"+id
+        uri = HPB_URI.format(id)
         datafields = {}
-        for tag, description in sorted(translationDictionary.items(), key=itemgetter(0)):
+        for tag, description in translationDictionary.items():
             datafield = record.find('datafield', tag=tag)
             if datafield:
                 subfields = datafield.find_all('subfield')
