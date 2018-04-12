@@ -85,8 +85,19 @@ var APICollection = Backbone.Collection.extend({
     },
 });
 
+var Annotations = APICollection.extend({
+    url: '/vre/api/annotations',
+});
+
 var Record = Backbone.Model.extend({
     idAttribute: 'uri',
+    getAnnotations: function() {
+        if (!this.annotations) {
+            this.annotations = new Annotations();
+            this.annotations.query({filters: {record__uri: this.id}});
+        }
+        return this.annotations;
+    },
 });
 
 var Records = APICollection.extend({
@@ -118,6 +129,19 @@ var Collections = APICollection.extend({
         var myCollections = new Collections();
         myCollections.fetch({url: myCollections.url + '/mine'});
         return myCollections;
+    },
+});
+
+var ResearchGroups = APICollection.extend({
+    url: '/vre/api/researchgroups',
+}, {
+    /**
+     * Class method for retrieving only the research groups of the user.
+     */
+    mine: function() {
+        var myResearchGroups = new ResearchGroups();
+        myResearchGroups.fetch({url: myResearchGroups.url + '/mine'});
+        return myResearchGroups;
     },
 });
 
