@@ -160,7 +160,7 @@ var RecordListItemView = LazyTemplateView.extend({
 });
 
 var VRECollectionView = LazyTemplateView.extend({
-    templateName: 'select-multiple-collections',
+    templateName: 'collection-selector',
     initialize: function(options) {
         this.data = allCollections.models.map(
             d => {
@@ -172,6 +172,7 @@ var VRECollectionView = LazyTemplateView.extend({
         );
     },
     render: function() {
+        console.log(this.data);
         this.$el.html(this.template({}));
         this.$("#select-collections").select2({data: this.data});
         return this;
@@ -227,6 +228,7 @@ function submitSearch(event) {
     var searchTerm = $(event.target).find('input[name="search"]').val();
     var results = new HPBSearch();
     results.query({params:{search:searchTerm}});
+    console.log(results);
     var resultsView = new RecordListView({collection:results});
     resultsView.render().$el.insertAfter('#search');
 }
@@ -245,6 +247,8 @@ var VRERouter = Backbone.Router.extend({
             var records = collection.getRecords();
             var recordsList = new RecordListView({collection: records});
             recordsList.render().$el.insertAfter('#search');
+            var VRECollections = new VRECollectionView({collection:Collections});
+            VRECollections.render().$el.insertAfter('#search');
         }
     },
 });
@@ -254,8 +258,6 @@ var JST = {};
 
 var allCollections = new Collections();
 var router = new VRERouter();
-
-var selectCollections;
 
 $(function() {
     $('script[type="text/x-handlebars-template"]').each(function(i, element) {
