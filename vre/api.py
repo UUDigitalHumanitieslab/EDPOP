@@ -1,4 +1,4 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, renderers
 from rest_framework.decorators import list_route
 
 from .serializers import *
@@ -53,6 +53,14 @@ class ListMineMixin(object):
     def get_groups(self):
         """ Returns the ResearchGroups the current user is a member of. """
         return self.request.user.researchgroups.all()
+
+    # We manually enforce application/json for this route, because Safari
+    # has a bug that sometimes causes it to send the wrong Accept header.
+    def perform_content_negotiation(self, request, force=False):
+        if self.action == 'mine':
+            renderer = renderers.JSONRenderer()
+            return renderer, renderer.media_type
+        return super().perform_content_negotiation(request, force)
 
 
 class ResearchGroupViewSet(ListMineMixin, viewsets.ReadOnlyModelViewSet):
