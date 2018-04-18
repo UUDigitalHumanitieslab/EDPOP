@@ -274,6 +274,18 @@ var RecordListView = LazyTemplateView.extend({
     },
 });
 
+/**
+ * Displays a single model from a FlatAnnotations collection.
+ */
+var FieldAnnotationView = LazyTemplateView.extend({
+    tagName: 'tr',
+    templateName: 'item-field-annotation',
+    render: function() {
+        this.$el.html(this.template(this.model.attributes));
+        return this;
+    },
+});
+
 var RecordDetailView = LazyTemplateView.extend({
     el: '#result_detail',
     templateName: 'item-fields',
