@@ -48,6 +48,8 @@ function show_detail(event) {
     renderRecordDetail(jsonData);
 }
 
+// This function has been obsoleted by RecordDetailView. It can be removed
+// when the server returns HPB search results in the {uri, content} format.
 function renderRecordDetail(attributes) {
     var dataAsArray = _(attributes).omit('uri').map(function(value, key) {
         return {key: key, value: value};
@@ -223,10 +225,8 @@ var RecordListItemView = LazyTemplateView.extend({
         this.selected = event.target.checked;
     },
     display: function(event) {
-        renderRecordDetail(_.defaults(
-            {uri: this.model.get('uri')},
-            this.model.get('content'),
-        ));
+        recordDetailModal.model = this.model;
+        recordDetailModal.render();
     },
 });
 
@@ -274,6 +274,25 @@ var RecordListView = LazyTemplateView.extend({
     },
 });
 
+var RecordDetailView = LazyTemplateView.extend({
+    el: '#result_detail',
+    templateName: 'item-fields',
+    initialize: function(options) {
+        this.$title = this.$('.modal-title');
+        this.$body = this.$('.modal-body');
+    },
+    render: function() {
+        var attributes = this.model.get('content');
+        var dataAsArray = _(attributes).map(function(value, key) {
+            return {key: key, value: value};
+        }).value();
+        this.$title.text(this.model.get('uri'));
+        this.$body.html(this.template({fields: dataAsArray}));
+        this.$el.modal('show');
+        return this;
+    },
+});
+
 var VRERouter = Backbone.Router.extend({
     routes: {
         ':id/': 'showCollection',
@@ -297,6 +316,7 @@ var JST = {};
 
 var allCollections = new Collections();
 var allGroups = new ResearchGroups();
+var recordDetailModal = new RecordDetailView();
 var router = new VRERouter();
 
 $(function() {
