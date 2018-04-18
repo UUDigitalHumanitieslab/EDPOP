@@ -89,6 +89,57 @@ var Annotations = APICollection.extend({
     url: '/vre/api/annotations',
 });
 
+/**
+ * This is an alternative, flat representation of the annotations for a
+ * given option.record. Its purpose is to be easier to represent and manage
+ * from a view. It proxies to a normal Annotations (see above), using event
+ * bindings to keep the two representations in sync.
+ *
+ * normal: {id, record, managing_group, content}
+ * flat alternative: {id, key, value, group}
+ *
+ * Note that we extend directly from Backbone.Collection rather than from
+ * APICollection and that we don't set a URL. This is because we only talk
+ * to the server through the underlying Annotations collection.
+ */
+// (This is a trick we could use more often.)
+var FlatAnnotations = Backbone.Collection.extend({
+    // comparator: can be set to keep this sorted
+    // How to uniquely identify a field annotation.
+    modelId: function(attributes) {
+        return attributes.key + attributes.id;
+    },
+    initialize: function(models, options) {
+        _.assign(this, _.pick(options, ['record']));
+        this.underlying = this.record.getAnnotations();
+        this.underlying.forEach(this.toFlat, this);
+        this.listenTo(this.underlying, 'add change', this.toFlat);
+        // this.listenTo(this.underlying, 'remove', TODO);
+        // this.on('add change', this.fromFlat);
+        // this.on('remove', TODO);
+    },
+    // translate the official representation to the flat one
+    toFlat: function(annotation) {
+        var id = annotation.id,
+            groupId = annotation.get('managing_group'),
+            groupName = allGroups.get(groupId).get('name'),
+            content = annotation.get('content'),
+            existing = this.underlying.filter({id: id}),
+            replacements = _.map(content, function(value, key) {
+                return {id: id, key: key, value: value, group: groupName};
+            }),
+            obsolete = _.differenceBy(existing, replacements, this.modelId);
+        // After the next two lines, this.models will be up-to-date and
+        // appropriate events will have been triggered.
+        this.remove(obsolete);
+        this.add(replacements, {merge: true});
+    },
+    // translate the flat representation to the official one
+    fromFlat: function(flatAnnotation) {
+        // TODO
+    },
+});
+
 var Record = Backbone.Model.extend({
     idAttribute: 'uri',
     getAnnotations: function() {
@@ -245,6 +296,7 @@ var VRERouter = Backbone.Router.extend({
 var JST = {};
 
 var allCollections = new Collections();
+var allGroups = new ResearchGroups();
 var router = new VRERouter();
 
 $(function() {
@@ -264,4 +316,5 @@ $(function() {
             root: '/vre/',
         });
     });
+    allGroups.fetch();
 });
