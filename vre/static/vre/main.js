@@ -165,7 +165,7 @@ var Collection = Backbone.Model.extend({
     getRecords: function() {
         if (!this.records) {
             this.records = new Records();
-            this.records.query({collection__id: this.id});
+            this.records.query({filters: {collection__id: this.id}});
         }
         return this.records;
     },
