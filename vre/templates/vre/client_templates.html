@@ -1,13 +1,17 @@
 {% verbatim %}
 <script type="text/x-handlebars-template" id="item-fields">
     <h5>Original content</h5>
-    <table class="table table-striped"><tbody>
-    {{#fields}}
-        <tr><td><u>{{key}}</u></td><td>{{value}}</td></tr>
-    {{/fields}}
-    </tbody></table>
+    <div class="well well-sm">
+        <table class="table"><tbody>
+        {{#fields}}
+            <tr><td><u>{{key}}</u></td><td>{{value}}</td></tr>
+        {{/fields}}
+        </tbody></table>
+    </div>
     <h5>Field annotations</h5>
-    <table class="table table-striped"><tbody></tbody></table>
+    <div class="well well-sm">
+        <table class="table"><tbody></tbody></table>
+    </div>
 </script>
 
 <script type="text/x-handlebars-template" id="item-field-annotation">
