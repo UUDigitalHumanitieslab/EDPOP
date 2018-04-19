@@ -225,8 +225,7 @@ var RecordListItemView = LazyTemplateView.extend({
         this.selected = event.target.checked;
     },
     display: function(event) {
-        recordDetailModal.model = this.model;
-        recordDetailModal.render();
+        recordDetailModal.setModel(this.model).render();
     },
 });
 
@@ -292,6 +291,36 @@ var RecordDetailView = LazyTemplateView.extend({
     initialize: function(options) {
         this.$title = this.$('.modal-title');
         this.$body = this.$('.modal-body');
+        this.annotationRows = [];
+    },
+    setModel: function(model) {
+        if (this.model) {
+            if (this.model === model) return this;
+            this.stopListening(this.annotations);
+            this.annotations.stopListening();
+            _.invokeMap(this.annotations.models, 'stopListening');
+            _.invokeMap(this.annotationRows, 'stopListening');
+        }
+        this.model = model;
+        this.annotations = new FlatAnnotations(null, {record: model});
+        this.annotationRows = this.annotations.map(this.createRow);
+        this.listenTo(this.annotations, 'add', this.insertRow);
+        return this;
+    },
+    createRow: function(annotation) {
+        return new FieldAnnotationView({model: annotation});
+    },
+    insertRow: function(annotation, collection, options) {
+        var row = this.createRow(annotation),
+            el = row.render().el,
+            index = collection.indexOf(annotation);
+        if (index + 1 === collection.length) {
+            this.annotationRows.push(row);
+            this.$('tbody').last().append(row.render().el);
+        } else {
+            this.annotationRows.splice(index, 0, row);
+            this.$('tbody').last().children().eq(index).before(el);
+        }
     },
     render: function() {
         var attributes = this.model.get('content');
@@ -299,8 +328,12 @@ var RecordDetailView = LazyTemplateView.extend({
             return {key: key, value: value};
         }).value();
         this.$title.text(this.model.get('uri'));
+        _.invokeMap(this.annotationRows, 'remove');
         this.$body.html(this.template({fields: dataAsArray}));
         this.$el.modal('show');
+        this.$('tbody').last().append(
+            _(this.annotationRows).invokeMap('render').map('el').value()
+        );
         return this;
     },
 });
