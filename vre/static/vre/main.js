@@ -114,7 +114,7 @@ var FlatAnnotations = Backbone.Collection.extend({
     initialize: function(models, options) {
         _.assign(this, _.pick(options, ['record']));
         this.underlying = this.record.getAnnotations();
-        this.underlying.forEach(this.toFlat, this);
+        this.underlying.forEach(this.toFlat.bind(this));
         this.listenTo(this.underlying, 'add change', this.toFlat);
         // this.listenTo(this.underlying, 'remove', TODO);
         // this.on('add change', this.fromFlat);
@@ -126,7 +126,7 @@ var FlatAnnotations = Backbone.Collection.extend({
             groupId = annotation.get('managing_group'),
             groupName = allGroups.get(groupId).get('name'),
             content = annotation.get('content'),
-            existing = this.underlying.filter({id: id}),
+            existing = this.filter({id: id}),
             replacements = _.map(content, function(value, key) {
                 return {id: id, key: key, value: value, group: groupName};
             }),
