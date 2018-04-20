@@ -6,6 +6,10 @@ function getContent(index, item) {
     return $(item).data('content');
 }
 
+function getValue(index, item) {
+    return $(item).data('value');
+}
+
 /**
  * Insert the CSRF token header into $.ajax-compatible request options.
  * Returns a new object, does not mutate the original object.
@@ -24,11 +28,11 @@ function addCSRFToken(ajaxOptions) {
 
 function return_selected_records(event) {
     event.preventDefault();
-    var selected = $(this).find("input").filter(isChecked).map(getContent).get();
+    var selected_records = $(this).find("input").filter(isChecked).map(getContent).get();
     $.ajax(addCSRFToken({
         url: 'add-selection',
         contentType:'application/json',
-        data: JSON.stringify(selected),
+        data: JSON.stringify(selected_records),
         success : function(json) {
             console.log(json); // log the returned json to the console
             console.log("success"); // another sanity check
@@ -161,6 +165,9 @@ var RecordListItemView = LazyTemplateView.extend({
 
 var VRECollectionView = LazyTemplateView.extend({
     templateName: 'collection-selector',
+    events: {
+        'change': 'select'
+    },
     initialize: function(options) {
         this.data = allCollections.models.map(
             d => {
@@ -170,20 +177,24 @@ var VRECollectionView = LazyTemplateView.extend({
                 return option;
             }
         );
+        this.render();
     },
     render: function() {
-        console.log(this.data);
         this.$el.html(this.template({}));
         this.$("#select-collections").select2({data: this.data});
         return this;
-    }
+    },
+    /*select: function(event) {
+        this.selected = event;//.target.selectedOptions;//.map( d => d.value );
+        console.log(this.selected);
+    },*/
 })
 
 var RecordListView = LazyTemplateView.extend({
     tagName: 'form',
     templateName: 'record-list',
     events: {
-        submit: 'submitForm',
+        'click #add': 'submitForm',
     },
     initialize: function(options) {
         this.items = [];
@@ -194,6 +205,8 @@ var RecordListView = LazyTemplateView.extend({
     },
     render: function() {
         this.$el.html(this.template({}));
+        this.vreCollectionsSelect = new VRECollectionView();
+        this.$el.prepend(this.vreCollectionsSelect.$el);
         this.$tbody = this.$('tbody');
         this.renderItems();
         return this;
@@ -218,8 +231,16 @@ var RecordListView = LazyTemplateView.extend({
         return this;
     },
     submitForm: function(event) {
-        // for now, this is a no-op
         event.preventDefault();
+        var selected_records = this.$tbody.find(':checked').parents('tr').map( function() {
+            return this.rowIndex;
+        }).get();
+        selected_to_api = this.collection.filter( function(d, i) { 
+            return _.includes(selected_records, i) 
+        }).map( function (d) { return d.attributes; });
+        var selected_collections = $('#select-collections').val();
+        console.log(selected_records, selected_to_api);
+        
     },
 });
 
@@ -228,7 +249,6 @@ function submitSearch(event) {
     var searchTerm = $(event.target).find('input[name="search"]').val();
     var results = new HPBSearch();
     results.query({params:{search:searchTerm}});
-    console.log(results);
     var resultsView = new RecordListView({collection:results});
     resultsView.render().$el.insertAfter('#search');
 }
@@ -247,8 +267,6 @@ var VRERouter = Backbone.Router.extend({
             var records = collection.getRecords();
             var recordsList = new RecordListView({collection: records});
             recordsList.render().$el.insertAfter('#search');
-            var VRECollections = new VRECollectionView({collection:Collections});
-            VRECollections.render().$el.insertAfter('#search');
         }
     },
 });

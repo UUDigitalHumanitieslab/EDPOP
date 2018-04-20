@@ -10,9 +10,12 @@
 </script>
 
 <script type="text/x-handlebars-template" id="record-list">
-    <table class="table table-striped">
-        <tbody></tbody>
-    </table>
+    <form id="select_records">
+        <button class="btn btn-primary" type="submit" id="add">Add</button>
+        <table class="table table-striped">
+            <tbody></tbody>
+        </table>
+    </form>
 </script>
 
 <script type="text/x-handlebars-template" id="record-list-item">
@@ -23,8 +26,6 @@
 <script type="text/x-handlebars-template" id="collection-selector">
     <select name="collections" id="select-collections" multiple="multiple" style="width: 50%">
     </select>
-    <br>
-    <button class="btn btn-primary" type="submit" id="Add">Add</button>
 </script>
 
 {% endverbatim %}

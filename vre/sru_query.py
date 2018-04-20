@@ -53,12 +53,13 @@ def translate_sru_response_to_dict(response_content):
                     datafields[description] = datafield.subfield.string
         datafields['uri'] = uri
         record_list.append(datafields)
+        print(record_list)
     return record_list
 
 
 def load_translation_dictionary():
     translationDictionary = {}
-    with open(os.path.abspath("vre/M21_readable_fields.csv")) as dictionaryFile:
+    with open(os.path.abspath("vre/M21_fields.csv")) as dictionaryFile:
         reader = csv.DictReader(dictionaryFile)
         for row in reader:
             translationDictionary[row['Tag number']] = row[' Tag description'].strip()
