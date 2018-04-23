@@ -397,7 +397,6 @@ var RecordDetailView = LazyTemplateView.extend({
         return this;
     },
 });
->>>>>>> develop
 
 var VRERouter = Backbone.Router.extend({
     routes: {
