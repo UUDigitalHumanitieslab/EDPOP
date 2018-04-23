@@ -1,12 +1,21 @@
 {% verbatim %}
 <script type="text/x-handlebars-template" id="item-fields">
-    <table class="table table-striped">
-    {{#fields}}
-        <tr>
-            <th>{{key}}</th><td>{{value}}</td>
-        </tr>
-    {{/fields}}
-    </table>
+    <h5>Original content</h5>
+    <div class="well well-sm">
+        <table class="table"><tbody>
+        {{#fields}}
+            <tr><td><u>{{key}}</u></td><td>{{value}}</td></tr>
+        {{/fields}}
+        </tbody></table>
+    </div>
+    <h5>Field annotations</h5>
+    <div class="well well-sm">
+        <table class="table"><tbody></tbody></table>
+    </div>
+</script>
+
+<script type="text/x-handlebars-template" id="item-field-annotation">
+    <td><u>{{key}}</u></td><td>{{value}}</td><td>{{group}}</td>
 </script>
 
 <script type="text/x-handlebars-template" id="record-list">
@@ -20,7 +29,7 @@
 
 <script type="text/x-handlebars-template" id="record-list-item">
     <td><input type="checkbox"></td>
-    <td><a href="#">{{# content}}{{'Title Statement'}}{{/ content}}</a></td>
+    <td><a href="#">{{# content}}{{Title}}{{/ content}}</a></td>
 </script>
 
 <script type="text/x-handlebars-template" id="collection-selector">
