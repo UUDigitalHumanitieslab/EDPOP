@@ -54,26 +54,30 @@ def collection_detail(request, collection_id):
             )
 
 
-def add_records_to_collection(request, collection_id):
-    collection = get_object_or_404(Collection, pk=collection_id)
-    selected_records = json.loads(request.body.decode())
-    if selected_records:
-        print(selected_records)
-        records_in_collection = [r.uri for r in collection.record_set.all()]
-        for record in selected_records:
+def add_records_to_collections(request, collection_id):
+    records_and_collections = json.loads(request.body.decode())
+    collections = records_and_collections['collections']
+    if not collections:
+        return JsonResponse({'error': 'cannot create records without collection id!'}, status=400)
+    records = records_and_collections['records']
+    if not records:
+        return JsonResponse({'error': 'no records selected!'}, status=400)
+    for collection_id in collections:
+        collection = get_object_or_404(Collection, pk=collection_id)
+        for record in records:
+            records_in_collection = [r.uri for r in collection.record_set.all()]
+            print(record)
             uri = record["uri"]
             if not uri in records_in_collection:
-                del record["uri"]
                 new_record = Record(
                     uri=uri,
-                    content=record,
+                    content=record.content,
                     annotation=''
                 )
                 new_record.save()
                 new_record.collection.add(collection)
-        return JsonResponse({'success': 'records added!'})
-    else:
-        return JsonResponse({'error': 'no records selected!'}, status=400)
+    # to do: give a response of which records have been added to which collections
+    return JsonResponse({'success': 'records added!'})
 
 
 def item_detail(request, result):
