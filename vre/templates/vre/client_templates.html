@@ -1,24 +1,15 @@
 {% verbatim %}
-<script type="text/x-handlebars-template" id="item-fields">
-    <h5>Original content</h5>
-    <div class="well well-sm">
-        <table class="table"><tbody>
-        {{#fields}}
-            <tr><td><u>{{key}}</u></td><td>{{value}}</td></tr>
-        {{/fields}}
-        </tbody></table>
-    </div>
-</script>
-
-<script type="text/x-handlebars-template" id="item-fields-annotations">
-    <h5>Field annotations</h5>
+<script type="text/x-handlebars-template" id="field-list">
+    <h5>{{title}}</h5>
     <div class="well well-sm">
         <table class="table"><tbody></tbody></table>
     </div>
 </script>
 
-<script type="text/x-handlebars-template" id="item-field-annotation">
-    <td><u>{{key}}</u></td><td>{{value}}</td><td>{{group}}</td>
+<script type="text/x-handlebars-template" id="field-list-item">
+    <td><u>{{key}}</u></td>
+    <td>{{value}}</td>
+    {{#group}}<td>{{group}}</td>{{/group}}
 </script>
 
 <script type="text/x-handlebars-template" id="record-list">

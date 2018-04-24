@@ -87,24 +87,54 @@ var APICollection = Backbone.Collection.extend({
     },
 });
 
+// A single field of a single record.
+var Field = Backbone.Model.extend({
+    idAttribute: 'key',
+});
+
+/**
+ * This is an alternative, flat representation of the fields in a given
+ * option.record. Its purpose is to be easier to represent and manage from
+ * a view.
+ *
+ * normal: {id, uri, content}
+ * flat alternative: [{id, key, value}]
+ *
+ * Note that we extend directly from Backbone.Collection rather than from
+ * APICollection and that we don't set a URL. This is because we only talk
+ * to the server through the underlying Record model.
+ */
+var FlatFields = Backbone.Collection.extend({
+    model: Field,
+    initialize: function(models, options) {
+        _.assign(this, _.pick(options, ['record']));
+        if (this.record.has('content')) this.set(this.toFlat(this.record));
+        // Do the above line again when the record changes.
+        this.listenTo(this.record, 'change', _.flow([this.toFlat, this.set]));
+    },
+    toFlat: function(record) {
+        var id = record.id;
+        return _.map(record.get('content'), function(value, key) {
+            return {id: id, key: key, value: value};
+        });
+    },
+});
+
 var Annotations = APICollection.extend({
     url: '/vre/api/annotations',
 });
 
 /**
  * This is an alternative, flat representation of the annotations for a
- * given option.record. Its purpose is to be easier to represent and manage
- * from a view. It proxies to a normal Annotations (see above), using event
- * bindings to keep the two representations in sync.
+ * given option.record, similar to FlatFields. It proxies to a normal
+ * Annotations (see above), using event bindings to keep the two
+ * representations in sync. This requires some additional sophistication
+ * compared to FlatFields, because annotations allow editing and because
+ * there may be multiple underlying annotation objects.
  *
  * normal: {id, record, managing_group, content}
- * flat alternative: {id, key, value, group}
- *
- * Note that we extend directly from Backbone.Collection rather than from
- * APICollection and that we don't set a URL. This is because we only talk
- * to the server through the underlying Annotations collection.
+ * flat alternative: [{id, key, value, group}]
  */
-// (This is a trick we could use more often.)
 var FlatAnnotations = Backbone.Collection.extend({
     // comparator: can be set to keep this sorted
     // How to uniquely identify a field annotation.
@@ -274,31 +304,31 @@ var RecordListView = LazyTemplateView.extend({
 });
 
 /**
- * Displays a single model from a FlatAnnotations collection.
+ * Displays a single model from a FlatFields or FlatAnnotations collection.
  */
-var FieldAnnotationView = LazyTemplateView.extend({
+var FieldView = LazyTemplateView.extend({
     tagName: 'tr',
-    templateName: 'item-field-annotation',
+    templateName: 'field-list-item',
     render: function() {
         this.$el.html(this.template(this.model.attributes));
         return this;
     },
 });
 
-var RecordAnnotationsView = LazyTemplateView.extend({
-    templateName: 'item-fields-annotations',
+var RecordFieldsBaseView = LazyTemplateView.extend({
+    templateName: 'field-list',
     initialize: function(options) {
         this.rows = this.collection.map(this.createRow);
         this.listenTo(this.collection, 'add', this.insertRow);
     },
-    createRow: function(annotation) {
-        return new FieldAnnotationView({model: annotation});
+    createRow: function(model) {
+        return new FieldView({model: model});
     },
-    insertRow: function(annotation, collection, options) {
-        var row = this.createRow(annotation),
+    insertRow: function(model, collection, options) {
+        var row = this.createRow(model),
             rows = this.rows,
             el = row.render().el,
-            index = collection.indexOf(annotation);
+            index = collection.indexOf(model);
         if (index >= rows.length) {
             rows.push(row);
             this.$tbody.append(el);
@@ -308,16 +338,23 @@ var RecordAnnotationsView = LazyTemplateView.extend({
         }
     },
     render: function() {
-        this.$el.html(this.template({}));
+        this.$el.html(this.template({title: this.title}));
         this.$tbody = this.$('tbody');
         this.$tbody.append(_(this.rows).invokeMap('render').map('el').value());
         return this;
     },
 });
 
+var RecordFieldsView = RecordFieldsBaseView.extend({
+    title: 'Original content',
+});
+
+var RecordAnnotationsView = RecordFieldsBaseView.extend({
+    title: 'Annotations',
+});
+
 var RecordDetailView = LazyTemplateView.extend({
     el: '#result_detail',
-    templateName: 'item-fields',
     initialize: function(options) {
         this.$title = this.$('.modal-title');
         this.$body = this.$('.modal-body');
@@ -326,21 +363,21 @@ var RecordDetailView = LazyTemplateView.extend({
         if (this.model) {
             if (this.model === model) return this;
             this.annotationsView.remove();
+            this.fieldsView.remove();
         }
         this.model = model;
+        this.fieldsView = new RecordFieldsView({
+            collection: new FlatFields(null, {record: model}),
+        });
         this.annotationsView = new RecordAnnotationsView({
             collection: new FlatAnnotations(null, {record: model}),
         });
         return this;
     },
     render: function() {
-        var attributes = this.model.get('content');
-        var dataAsArray = _(attributes).map(function(value, key) {
-            return {key: key, value: value};
-        }).value();
         this.$title.text(this.model.get('uri'));
-        this.$body.html(this.template({fields: dataAsArray}));
         this.$el.modal('show');
+        this.fieldsView.render().$el.appendTo(this.$body);
         this.annotationsView.render().$el.appendTo(this.$body);
         return this;
     },
