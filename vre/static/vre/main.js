@@ -285,43 +285,53 @@ var FieldAnnotationView = LazyTemplateView.extend({
     },
 });
 
-var RecordDetailView = LazyTemplateView.extend({
-    el: '#result_detail',
-    templateName: 'item-fields',
+var RecordAnnotationsView = LazyTemplateView.extend({
+    templateName: 'item-fields-annotations',
     initialize: function(options) {
-        this.$title = this.$('.modal-title');
-        this.$body = this.$('.modal-body');
-        this.annotationRows = [];
-    },
-    setModel: function(model) {
-        if (this.model) {
-            if (this.model === model) return this;
-            this.stopListening(this.annotations);
-            this.annotations.stopListening();
-            _.invokeMap(this.annotations.models, 'stopListening');
-            _.invokeMap(this.annotationRows, 'stopListening');
-        }
-        this.model = model;
-        this.annotations = new FlatAnnotations(null, {record: model});
-        this.annotationRows = this.annotations.map(this.createRow);
-        this.listenTo(this.annotations, 'add', this.insertRow);
-        return this;
+        this.rows = this.collection.map(this.createRow);
+        this.listenTo(this.collection, 'add', this.insertRow);
     },
     createRow: function(annotation) {
         return new FieldAnnotationView({model: annotation});
     },
     insertRow: function(annotation, collection, options) {
         var row = this.createRow(annotation),
-            rows = this.annotationRows,
+            rows = this.rows,
             el = row.render().el,
             index = collection.indexOf(annotation);
         if (index >= rows.length) {
             rows.push(row);
-            this.$('tbody').last().append(row.render().el);
+            this.$tbody.append(el);
         } else {
             rows.splice(index, 0, row);
-            this.$('tbody').last().children().eq(index).before(el);
+            this.$tbody.children().eq(index).before(el);
         }
+    },
+    render: function() {
+        this.$el.html(this.template({}));
+        this.$tbody = this.$('tbody');
+        this.$tbody.append(_(this.rows).invokeMap('render').map('el').value());
+        return this;
+    },
+});
+
+var RecordDetailView = LazyTemplateView.extend({
+    el: '#result_detail',
+    templateName: 'item-fields',
+    initialize: function(options) {
+        this.$title = this.$('.modal-title');
+        this.$body = this.$('.modal-body');
+    },
+    setModel: function(model) {
+        if (this.model) {
+            if (this.model === model) return this;
+            this.annotationsView.remove();
+        }
+        this.model = model;
+        this.annotationsView = new RecordAnnotationsView({
+            collection: new FlatAnnotations(null, {record: model}),
+        });
+        return this;
     },
     render: function() {
         var attributes = this.model.get('content');
@@ -329,12 +339,9 @@ var RecordDetailView = LazyTemplateView.extend({
             return {key: key, value: value};
         }).value();
         this.$title.text(this.model.get('uri'));
-        _.invokeMap(this.annotationRows, 'remove');
         this.$body.html(this.template({fields: dataAsArray}));
         this.$el.modal('show');
-        this.$('tbody').last().append(
-            _(this.annotationRows).invokeMap('render').map('el').value()
-        );
+        this.annotationsView.render().$el.appendTo(this.$body);
         return this;
     },
 });
