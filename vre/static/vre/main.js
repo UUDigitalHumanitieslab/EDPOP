@@ -312,13 +312,14 @@ var RecordDetailView = LazyTemplateView.extend({
     },
     insertRow: function(annotation, collection, options) {
         var row = this.createRow(annotation),
+            rows = this.annotationRows,
             el = row.render().el,
             index = collection.indexOf(annotation);
-        if (index + 1 === collection.length) {
-            this.annotationRows.push(row);
+        if (index >= rows.length) {
+            rows.push(row);
             this.$('tbody').last().append(row.render().el);
         } else {
-            this.annotationRows.splice(index, 0, row);
+            rows.splice(index, 0, row);
             this.$('tbody').last().children().eq(index).before(el);
         }
     },
