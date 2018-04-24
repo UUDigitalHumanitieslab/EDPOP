@@ -6,7 +6,7 @@ from django.contrib.postgres.fields import JSONField
 
 
 class ResearchGroup(models.Model):
-    """ Research group with a given name and project; 
+    """ Research group with a given name and project;
     Users can be part of multiple research groups,
     research groups have multiple users.
     """
@@ -40,12 +40,15 @@ class Collection(models.Model):
 
 
 class Record(models.Model):
-    """ an item in one or several collections in the 
+    """ an item in one or several collections in the
     Virtual Research Environment.
     """
     uri = models.CharField(max_length=200)
     collection = models.ManyToManyField(Collection)
     content = JSONField(default='VRE Record')
+
+    def __str__(self):
+        return self.uri
 
 
 '''
@@ -59,10 +62,13 @@ class AnnotationAdmin(admin.modelAdmin):
 class Annotation(models.Model):
     """ Import the fields of a given record, and stores annotations to its fields,
     as well as extra information.
-    An annotation is related to exactly one record. 
+    An annotation is related to exactly one record.
     One record can have multiple annotations.
     An annotation is also linked to exactly one research group,
     but multiple groups can add annotations."""
     record = models.ForeignKey(Record)
     managing_group = models.ForeignKey(ResearchGroup)
     content = JSONField(default='VRE Annotation')
+
+    def __str__(self):
+        return '{} ({})'.format(self.record.uri, self.managing_group.name)
