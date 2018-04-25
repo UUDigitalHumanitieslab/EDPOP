@@ -528,7 +528,7 @@ var router = new VRERouter();
 $(function() {
     $('script[type="text/x-handlebars-template"]').each(function(i, element) {
         $el = $(element);
-        JST[$el.prop('id')] = Handlebars.compile($el.html());
+        JST[$el.prop('id')] = Handlebars.compile($el.html(), {compat: true});
     });
     $("#select_records").submit(return_selected_records);
     $('#select_records a').click(show_detail);
