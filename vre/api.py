@@ -95,14 +95,20 @@ class HPBViewSet(ViewSetMixin, APIView):
     def list(self, request, format=None):
         url_string = HPB_SRU_URL
         searchterm = request.query_params.get('search')
+        print(request.query_params)
+        if 'startRecord' in request.query_params:
+            startRecord = request.query_params.get('startRecord')
+        else:
+            startRecord = 1
         if searchterm:
             try:
-                search_result = sru_query(url_string, searchterm)
+                search_result = sru_query(url_string, searchterm, startRecord=startRecord)
             except Exception as e:
                 print(e)
             result_list = translate_sru_response_to_dict(
                 search_result.text
             )
+            print(result_list)
             return Response(result_list)
         else: 
             return Response({}) # to do: return http response code

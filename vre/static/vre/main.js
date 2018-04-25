@@ -46,6 +46,28 @@ function return_selected_records(event) {
     }));
 }
 
+function submitSearch(event) {
+    event.preventDefault();
+    var searchTerm = $(event.target).find('input[name="search"]').val();
+    results.query({params:{search:searchTerm}});
+    recordsList.remove()
+    recordsList = new RecordListView({collection: results});
+    recordsList.render().$el.insertAfter('#search');
+}
+
+function retrieveMoreRecords(event) {
+    event.preventDefault();
+    var searchTerm = $('input[name="search"]').val();
+    var noCurrentRecords = $.find('tr').length+1;
+    var newResults = new HPBSearch();
+    newResults.query({params:{search:searchTerm, startRecord:noCurrentRecords}}).then(
+        function () {
+            results.add(newResults.models)
+    });
+    console.log(results);
+    //recordsList.renderItems();
+}
+
 function show_detail(event) {
     event.preventDefault();
     var sisterCheckbox = $(this).parents('tr').find('input');
@@ -266,7 +288,7 @@ var RecordListView = LazyTemplateView.extend({
     },
     initialize: function(options) {
         this.items = [];
-        this.render();
+        //this.render();
         this.listenTo(this.collection, {
             add: this.addItem,
         });
@@ -324,15 +346,6 @@ var RecordListView = LazyTemplateView.extend({
     }));
     },
 });
-
-function submitSearch(event) {
-    event.preventDefault();
-    var searchTerm = $(event.target).find('input[name="search"]').val();
-    var results = new HPBSearch();
-    results.query({params:{search:searchTerm}});
-    var resultsView = new RecordListView({collection: results});
-    resultsView.render().$el.insertAfter('#search');
-}
 
 /**
  * Displays a single model from a FlatAnnotations collection.
@@ -439,7 +452,8 @@ var VRERouter = Backbone.Router.extend({
             // records in the current selection instead.
             var collection = allCollections.get(id);
             var records = collection.getRecords();
-            var recordsList = new RecordListView({collection: records});
+            recordsList.remove();
+            recordsList = new RecordListView({collection: records});
             recordsList.render().$el.insertAfter('#search');
         }
     },
@@ -450,17 +464,20 @@ var JST = {};
 var allCollections = new VRECollections();
 var allGroups = new ResearchGroups();
 var recordDetailModal = new RecordDetailView();
+var recordsList = new RecordListView();
 var router = new VRERouter();
+var results = new HPBSearch();
 
 $(function() {
     $('script[type="text/x-handlebars-template"]').each(function(i, element) {
         $el = $(element);
         JST[$el.prop('id')] = Handlebars.compile($el.html());
     });
-    $("#select_records").submit(return_selected_records);
+    //$("#select_records").submit(return_selected_records);
     $('#select_records a').click(show_detail);
     $('#result_detail').modal({show: false});
     $('#search').submit(submitSearch);
+    $('#more_records').click(retrieveMoreRecords);
     // We fetch the collections and ensure that we have them before we handle
     // the route, because VRERouter.showCollection depends on them being
     // available. This is something we can definitely improve upon.
