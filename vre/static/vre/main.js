@@ -366,6 +366,7 @@ var RecordDetailView = LazyTemplateView.extend({
     templateName: 'item-fields',
     events: {
         'click #add': 'submitForm',
+        "click #load_next": "loadNext",
     },
     initialize: function(options) {
         this.$title = this.$('.modal-title');
@@ -440,6 +441,9 @@ var RecordDetailView = LazyTemplateView.extend({
             method: 'POST'
     }));
     },
+    loadNext: function() {
+        console.log("clicked!");
+    }
 });
 
 var VRERouter = Backbone.Router.extend({
