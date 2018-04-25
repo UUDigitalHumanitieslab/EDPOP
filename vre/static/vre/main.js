@@ -1,3 +1,4 @@
+
 function isChecked(index, item) {
     return item.checked;
 }
@@ -348,9 +349,13 @@ var FieldAnnotationView = LazyTemplateView.extend({
 var RecordDetailView = LazyTemplateView.extend({
     el: '#result_detail',
     templateName: 'item-fields',
+    events: {
+        'click #add': 'submitForm',
+    },
     initialize: function(options) {
         this.$title = this.$('.modal-title');
         this.$body = this.$('.modal-body');
+        this.$footer = this.$('.modal-footer');
         this.annotationRows = [];
     },
     setModel: function(model) {
@@ -394,7 +399,31 @@ var RecordDetailView = LazyTemplateView.extend({
         this.$('tbody').last().append(
             _(this.annotationRows).invokeMap('render').map('el').value()
         );
+        this.vreCollectionsSelect = new VRECollectionView();
+        this.$footer = this.$('.modal-footer');
+        this.$footer.prepend(this.vreCollectionsSelect.$el);
         return this;
+    },
+    submitForm: function(event) {
+        event.preventDefault();
+        var selected_collections = this.vreCollectionsSelect.$el.find('#select-collections').val();
+        var selected_record = [];
+        selected_record.push(this.model); //wrap object in an array for compatibility with backend
+        var records_and_collections = {'records': selected_record, 'collections': selected_collections}
+        $.ajax(addCSRFToken({
+            url: 'add-selection',
+            contentType:'application/json',
+            data: JSON.stringify(records_and_collections),
+            success : function(json) {
+                console.log(json); // log the returned json to the console
+                console.log("success"); // another sanity check
+            },
+            // handle a non-successful response
+            error : function(xhr,errmsg,err) {
+                console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+            },
+            method: 'POST'
+    }));
     },
 });
 
@@ -418,8 +447,7 @@ var VRERouter = Backbone.Router.extend({
 
 // Global object to hold the templates, initialized at page load below.
 var JST = {};
-
-var allCollections = new Collections();
+var allCollections = new VRECollections();
 var allGroups = new ResearchGroups();
 var recordDetailModal = new RecordDetailView();
 var router = new VRERouter();

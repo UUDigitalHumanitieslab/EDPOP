@@ -45,8 +45,7 @@ def collection_detail(request, collection_id):
             results_json = [
                 json.dumps(record) for record in result_list
             ]
-            combined_results = zip(result_list, results_json)
-            response_dict.update({'result_list': combined_results})
+            response_dict.update({'result_list': results_json})
             return render(
                 request,
                 'vre/collection_detail.html',
@@ -54,7 +53,6 @@ def collection_detail(request, collection_id):
             )
 
 
-<<<<<<< HEAD
 def add_records_to_collections(request, collection_id):
     records_and_collections = json.loads(request.body.decode())
     collections = records_and_collections['collections']
@@ -68,20 +66,12 @@ def add_records_to_collections(request, collection_id):
         for record in records:
             records_in_collection = [r.uri for r in collection.record_set.all()]
             print(record)
-=======
-def add_records_to_collection(request, collection_id):
-    collection = get_object_or_404(Collection, pk=collection_id)
-    selected_records = json.loads(request.body.decode())
-    if selected_records:
-        records_in_collection = [r.uri for r in collection.record_set.all()]
-        for record in selected_records:
->>>>>>> develop
             uri = record["uri"]
             if not uri in records_in_collection:
                 new_record = Record(
                     uri=uri,
-                    content=record.content,
-                    annotation=''
+                    content=record['content'],
+                    annotation='' # to do: link actual annotations to records here
                 )
                 new_record.save()
                 new_record.collection.add(collection)

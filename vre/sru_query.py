@@ -37,6 +37,7 @@ def translate_sru_response_to_dict(response_content):
     records = soup.find_all('record')
     record_list = []
     for record in records:
+        result = {}
         ids = record.find_all('datafield', tag='035')
         # for multiple fields with tag "035", select one which does not start with a bracket
         # HPB specific!!
@@ -51,8 +52,9 @@ def translate_sru_response_to_dict(response_content):
                     datafields[description] = " ; ".join([sub.string for sub in subfields])
                 else:
                     datafields[description] = datafield.subfield.string
-        datafields['uri'] = uri
-        record_list.append(datafields)
+        result['uri'] = uri
+        result['content'] = datafields
+        record_list.append(result)
     return record_list
 
 
