@@ -12,6 +12,29 @@
     {{#group}}<td>{{group}}</td>{{/group}}
 </script>
 
+<script type="text/x-handlebars-template" id="field-list-item-edit">
+    <td><input
+        type=text
+        name=key
+        form=form-{{cid}}
+        class=form-control
+        placeholder="Field"
+        title="Field annotation name"
+    ></td>
+    <td><input
+        type=text
+        name=value
+        form=form-{{cid}}
+        class=form-control
+        placeholder="Value"
+        title="Field annotation value"
+    ></td>
+    <td><form id=form-{{cid}}>
+        <button type=reset class="btn btn-default">Cancel</button>
+        <button type=submit class="btn btn-primary">Save</button>
+    </form></td>
+</script>
+
 <script type="text/x-handlebars-template" id="record-list">
     <input type="submit" value="Add">
     <table class="table table-striped">

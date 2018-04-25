@@ -309,20 +309,54 @@ var RecordListView = LazyTemplateView.extend({
 var FieldView = LazyTemplateView.extend({
     tagName: 'tr',
     templateName: 'field-list-item',
+    events: {
+        'click': 'edit',
+    },
     render: function() {
         this.$el.html(this.template(this.model.attributes));
         return this;
+    },
+    edit: function(event) {
+        this.trigger('edit', this.model);
+    },
+});
+
+var AnnotationEditView = LazyTemplateView.extend({
+    tagName: 'tr',
+    className: 'form-inline',
+    templateName: 'field-list-item-edit',
+    events: {
+        'submit': 'submit',
+        'reset': 'reset',
+    },
+    render: function() {
+        this.$el.html(this.template(this));
+        var model = this.model;
+        this.$('input').val(function(index, oldValue) {
+            return model.get(this.name);
+        }).last().focus();  // TODO: focus doesn't work yet
+        return this;
+    },
+    submit: function(event) {
+        event.preventDefault();
+        // TODO
+    },
+    reset: function(event) {
+        event.preventDefault();
+        // TODO
     },
 });
 
 var RecordFieldsBaseView = LazyTemplateView.extend({
     templateName: 'field-list',
     initialize: function(options) {
-        this.rows = this.collection.map(this.createRow);
+        this.rows = this.collection.map(this.createRow.bind(this));
         this.listenTo(this.collection, 'add', this.insertRow);
     },
     createRow: function(model) {
-        return new FieldView({model: model});
+        var row = new FieldView({model: model});
+        row.on('edit', this.edit, this);
+        return row;
     },
     insertRow: function(model, collection, options) {
         var row = this.createRow(model),
@@ -347,10 +381,34 @@ var RecordFieldsBaseView = LazyTemplateView.extend({
 
 var RecordFieldsView = RecordFieldsBaseView.extend({
     title: 'Original content',
+    edit: function(model) {
+        this.trigger('edit', model);
+    },
 });
 
 var RecordAnnotationsView = RecordFieldsBaseView.extend({
     title: 'Annotations',
+    edit: function(model) {
+        var group = groupMenu.model.get('name'),
+            preExisting = this.collection.findWhere({
+                key: model.get('key'),
+                group: group,
+            }),
+            newRow;
+        if (preExisting) {
+            var index = this.collection.indexOf(preExisting),
+                oldRow = this.rows[index];
+            newRow = new AnnotationEditView({model: preExisting});
+            this.rows.splice(index, 1, newRow);
+            oldRow.$el.before(newRow.render().el);
+            oldRow.remove();
+        } else {
+            var editTarget = model.clone().set('group', group);
+            newRow = new AnnotationEditView({model: editTarget});
+            this.rows.push(newRow);
+            this.$tbody.append(newRow.render().el);
+        }
+    },
 });
 
 var RecordDetailView = LazyTemplateView.extend({
@@ -362,8 +420,8 @@ var RecordDetailView = LazyTemplateView.extend({
     setModel: function(model) {
         if (this.model) {
             if (this.model === model) return this;
-            this.annotationsView.remove();
-            this.fieldsView.remove();
+            this.annotationsView.remove().off();
+            this.fieldsView.remove().off();
         }
         this.model = model;
         this.fieldsView = new RecordFieldsView({
@@ -372,6 +430,7 @@ var RecordDetailView = LazyTemplateView.extend({
         this.annotationsView = new RecordAnnotationsView({
             collection: new FlatAnnotations(null, {record: model}),
         });
+        this.annotationsView.listenTo(this.fieldsView, 'edit', this.annotationsView.edit);
         return this;
     },
     render: function() {
