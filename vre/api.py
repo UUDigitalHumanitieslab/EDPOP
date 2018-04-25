@@ -108,7 +108,6 @@ class HPBViewSet(ViewSetMixin, APIView):
             result_list = translate_sru_response_to_dict(
                 search_result.text
             )
-            print(result_list)
             return Response(result_list)
         else: 
             return Response({}) # to do: return http response code

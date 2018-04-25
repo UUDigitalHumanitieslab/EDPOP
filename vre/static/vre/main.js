@@ -49,7 +49,9 @@ function return_selected_records(event) {
 function submitSearch(event) {
     event.preventDefault();
     var searchTerm = $(event.target).find('input[name="search"]').val();
-    results.query({params:{search:searchTerm}});
+    results.query({params:{search:searchTerm}}).then( function () {
+        $('#more_records').show();
+    });
     recordsList.remove()
     recordsList = new RecordListView({collection: results});
     recordsList.render().$el.insertAfter('#search');
@@ -57,15 +59,15 @@ function submitSearch(event) {
 
 function retrieveMoreRecords(event) {
     event.preventDefault();
+    $('#more_records').hide();
     var searchTerm = $('input[name="search"]').val();
     var noCurrentRecords = $.find('tr').length+1;
     var newResults = new HPBSearch();
     newResults.query({params:{search:searchTerm, startRecord:noCurrentRecords}}).then(
         function () {
-            results.add(newResults.models)
+            results.add(newResults.models);
+            $('#more_records').show();
     });
-    console.log(results);
-    //recordsList.renderItems();
 }
 
 function show_detail(event) {
