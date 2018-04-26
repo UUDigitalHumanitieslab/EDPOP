@@ -73,13 +73,11 @@ def add_records_to_collections(request, collection_id):
                 new_record = Record(
                     uri=uri,
                     content=record['content'],
-                    annotation='' # to do: link actual annotations to records here
                 )
                 record_counter += 1
                 new_record.save()
                 new_record.collection.add(collection)
         response_dict[collection.description] = record_counter
-    # to do: give a response of which records have been added to which collections
     return JsonResponse(response_dict)
 
 
