@@ -329,6 +329,9 @@ var AnnotationEditView = LazyTemplateView.extend({
         'submit': 'submit',
         'reset': 'reset',
     },
+    initialize: function(options) {
+        _.assign(this, _.pick(options, ['existing']));
+    },
     render: function() {
         this.$el.html(this.template(this));
         var model = this.model;
@@ -396,7 +399,10 @@ var RecordAnnotationsView = RecordFieldsBaseView.extend({
         if (preExisting) {
             var index = this.collection.indexOf(preExisting),
                 oldRow = this.rows[index];
-            newRow = new AnnotationEditView({model: preExisting});
+            newRow = new AnnotationEditView({
+                model: preExisting,
+                existing: true,
+            });
             this.rows.splice(index, 1, newRow);
             oldRow.$el.before(newRow.render().el);
             oldRow.remove();
