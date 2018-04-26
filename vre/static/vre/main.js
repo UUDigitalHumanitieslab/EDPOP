@@ -346,7 +346,7 @@ var AnnotationEditView = LazyTemplateView.extend({
     },
     reset: function(event) {
         event.preventDefault();
-        // TODO
+        this.trigger('cancel', this);
     },
 });
 
@@ -411,6 +411,16 @@ var RecordAnnotationsView = RecordFieldsBaseView.extend({
             this.rows.push(newRow);
             this.$tbody.append(newRow.render().el);
         }
+        newRow.on({cancel: this.cancel}, this);
+    },
+    cancel: function(editRow) {
+        var staticRow, index = _.indexOf(this.rows, editRow);
+        if (editRow.existing) {
+            staticRow = this.createRow(editRow.model);
+            editRow.$el.after(staticRow.render().el);
+        }
+        editRow.remove();
+        this.rows.splice(index, 1, staticRow);
     },
 });
 
