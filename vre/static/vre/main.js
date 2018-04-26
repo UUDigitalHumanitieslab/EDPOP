@@ -366,7 +366,8 @@ var RecordDetailView = LazyTemplateView.extend({
     templateName: 'item-fields',
     events: {
         'click #add': 'submitForm',
-        "click #load_next": "loadNext",
+        'click #load_next': 'load',
+        'click #load_previous': 'load',
     },
     initialize: function(options) {
         this.$title = this.$('.modal-title');
@@ -415,9 +416,10 @@ var RecordDetailView = LazyTemplateView.extend({
         this.$('tbody').last().append(
             _(this.annotationRows).invokeMap('render').map('el').value()
         );
-        this.vreCollectionsSelect = new VRECollectionView();
-        this.$footer = this.$('.modal-footer');
-        this.$footer.prepend(this.vreCollectionsSelect.$el);
+        if (!this.vreCollectionsSelect) {
+            this.vreCollectionsSelect = new VRECollectionView();
+            this.$footer.prepend(this.vreCollectionsSelect.$el);
+        }
         return this;
     },
     submitForm: function(event) {
@@ -441,8 +443,12 @@ var RecordDetailView = LazyTemplateView.extend({
             method: 'POST'
     }));
     },
-    loadNext: function() {
-        console.log("clicked!");
+    load: function(event) {
+        var currentIndex = recordsList.collection.findIndex(this.model);
+        var nextIndex = event.target===$('#load_next')? currentIndex+1 : currentIndex-1;
+        var nextModel = recordsList.collection.at(nextIndex);
+        this.setModel(nextModel);
+        this.render();
     }
 });
 
