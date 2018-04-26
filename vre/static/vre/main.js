@@ -139,7 +139,7 @@ var FlatAnnotations = Backbone.Collection.extend({
     // comparator: can be set to keep this sorted
     // How to uniquely identify a field annotation.
     modelId: function(attributes) {
-        return attributes.key + attributes.id;
+        return attributes.key + ':' + attributes.group;
     },
     initialize: function(models, options) {
         _.assign(this, _.pick(options, ['record']));
@@ -390,10 +390,8 @@ var RecordAnnotationsView = RecordFieldsBaseView.extend({
     title: 'Annotations',
     edit: function(model) {
         var group = groupMenu.model.get('name'),
-            preExisting = this.collection.findWhere({
-                key: model.get('key'),
-                group: group,
-            }),
+            editTarget = model.clone().set('group', group),
+            preExisting = this.collection.get(editTarget),
             newRow;
         if (preExisting) {
             var index = this.collection.indexOf(preExisting),
@@ -403,7 +401,6 @@ var RecordAnnotationsView = RecordFieldsBaseView.extend({
             oldRow.$el.before(newRow.render().el);
             oldRow.remove();
         } else {
-            var editTarget = model.clone().set('group', group);
             newRow = new AnnotationEditView({model: editTarget});
             this.rows.push(newRow);
             this.$tbody.append(newRow.render().el);
