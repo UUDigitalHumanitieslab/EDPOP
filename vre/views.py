@@ -61,8 +61,10 @@ def add_records_to_collections(request, collection_id):
     records = records_and_collections['records']
     if not records:
         return JsonResponse({'error': 'no records selected!'}, status=400)
+    response_dict = {}
     for collection_id in collections:
         collection = get_object_or_404(Collection, pk=collection_id)
+        record_counter = 0
         for record in records:
             records_in_collection = [r.uri for r in collection.record_set.all()]
             print(record)
@@ -73,10 +75,12 @@ def add_records_to_collections(request, collection_id):
                     content=record['content'],
                     annotation='' # to do: link actual annotations to records here
                 )
+                record_counter += 1
                 new_record.save()
                 new_record.collection.add(collection)
+        response_dict[collection.description] = record_counter
     # to do: give a response of which records have been added to which collections
-    return JsonResponse({'success': 'records added!'})
+    return JsonResponse(response_dict)
 
 
 def item_detail(request, result):

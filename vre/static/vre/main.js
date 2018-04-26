@@ -164,7 +164,14 @@ var Records = APICollection.extend({
 });
 
 var HPBSearch = Records.extend({
-    url:'/vre/api/search'
+    url:'/vre/api/search',
+    total_results: 0,
+    parse: function(response) {
+        this.total_results = response.total_results;
+        var displayString = "Showing ".concat(response.result_list.length, " of ", this.total_results, " results");    
+        $("h4").html(displayString);
+        return response.result_list;
+    }
 });
 
 /**
@@ -313,8 +320,17 @@ var RecordListView = LazyTemplateView.extend({
             contentType:'application/json',
             data: JSON.stringify(records_and_collections),
             success : function(json) {
-                console.log(json); // log the returned json to the console
-                console.log("success"); // another sanity check
+                var feedback_string = new String();
+                $.each(json, function(k, v) {
+                    //display the key and value pair
+                    feedback_string = feedback_string.concat('Added ', v, ' record(s) to ', k, ". ");
+                });
+                $('#add_feedback').html(feedback_string).show(1000, function() {
+                    setTimeout(function() {
+                        $('#add_feedback').hide(1000);
+                    }, 2000)
+                });
+                console.log("success"); // sanity check
             },
             // handle a non-successful response
             error : function(xhr,errmsg,err) {
@@ -331,9 +347,10 @@ function submitSearch(event) {
     var results = new HPBSearch();
     results.query({params:{search:searchTerm}});
     var resultsView = new RecordListView({collection: results});
-    resultsView.render().$el.insertAfter('#search');
+    resultsView.render().$el.insertAfter('#search'); 
 }
-
+        
+        
 /**
  * Displays a single model from a FlatAnnotations collection.
  */

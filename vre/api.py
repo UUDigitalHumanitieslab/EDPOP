@@ -100,12 +100,12 @@ class HPBViewSet(ViewSetMixin, APIView):
                 search_result = sru_query(url_string, searchterm)
             except Exception as e:
                 print(e)
-            result_list = translate_sru_response_to_dict(
+            result_info = translate_sru_response_to_dict(
                 search_result.text
             )
-            return Response(result_list)
+            return Response(result_info)
         else: 
-            return Response({}) # to do: return http response code
+            return Response("search field empty", status=status.HTTP_400_BAD_REQUEST) # to do: return http response code
 
 class AnnotationViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = AnnotationSerializer
