@@ -95,6 +95,8 @@ class HPBViewSet(ViewSetMixin, APIView):
     def list(self, request, format=None):
         url_string = HPB_SRU_URL
         searchterm = request.query_params.get('search')
+        if not searchterm:
+            return Response("search field empty", status=status.HTTP_400_BAD_REQUEST)
         if searchterm:
             try:
                 search_result = sru_query(url_string, searchterm)
@@ -104,8 +106,6 @@ class HPBViewSet(ViewSetMixin, APIView):
                 search_result.text
             )
             return Response(result_info)
-        else: 
-            return Response("search field empty", status=status.HTTP_400_BAD_REQUEST)
 
 class AnnotationViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = AnnotationSerializer
