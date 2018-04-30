@@ -58,19 +58,6 @@ function show_detail(event) {
     renderRecordDetail(jsonData);
 }
 
-// This function has been obsoleted by RecordDetailView. It can be removed
-// when the server returns HPB search results in the {uri, content} format.
-function renderRecordDetail(attributes) {
-    var dataAsArray = _(attributes).omit('uri').map(function(value, key) {
-        return {key: key, value: value};
-    }).value();
-    var template = JST['item-fields'];
-    var target = $('#result_detail');
-    target.find('.modal-title').text(attributes.uri);
-    target.find('.modal-body').html(template({fields: dataAsArray}));
-    $("#result_detail").modal('show');
-}
-
 /**
  * Perform the following transformation:
  * (from)  {foo: 'bar', foobar: 'baz'}
@@ -273,7 +260,7 @@ var RecordListView = LazyTemplateView.extend({
     tagName: 'form',
     templateName: 'record-list',
     events: {
-        'click #add': 'submitForm',
+        'submit': 'submitForm',
     },
     initialize: function(options) {
         this.items = [];
@@ -283,7 +270,7 @@ var RecordListView = LazyTemplateView.extend({
     },
     render: function() {
         this.$el.html(this.template({}));
-        this.vreCollectionsSelect = new VRECollectionView();
+        this.vreCollectionsSelect = new VRECollectionView({collection: myCollections});
         this.$el.prepend(this.vreCollectionsSelect.$el);
         this.$tbody = this.$('tbody');
         this.renderItems();
@@ -390,7 +377,7 @@ var RecordDetailView = LazyTemplateView.extend({
         this.$('tbody').last().append(
             _(this.annotationRows).invokeMap('render').map('el').value()
         );
-        this.vreCollectionsSelect = new VRECollectionView();
+        this.vreCollectionsSelect = new VRECollectionView({collection: myCollections});
         this.$footer = this.$('.modal-footer');
         this.$footer.prepend(this.vreCollectionsSelect.$el);
         return this;
@@ -430,6 +417,7 @@ var VRERouter = Backbone.Router.extend({
 // Global object to hold the templates, initialized at page load below.
 var JST = {};
 var allCollections = new VRECollections();
+var myCollections = new VRECollections().mine;
 var allGroups = new ResearchGroups();
 var recordDetailModal = new RecordDetailView();
 var recordsList = new RecordListView();
