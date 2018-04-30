@@ -247,7 +247,6 @@ var VRECollectionView = LazyTemplateView.extend({
                     text: d.get('description'),
                 };
             });
-        console.log("triggered")
         //this.render();
     },
     render: function() {
