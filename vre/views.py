@@ -67,13 +67,16 @@ def add_records_to_collections(request, collection_id):
             records_in_collection = [r.uri for r in collection.record_set.all()]
             uri = record["uri"]
             if not uri in records_in_collection:
-                new_record = Record(
-                    uri=uri,
-                    content=record['content'],
-                    annotation='' # to do: link actual annotations to records here
-                )
-                new_record.save()
-                new_record.collection.add(collection)
+                existing_record = Record.objects.filter(uri=uri)
+                if existing_record:
+                    existing_record[0].collection.add(collection)
+                else:
+                    new_record = Record(
+                        uri=uri,
+                        content=record['content'],
+                    )
+                    new_record.save()
+                    new_record.collection.add(collection)
     # to do: give a response of which records have been added to which collections
     return JsonResponse({'success': 'records added!'})
 
