@@ -161,6 +161,13 @@ var Records = APICollection.extend({
 
 var HPBSearch = Records.extend({
     url:'/vre/api/search',
+    total_results: 0,
+    parse: function(response) {
+        this.total_results = response.total_results;
+        var displayString = "Showing ".concat(response.result_list.length, " of ", this.total_results, " results");    
+        $("h4").html(displayString);
+        return response.result_list;
+    }
 });
 
 /**
@@ -311,8 +318,52 @@ var RecordListView = LazyTemplateView.extend({
         }
         return this;
     },
+    submitForm: function(event) {
+        event.preventDefault();
+        var selected_indices = this.$tbody.find(':checked').parents('tr').map( function() {
+            return this.rowIndex;
+        }).get();
+        selected_records = this.collection.filter( function(d, i) { 
+            return _.includes(selected_indices, i) 
+        });
+        var selected_collections = $('#select-collections').val();
+        var records_and_collections = {'records': selected_records, 'collections': selected_collections}
+        $.ajax(addCSRFToken({
+            url: 'add-selection',
+            contentType:'application/json',
+            data: JSON.stringify(records_and_collections),
+            success : function(json) {
+                var feedback_string = new String();
+                $.each(json, function(k, v) {
+                    //display the key and value pair
+                    feedback_string = feedback_string.concat('Added ', v, ' record(s) to ', k, ". ");
+                });
+                $('#add_feedback').html(feedback_string).show(1000, function() {
+                    setTimeout(function() {
+                        $('#add_feedback').hide(1000);
+                    }, 2000)
+                });
+                console.log("success"); // sanity check
+            },
+            // handle a non-successful response
+            error : function(xhr,errmsg,err) {
+                console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+            },
+            method: 'POST'
+    }));
+    },
 });
 
+function submitSearch(event) {
+    event.preventDefault();
+    var searchTerm = $(event.target).find('input[name="search"]').val();
+    var results = new HPBSearch();
+    results.query({params:{search:searchTerm}});
+    var resultsView = new RecordListView({collection: results});
+    resultsView.render().$el.insertAfter('#search'); 
+}
+        
+        
 /**
  * Displays a single model from a FlatAnnotations collection.
  */
