@@ -236,7 +236,9 @@ var RecordListItemView = LazyTemplateView.extend({
 
 var VRECollectionView = LazyTemplateView.extend({
     templateName: 'collection-selector',
-    collection: allCollections,
+    events: {
+        'click #add': 'submitForm',
+    },
     initialize: function(options) {
         this.data = allCollections.map(
             function(d) {
@@ -245,7 +247,8 @@ var VRECollectionView = LazyTemplateView.extend({
                     text: d.get('description'),
                 };
             });
-        this.render();
+        console.log("triggered")
+        //this.render();
     },
     render: function() {
         this.$el.html(this.template({}));
@@ -254,23 +257,37 @@ var VRECollectionView = LazyTemplateView.extend({
         this.$('#select-collections').select2({});*/
         return this;
     },
+    submitForm: function(event) {
+        event.preventDefault();
+        if (this.model) {
+            var selected_records = [];
+            selected_records.push(this.model);
+        }
+        else {
+            var selected_records = _(recordsList.items).filter({selected: true}).invokeMap('model.toJSON').value();
+        }
+        var selected_collections = $('select[name="collections"]').val();
+        var records_and_collections = new AdditionsToCollections({
+            'records': selected_records,
+            'collections': selected_collections,
+        });
+        records_and_collections.save();
+    },
 });
 
 var RecordListView = LazyTemplateView.extend({
     tagName: 'form',
     templateName: 'record-list',
-    events: {
-        'submit': 'submitForm',
-    },
     initialize: function(options) {
         this.items = [];
         this.listenTo(this.collection, {
             add: this.addItem,
         });
+        this.vreCollectionsSelect = new VRECollectionView({collection: myCollections});
     },
     render: function() {
         this.$el.html(this.template({}));
-        this.vreCollectionsSelect = new VRECollectionView({collection: myCollections});
+        this.vreCollectionsSelect.render();    
         this.$el.prepend(this.vreCollectionsSelect.$el);
         this.$tbody = this.$('tbody');
         this.renderItems();
@@ -295,21 +312,6 @@ var RecordListView = LazyTemplateView.extend({
         }
         return this;
     },
-    submitForm: function(event) {
-        event.preventDefault();
-        var selected_indices = this.$tbody.find(':checked').parents('tr').map( function() {
-            return this.rowIndex;
-        }).get();
-        selected_records = this.collection.filter( function(d, i) { 
-            return _.includes(selected_indices, i) 
-        });
-        var selected_collections = $('select[name="collections"]').val();
-        var records_and_collections = new AdditionsToCollections({
-            'records': selected_records,
-            'collections': selected_collections,
-        });
-        records_and_collections.save();
-    },
 });
 
 /**
@@ -327,9 +329,6 @@ var FieldAnnotationView = LazyTemplateView.extend({
 var RecordDetailView = LazyTemplateView.extend({
     el: '#result_detail',
     templateName: 'item-fields',
-    events: {
-        'click #add': 'submitForm',
-    },
     initialize: function(options) {
         this.$title = this.$('.modal-title');
         this.$body = this.$('.modal-body');
@@ -377,21 +376,11 @@ var RecordDetailView = LazyTemplateView.extend({
         this.$('tbody').last().append(
             _(this.annotationRows).invokeMap('render').map('el').value()
         );
-        this.vreCollectionsSelect = new VRECollectionView({collection: myCollections});
         this.$footer = this.$('.modal-footer');
+        this.vreCollectionsSelect = new VRECollectionView({collection: myCollections, model: this.model});
+        this.vreCollectionsSelect.render();
         this.$footer.prepend(this.vreCollectionsSelect.$el);
         return this;
-    },
-    submitForm: function(event) {
-        event.preventDefault();
-        var selected_collections = this.vreCollectionsSelect.$el.find('select[name="collections"]').val();
-        var selected_record = [];
-        selected_record.push(this.model); //wrap object in an array for compatibility with backend
-        var records_and_collections = new AdditionsToCollections({
-            'records': selected_records,
-            'collections': selected_collections,
-        });
-        records_and_collections.save();
     },
 });
 
