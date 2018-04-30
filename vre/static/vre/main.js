@@ -27,25 +27,6 @@ function addCSRFToken(ajaxOptions) {
     Backbone.sync = _.overArgs(Backbone.sync, [id, id, addCSRFToken]);
 }());
 
-function return_selected_records(event) {
-    event.preventDefault();
-    var selected_records = $(this).find("input").filter(isChecked).map(getContent).get();
-    $.ajax(addCSRFToken({
-        url: 'add-selection',
-        contentType:'application/json',
-        data: JSON.stringify(selected_records),
-        success : function(json) {
-            console.log(json); // log the returned json to the console
-            console.log("success"); // another sanity check
-        },
-        // handle a non-successful response
-        error : function(xhr,errmsg,err) {
-            console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
-        },
-        method: 'POST'
-    }));
-}
-
 function submitSearch(event) {
     event.preventDefault();
     var searchTerm = $(event.target).find('input[name="search"]').val();
@@ -182,13 +163,17 @@ var Record = Backbone.Model.extend({
     },
 });
 
+var AdditionsToCollections = Backbone.Model.extend({
+    url: 'add-selection',
+})
+
 var Records = APICollection.extend({
     url: '/vre/api/records',
     model: Record,
 });
 
 var HPBSearch = Records.extend({
-    url:'/vre/api/search'
+    url:'/vre/api/search',
 });
 
 /**
@@ -264,23 +249,25 @@ var RecordListItemView = LazyTemplateView.extend({
 
 var VRECollectionView = LazyTemplateView.extend({
     templateName: 'collection-selector',
+    collection: allCollections,
     initialize: function(options) {
-        this.data = allCollections.models.map(
-            d => {
-                var option = new Object();
-                option.id = d.attributes.id;
-                option.text = d.attributes.description;
-                return option;
-            }
-        );
+        this.data = allCollections.map(
+            function(d) {
+                return {
+                    id: d.id,
+                    text: d.get('description'),
+                };
+            });
         this.render();
     },
     render: function() {
         this.$el.html(this.template({}));
-        this.$("#select-collections").select2({data: this.data});
+        this.$('select[name="collections"]').select2({data: this.data});
+        /*this.$el.html(this.template({models: this.collection.toJSON()}));
+        this.$('#select-collections').select2({});*/
         return this;
     },
-})
+});
 
 var RecordListView = LazyTemplateView.extend({
     tagName: 'form',
@@ -290,7 +277,6 @@ var RecordListView = LazyTemplateView.extend({
     },
     initialize: function(options) {
         this.items = [];
-        //this.render();
         this.listenTo(this.collection, {
             add: this.addItem,
         });
@@ -330,22 +316,12 @@ var RecordListView = LazyTemplateView.extend({
         selected_records = this.collection.filter( function(d, i) { 
             return _.includes(selected_indices, i) 
         });
-        var selected_collections = $('#select-collections').val();
-        var records_and_collections = {'records': selected_records, 'collections': selected_collections}
-        $.ajax(addCSRFToken({
-            url: 'add-selection',
-            contentType:'application/json',
-            data: JSON.stringify(records_and_collections),
-            success : function(json) {
-                console.log(json); // log the returned json to the console
-                console.log("success"); // another sanity check
-            },
-            // handle a non-successful response
-            error : function(xhr,errmsg,err) {
-                console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
-            },
-            method: 'POST'
-    }));
+        var selected_collections = $('select[name="collections"]').val();
+        var records_and_collections = new AdditionsToCollections({
+            'records': selected_records,
+            'collections': selected_collections,
+        });
+        records_and_collections.save();
     },
 });
 
@@ -421,24 +397,14 @@ var RecordDetailView = LazyTemplateView.extend({
     },
     submitForm: function(event) {
         event.preventDefault();
-        var selected_collections = this.vreCollectionsSelect.$el.find('#select-collections').val();
+        var selected_collections = this.vreCollectionsSelect.$el.find('select[name="collections"]').val();
         var selected_record = [];
         selected_record.push(this.model); //wrap object in an array for compatibility with backend
-        var records_and_collections = {'records': selected_record, 'collections': selected_collections}
-        $.ajax(addCSRFToken({
-            url: 'add-selection',
-            contentType:'application/json',
-            data: JSON.stringify(records_and_collections),
-            success : function(json) {
-                console.log(json); // log the returned json to the console
-                console.log("success"); // another sanity check
-            },
-            // handle a non-successful response
-            error : function(xhr,errmsg,err) {
-                console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
-            },
-            method: 'POST'
-    }));
+        var records_and_collections = new AdditionsToCollections({
+            'records': selected_records,
+            'collections': selected_collections,
+        });
+        records_and_collections.save();
     },
 });
 

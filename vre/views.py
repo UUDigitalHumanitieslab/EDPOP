@@ -65,7 +65,6 @@ def add_records_to_collections(request, collection_id):
         collection = get_object_or_404(Collection, pk=collection_id)
         for record in records:
             records_in_collection = [r.uri for r in collection.record_set.all()]
-            print(record)
             uri = record["uri"]
             if not uri in records_in_collection:
                 new_record = Record(

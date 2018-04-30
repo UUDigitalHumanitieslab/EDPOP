@@ -19,12 +19,10 @@
 </script>
 
 <script type="text/x-handlebars-template" id="record-list">
-    <form id="select_records">
-        <button class="btn btn-primary" type="submit" id="add">Add</button>
-        <table class="table table-striped">
-            <tbody></tbody>
-        </table>
-    </form>
+    <button class="btn btn-primary" type="submit" id="add">Add</button>
+    <table class="table table-striped">
+        <tbody></tbody>
+    </table>
 </script>
 
 <script type="text/x-handlebars-template" id="record-list-item">
@@ -33,7 +31,8 @@
 </script>
 
 <script type="text/x-handlebars-template" id="collection-selector">
-    <select name="collections" id="select-collections" multiple="multiple" style="width: 50%">
+    <select name="collections" multiple="multiple" style="width: 50%">
+        <!-- {{#models}}<option value={{id}}>{{description}}</option>{{/models}} -->
     </select>
 </script>
 
