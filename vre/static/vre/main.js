@@ -71,9 +71,20 @@ function objectAsUrlParams(object) {
 }
 
 /**
+ * Generic subclass that appends a slash to the model URL.
+ * This is required for interop with Django REST Framework.
+ */
+var APIModel = Backbone.Model.extend({
+    url: function() {
+        return Backbone.Model.prototype.url.call(this) + '/';
+    },
+});
+
+/**
  * Generic subclass that supports filtering at the backend.
  */
 var APICollection = Backbone.Collection.extend({
+    model: APIModel,
     query: function(options) {
         var url = options.url || this.url;
         var urlParts = [url, '?'];
@@ -172,7 +183,7 @@ var FlatAnnotations = Backbone.Collection.extend({
     },
 });
 
-var Record = Backbone.Model.extend({
+var Record = APIModel.extend({
     idAttribute: 'uri',
     getAnnotations: function() {
         if (!this.annotations) {
@@ -191,7 +202,7 @@ var Records = APICollection.extend({
 /**
  * Representation of a single VRE collection.
  */
-var Collection = Backbone.Model.extend({
+var Collection = APIModel.extend({
     getRecords: function() {
         if (!this.records) {
             this.records = new Records();
