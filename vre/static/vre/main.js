@@ -157,8 +157,8 @@ var FlatAnnotations = Backbone.Collection.extend({
         this.underlying = this.record.getAnnotations();
         this.underlying.forEach(this.toFlat.bind(this));
         this.listenTo(this.underlying, 'add change', this.toFlat);
+        this.on('add change', _.debounce(this.fromFlat), this);
         // this.listenTo(this.underlying, 'remove', TODO);
-        // this.on('add change', this.fromFlat);
         // this.on('remove', TODO);
     },
     // translate the official representation to the flat one
@@ -177,9 +177,24 @@ var FlatAnnotations = Backbone.Collection.extend({
         this.remove(obsolete);
         this.add(replacements, {merge: true});
     },
-    // translate the flat representation to the official one
+    // translate the flat representation to the official one, save immediately
     fromFlat: function(flatAnnotation) {
-        // TODO
+        var groupName = flatAnnotation.get('group'),
+            groupId = allGroups.findWhere({name: groupName}).id,
+            existing = this.underlying.findWhere({managing_group: groupId}),
+            id = existing && existing.id,
+            allFlat = this.where({group: groupName}),
+            content = _(allFlat).map('attributes').map(function(attributes) {
+                return [attributes.key, attributes.value];
+            }).fromPairs().value(),
+            replacement = {
+                id: id,
+                record: this.record.get('id'),
+                managing_group: groupId,
+                content: content,
+            },
+            annotation = this.underlying.add(replacement, {merge: true});
+        annotation.save(null, {silent: true});
     },
 });
 
@@ -353,7 +368,11 @@ var AnnotationEditView = LazyTemplateView.extend({
     },
     submit: function(event) {
         event.preventDefault();
-        // TODO
+        var model = this.model;
+        this.$('input').each(function(index, element) {
+            model.set(this.name, $(this).val());
+        });
+        this.trigger('save', this);
     },
     reset: function(event) {
         event.preventDefault();
@@ -365,18 +384,18 @@ var RecordFieldsBaseView = LazyTemplateView.extend({
     templateName: 'field-list',
     initialize: function(options) {
         this.rows = this.collection.map(this.createRow.bind(this));
-        this.listenTo(this.collection, 'add', this.insertRow);
+        this.listenTo(this.collection, 'add change', this.insertRow);
     },
     createRow: function(model) {
         var row = new FieldView({model: model});
         row.on('edit', this.edit, this);
         return row;
     },
-    insertRow: function(model, collection, options) {
+    insertRow: function(model) {
         var row = this.createRow(model),
             rows = this.rows,
             el = row.render().el,
-            index = collection.indexOf(model);
+            index = this.collection.indexOf(model);
         if (index >= rows.length) {
             rows.push(row);
             this.$tbody.append(el);
@@ -422,7 +441,7 @@ var RecordAnnotationsView = RecordFieldsBaseView.extend({
             this.rows.push(newRow);
             this.$tbody.append(newRow.render().el);
         }
-        newRow.on({cancel: this.cancel}, this);
+        newRow.on({cancel: this.cancel, save: this.save}, this);
     },
     cancel: function(editRow) {
         var staticRow, index = _.indexOf(this.rows, editRow);
@@ -432,6 +451,13 @@ var RecordAnnotationsView = RecordFieldsBaseView.extend({
         }
         editRow.remove();
         this.rows.splice(index, 1, staticRow);
+    },
+    save: function(editRow) {
+        // first, remove the inline form
+        this.rows.splice(_.indexOf(this.rows, editRow), 1);
+        editRow.remove();
+        // then, add the model (will re-insert static row because of add event)
+        this.collection.add(editRow.model, {merge: true});
     },
 });
 
