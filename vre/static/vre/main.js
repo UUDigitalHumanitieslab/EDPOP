@@ -156,7 +156,7 @@ var FlatAnnotations = Backbone.Collection.extend({
             groupId = annotation.get('managing_group'),
             groupName = allGroups.get(groupId).get('name'),
             content = annotation.get('content'),
-            existing = this.filter({id: id}),
+            existing = this.filter({group: groupName}),
             replacements = _.map(content, function(value, key) {
                 return {id: id, key: key, value: value, group: groupName};
             }),
