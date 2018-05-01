@@ -84,7 +84,7 @@ class RecordViewSet(viewsets.ReadOnlyModelViewSet):
     filter_fields = ['uri', 'collection__id']
 
 
-class AnnotationViewSet(viewsets.ReadOnlyModelViewSet):
+class AnnotationViewSet(viewsets.ModelViewSet):
     serializer_class = AnnotationSerializer
     queryset = Annotation.objects.all()
     filter_fields = ['record__id', 'record__uri']
