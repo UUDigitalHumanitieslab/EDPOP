@@ -239,20 +239,9 @@ var VRECollectionView = LazyTemplateView.extend({
     events: {
         'click #add': 'submitForm',
     },
-    initialize: function(options) {
-        this.data = this.collection.map( function(d) {
-            return {
-                id: d.id,
-                text: d.get('description'),
-            };
-        });
-        //this.render();
-    },
     render: function() {
-        this.$el.html(this.template({}));
-        this.$('select[name="collections"]').select2({data: this.data});
-        /*this.$el.html(this.template({models: this.collection.toJSON()}));
-        this.$('#select-collections').select2({});*/
+        this.$el.html(this.template({models: this.collection.toJSON()}));
+        this.$('select').select2();
         return this;
     },
     setRecord: function(model) {
@@ -273,8 +262,7 @@ var VRECollectionView = LazyTemplateView.extend({
         else {
             selected_records = _(recordsList.items).filter({selected: true}).invokeMap('model.toJSON').value();
         }
-        var selected_collections = $('select[name="collections"]').val();
-        console.log(selected_records, selected_collections);
+        var selected_collections = this.$('select').val();
         var records_and_collections = new AdditionsToCollections({
             'records': selected_records,
             'collections': selected_collections,
@@ -415,9 +403,9 @@ var VRERouter = Backbone.Router.extend({
 var JST = {};
 var allCollections = new VRECollections();
 var myCollections = VRECollections.mine();
-console.log(myCollections);
 var allGroups = new ResearchGroups();
-var recordDetailModal = new RecordDetailView();
+var recordDetailModal;
+myCollections.on("sync", function() { recordDetailModal = new RecordDetailView()});
 var recordsList = new RecordListView();
 var router = new VRERouter();
 var results = new HPBSearch();
