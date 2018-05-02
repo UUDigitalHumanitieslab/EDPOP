@@ -4,6 +4,8 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSetMixin
 from rest_framework.response import Response
 from rest_framework.decorators import list_route
+from rest_framework.renderers import JSONRenderer
+
 
 from .serializers import *
 from .models import *
@@ -65,7 +67,7 @@ class ListMineMixin(object):
     # has a bug that sometimes causes it to send the wrong Accept header.
     def perform_content_negotiation(self, request, force=False):
         if self.action == 'mine':
-            renderer = renderers.JSONRenderer()
+            renderer = JSONRenderer()
             return renderer, renderer.media_type
         return super().perform_content_negotiation(request, force)
 
@@ -91,24 +93,34 @@ class RecordViewSet(viewsets.ReadOnlyModelViewSet):
     filter_fields = ['uri', 'collection__id']
 
 
-class HPBViewSet(ViewSetMixin, APIView):
+class SearchViewSet(ViewSetMixin, APIView):
     def list(self, request, format=None):
-        url_string = HPB_SRU_URL
         searchterm = request.query_params.get('search')
+        if not searchterm:
+            return Response("search field empty", status=status.HTTP_400_BAD_REQUEST)
+        search_source = request.query_params.get('source')
         print(request.query_params)
         if 'startRecord' in request.query_params:
             startRecord = request.query_params.get('startRecord')
         else:
             startRecord = 1
-        if not searchterm:
-            return Response("search field empty", status=status.HTTP_400_BAD_REQUEST)
-        try:
-            search_result = sru_query(url_string, searchterm, startRecord=startRecord)
-        except Exception as e:
-            return Response(e, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        result_info = translate_sru_response_to_dict(
-            search_result.text
-        )
+        if search_source=="HPB":
+            url_string = HPB_SRU_URL
+            try:
+                search_result = sru_query(url_string, searchterm, startRecord=startRecord)
+            except Exception as e:
+                return Response(e, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            result_info = translate_sru_response_to_dict(
+                search_result.text
+            )
+        else:
+            # searching records in collection: do they contain the search term anywhere in content?
+            records = Record.objects.filter(collection__id=search_source)
+            search_results = records.filter(content__Title__icontains=searchterm)
+            print(search_results)
+            result_list = [JSONRenderer().render(RecordSerializer(result).data) for result in search_results]
+            print(result_list)
+            result_info = {'total_results': len(search_results), 'result_list': result_list}
         return Response(result_info)
 
 class AnnotationViewSet(viewsets.ReadOnlyModelViewSet):

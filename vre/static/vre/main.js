@@ -30,7 +30,7 @@ function addCSRFToken(ajaxOptions) {
 function submitSearch(event) {
     event.preventDefault();
     var searchTerm = $(event.target).find('input[name="search"]').val();
-    results.query({params:{search:searchTerm}}).then( function () {
+    results.query({params:{search:searchTerm, source:1}}).then( function () {
         $('#more_records').show();
     });
     recordsList.remove()
@@ -353,16 +353,7 @@ var RecordListView = LazyTemplateView.extend({
     }));
     },
 });
-
-function submitSearch(event) {
-    event.preventDefault();
-    var searchTerm = $(event.target).find('input[name="search"]').val();
-    var results = new HPBSearch();
-    results.query({params:{search:searchTerm}});
-    var resultsView = new RecordListView({collection: results});
-    resultsView.render().$el.insertAfter('#search'); 
-}
-        
+  
         
 /**
  * Displays a single model from a FlatAnnotations collection.

@@ -9,7 +9,7 @@ api_router = routers.DefaultRouter()
 api_router.register(r'researchgroups', api.ResearchGroupViewSet)
 api_router.register(r'collections', api.CollectionViewSet)
 api_router.register(r'records', api.RecordViewSet)
-api_router.register(r'search', api.HPBViewSet, base_name='search')
+api_router.register(r'search', api.SearchViewSet, base_name='search')
 api_router.register(r'annotations', api.AnnotationViewSet)
 
 urlpatterns = [
