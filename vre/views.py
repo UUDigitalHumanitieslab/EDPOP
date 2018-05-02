@@ -59,22 +59,26 @@ def add_records_to_collections(request, collection_id):
     if not collections:
         return JsonResponse({'error': 'cannot create records without collection id!'}, status=400)
     records = records_and_collections['records']
+    print(records)
     if not records:
         return JsonResponse({'error': 'no records selected!'}, status=400)
     for collection_id in collections:
         collection = get_object_or_404(Collection, pk=collection_id)
+        print(collection)
         for record in records:
             records_in_collection = [r.uri for r in collection.record_set.all()]
-            print(record)
             uri = record["uri"]
             if not uri in records_in_collection:
-                new_record = Record(
-                    uri=uri,
-                    content=record['content'],
-                    annotation='' # to do: link actual annotations to records here
-                )
-                new_record.save()
-                new_record.collection.add(collection)
+                existing_record = Record.objects.filter(uri=uri)
+                if existing_record:
+                    existing_record[0].collection.add(collection)
+                else:
+                    new_record = Record(
+                        uri=uri,
+                        content=record['content'],
+                    )
+                    new_record.save()
+                    new_record.collection.add(collection)
     # to do: give a response of which records have been added to which collections
     return JsonResponse({'success': 'records added!'})
 
