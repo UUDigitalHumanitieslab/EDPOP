@@ -19,7 +19,6 @@
 </script>
 
 <script type="text/x-handlebars-template" id="record-list">
-    <input type="submit" value="Add">
     <table class="table table-striped">
         <tbody></tbody>
     </table>
@@ -29,4 +28,35 @@
     <td><input type="checkbox"></td>
     <td><a href="#">{{# content}}{{Title}}{{/ content}}</a></td>
 </script>
+
+<script type="text/x-handlebars-template" id="collection-selector">
+    <select name="collections" multiple="multiple" style="width: 50%;">
+        {{#models}}<option value={{id}}>{{description}}</option>{{/models}}
+    </select>
+    <button class="btn btn-primary" type="submit" id="add">Add</button>
+</script>
+
+<script type="text/x-handlebars-template" id="item-detail">
+    <div class="modal" id="record_detail" role=dialog>
+        <div class="modal-dialog" role=document>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button
+                        type="button"
+                        class="close"
+                        data-dismiss="modal"
+                        aria-label="Close"
+                    ><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title"></h4>
+                </div>
+                <div class="modal-body"></div>
+                <div class="modal-footer">
+                    <button type=button class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
+
 {% endverbatim %}

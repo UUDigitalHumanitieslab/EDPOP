@@ -1,8 +1,16 @@
-from rest_framework import viewsets, renderers
+
+from rest_framework import viewsets
+from rest_framework import renderers
+from rest_framework.views import APIView
+from rest_framework.viewsets import ViewSetMixin
+from rest_framework.response import Response
 from rest_framework.decorators import list_route
 
 from .serializers import *
 from .models import *
+from .sru_query import sru_query, translate_sru_response_to_dict
+
+HPB_SRU_URL = "http://sru.gbv.de/hpb"
 
 
 class ListMineMixin(object):
@@ -83,6 +91,27 @@ class RecordViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Record.objects.all()
     filter_fields = ['uri', 'collection__id']
 
+
+class HPBViewSet(ViewSetMixin, APIView):
+    def list(self, request, format=None):
+        url_string = HPB_SRU_URL
+        searchterm = request.query_params.get('search')
+        print(request.query_params)
+        if 'startRecord' in request.query_params:
+            startRecord = request.query_params.get('startRecord')
+        else:
+            startRecord = 1
+        if searchterm:
+            try:
+                search_result = sru_query(url_string, searchterm, startRecord=startRecord)
+            except Exception as e:
+                print(e)
+            result_list = translate_sru_response_to_dict(
+                search_result.text
+            )
+            return Response(result_list)
+        else: 
+            return Response({}) # to do: return http response code
 
 class AnnotationViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = AnnotationSerializer

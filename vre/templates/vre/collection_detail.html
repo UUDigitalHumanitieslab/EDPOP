@@ -4,32 +4,17 @@
     <h1>{{ collection.description}}</h1>
     <h2> Search CERL HPB to add items </h2>
 
-    <form method="POST" id="search">
+    <form id="search">
     {% csrf_token %}
-    <input type="text" name="search" size="30"> <br> <br>
-    <input type="submit" value="Search">
+    	<div class="input-group mb-3">
+    		<input type="text" class="form-control" name="search" placeholder="" aria-label="">
+    		<div class="input-group-btn">
+    			<button class="btn btn-primary" type="submit" id="search">Search</button>
+    		</div>
+    	</div>
     </form>
 
-    {% if result_list %}
-    <form method="POST" id="select_records">
-        {% csrf_token %}
-        <input type="submit" value="Add">
-        <table class="table table-striped">
-        {% for result, result_json in result_list %}
-            <tr>
-                <td>
-                    <input type="checkbox" data-content="{{result_json}}">
-                </td>
-                <td>
-                    <a id="title" href="#"> {{ result.Title }} </a>
-                </td>
-            </tr>
-        {% endfor %}
-        </table>
-
-    </form>
-    {% endif %}
 {% include "vre/item_detail.html" %}
+    <a href="#" id="more_records" style="display:none"> Load more records </a>
 </div>
-
 {% endblock content %}
