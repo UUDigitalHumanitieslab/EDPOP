@@ -240,13 +240,12 @@ var VRECollectionView = LazyTemplateView.extend({
         'click #add': 'submitForm',
     },
     initialize: function(options) {
-        this.data = allCollections.map(
-            function(d) {
-                return {
-                    id: d.id,
-                    text: d.get('description'),
-                };
-            });
+        this.data = this.collection.map( function(d) {
+            return {
+                id: d.id,
+                text: d.get('description'),
+            };
+        });
         //this.render();
     },
     render: function() {
@@ -256,16 +255,26 @@ var VRECollectionView = LazyTemplateView.extend({
         this.$('#select-collections').select2({});*/
         return this;
     },
+    setRecord: function(model) {
+        this.model = model;
+        return this;
+    },
+    clear: function() {
+        this.$el.val(null).trigger('change');
+    },
     submitForm: function(event) {
         event.preventDefault();
+        var selected_records = [];
         if (this.model) {
-            var selected_records = [];
+            // adding to array as the api expects an array.
             selected_records.push(this.model);
+            this.model = undefined;
         }
         else {
-            var selected_records = _(recordsList.items).filter({selected: true}).invokeMap('model.toJSON').value();
+            selected_records = _(recordsList.items).filter({selected: true}).invokeMap('model.toJSON').value();
         }
         var selected_collections = $('select[name="collections"]').val();
+        console.log(selected_records, selected_collections);
         var records_and_collections = new AdditionsToCollections({
             'records': selected_records,
             'collections': selected_collections,
@@ -333,6 +342,8 @@ var RecordDetailView = LazyTemplateView.extend({
         this.$body = this.$('.modal-body');
         this.$footer = this.$('.modal-footer');
         this.annotationRows = [];
+        this.vreCollectionsSelect = new VRECollectionView({collection: myCollections});
+        this.$footer.prepend(this.vreCollectionsSelect.$el);
     },
     setModel: function(model) {
         if (this.model) {
@@ -375,10 +386,8 @@ var RecordDetailView = LazyTemplateView.extend({
         this.$('tbody').last().append(
             _(this.annotationRows).invokeMap('render').map('el').value()
         );
-        this.$footer = this.$('.modal-footer');
-        this.vreCollectionsSelect = new VRECollectionView({collection: myCollections, model: this.model});
-        this.vreCollectionsSelect.render();
-        this.$footer.prepend(this.vreCollectionsSelect.$el);
+        this.vreCollectionsSelect.clear();
+        this.vreCollectionsSelect.setRecord(this.model).render();        
         return this;
     },
 });
@@ -405,7 +414,8 @@ var VRERouter = Backbone.Router.extend({
 // Global object to hold the templates, initialized at page load below.
 var JST = {};
 var allCollections = new VRECollections();
-var myCollections = new VRECollections().mine;
+var myCollections = VRECollections.mine();
+console.log(myCollections);
 var allGroups = new ResearchGroups();
 var recordDetailModal = new RecordDetailView();
 var recordsList = new RecordListView();
