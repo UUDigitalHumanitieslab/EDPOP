@@ -457,8 +457,10 @@ var VRERouter = Backbone.Router.extend({
 var JST = {};
 var allCollections = new VRECollections();
 var myCollections = new VRECollections().mine;
+var dropDown;
 myCollections.on('sync', function(){ 
-    dropDown = new SelectSourceView({collection: myCollections})})
+    dropDown = new SelectSourceView({collection: myCollections});
+});
 var allGroups = new ResearchGroups();
 var recordDetailModal = new RecordDetailView();
 var recordsList = new RecordListView();
