@@ -27,17 +27,6 @@ function addCSRFToken(ajaxOptions) {
     Backbone.sync = _.overArgs(Backbone.sync, [id, id, addCSRFToken]);
 }());
 
-function submitSearch(event) {
-    event.preventDefault();
-    var searchTerm = $(event.target).find('input[name="search"]').val();
-    results.query({params:{search:searchTerm, source:1}}).then( function () {
-        $('#more_records').show();
-    });
-    recordsList.remove()
-    recordsList = new RecordListView({collection: results});
-    recordsList.render().$el.insertAfter('#search');
-}
-
 function retrieveMoreRecords(event) {
     event.preventDefault();
     $('#more_records').hide();
@@ -246,33 +235,30 @@ var VRECollectionView = LazyTemplateView.extend({
     events: {
         'click #add': 'submitForm',
     },
-    initialize: function(options) {
-        this.data = allCollections.map(
-            function(d) {
-                return {
-                    id: d.id,
-                    text: d.get('description'),
-                };
-            });
-        //this.render();
-    },
     render: function() {
-        this.$el.html(this.template({}));
-        this.$('select[name="collections"]').select2({data: this.data});
-        /*this.$el.html(this.template({models: this.collection.toJSON()}));
-        this.$('#select-collections').select2({});*/
+        this.$el.html(this.template({models: this.collection.toJSON()}));
+        this.$('select').select2();
         return this;
+    },
+    setRecord: function(model) {
+        this.model = model;
+        return this;
+    },
+    clear: function() {
+        this.$el.val(null).trigger('change');
     },
     submitForm: function(event) {
         event.preventDefault();
+        var selected_records = [];
         if (this.model) {
-            var selected_records = [];
+            // adding to array as the api expects an array.
             selected_records.push(this.model);
+            this.model = undefined;
         }
         else {
-            var selected_records = _(recordsList.items).filter({selected: true}).invokeMap('model.toJSON').value();
+            selected_records = _(recordsList.items).filter({selected: true}).invokeMap('model.toJSON').value();
         }
-        var selected_collections = $('select[name="collections"]').val();
+        var selected_collections = this.$('select').val();
         var records_and_collections = new AdditionsToCollections({
             'records': selected_records,
             'collections': selected_collections,
@@ -281,6 +267,27 @@ var VRECollectionView = LazyTemplateView.extend({
     },
 });
 
+var SearchView= LazyTemplateView.extend({
+    templateName: "search-view",
+    events: {
+        'submit': 'submitSearch',
+    },
+    source: "hpb",
+    render: function() {
+        this.$el.html(this.template());
+        this.$el.appendTo($('.collapse'));
+    },
+    submitSearch: function(event) {
+        event.preventDefault();
+        var searchTerm = this.$('input').val();
+        results.query({params:{search:searchTerm, source:this.source}}).then( function () {
+            $('#more_records').show();
+            records.reset(results.models);
+        });
+    },
+});
+
+
 var RecordListView = LazyTemplateView.extend({
     tagName: 'form',
     templateName: 'record-list',
@@ -288,6 +295,7 @@ var RecordListView = LazyTemplateView.extend({
         this.items = [];
         this.listenTo(this.collection, {
             add: this.addItem,
+            reset: this.render,
         });
         this.vreCollectionsSelect = new VRECollectionView({collection: myCollections});
     },
@@ -369,11 +377,23 @@ var FieldAnnotationView = LazyTemplateView.extend({
 
 var SelectSourceView = LazyTemplateView.extend({
     templateName: 'nav-dropdown',
-    render: function() {
-        this.$el.html(this.template(this.collection));
-        this.$el.appendTo($('nav'));
+    tagName: 'li',
+    className: 'dropdown',
+    events: {
+        'click li': 'selectSource',
     },
-    // potentially, route to HPB / or "collection.id" here
+    initialize: function() {        
+        this.render();
+    },
+    render: function() {
+        var collections = {'collections': this.collection.toJSON()};
+        this.$el.html(this.template(collections));
+        this.$el.prependTo($('.nav'));
+    },
+    selectSource: function(event) {
+        var source = event.target.id;
+        searchView.source = source;
+    },
 });
 
 var RecordDetailView = LazyTemplateView.extend({
@@ -384,6 +404,8 @@ var RecordDetailView = LazyTemplateView.extend({
         this.$body = this.$('.modal-body');
         this.$footer = this.$('.modal-footer');
         this.annotationRows = [];
+        this.vreCollectionsSelect = new VRECollectionView({collection: myCollections});
+        this.$footer.prepend(this.vreCollectionsSelect.$el);
     },
     setModel: function(model) {
         if (this.model) {
@@ -426,10 +448,8 @@ var RecordDetailView = LazyTemplateView.extend({
         this.$('tbody').last().append(
             _(this.annotationRows).invokeMap('render').map('el').value()
         );
-        this.$footer = this.$('.modal-footer');
-        this.vreCollectionsSelect = new VRECollectionView({collection: myCollections, model: this.model});
-        this.vreCollectionsSelect.render();
-        this.$footer.prepend(this.vreCollectionsSelect.$el);
+        this.vreCollectionsSelect.clear();
+        this.vreCollectionsSelect.setRecord(this.model).render();        
         return this;
     },
 });
@@ -437,6 +457,7 @@ var RecordDetailView = LazyTemplateView.extend({
 var VRERouter = Backbone.Router.extend({
     routes: {
         ':id/': 'showCollection',
+        'hpb': 'showHPBPage',
     },
     showCollection: function(id) {
         // The if-condition is a bit of a hack, which can go away when we
@@ -445,27 +466,34 @@ var VRERouter = Backbone.Router.extend({
             // We are not on the HPB search results page, so display the
             // records in the current selection instead.
             var collection = allCollections.get(id);
-            var records = collection.getRecords();
+            records = collection.getRecords();
             recordsList.remove();
             recordsList = new RecordListView({collection: records});
-            recordsList.render().$el.appendTo($('body'));
+            recordsList.render().$el.insertAfter($('nav'));
+            searchView.render();
         }
     },
+    showHPBPage: function() {
+
+    }
 });
 
 // Global object to hold the templates, initialized at page load below.
 var JST = {};
+var records;
 var allCollections = new VRECollections();
-var myCollections = new VRECollections().mine;
-var dropDown;
-myCollections.on('sync', function(){ 
-    dropDown = new SelectSourceView({collection: myCollections});
-});
+var myCollections = VRECollections.mine();
 var allGroups = new ResearchGroups();
-var recordDetailModal = new RecordDetailView();
+var recordDetailModal;
+var dropDown;
+myCollections.on("sync", function() { 
+    recordDetailModal = new RecordDetailView();
+    dropDown = new SelectSourceView({collection:myCollections});
+});
 var recordsList = new RecordListView();
 var router = new VRERouter();
 var results = new HPBSearch();
+var searchView  = new SearchView();
 
 $(function() {
     $('script[type="text/x-handlebars-template"]').each(function(i, element) {
@@ -475,14 +503,14 @@ $(function() {
     //$("#select_records").submit(return_selected_records);
     $('#select_records a').click(show_detail);
     $('#result_detail').modal({show: false});
-    $('#search').submit(submitSearch);
+    //$('#search').submit(submitSearch);
     $('#more_records').click(retrieveMoreRecords);
     // We fetch the collections and ensure that we have them before we handle
     // the route, because VRERouter.showCollection depends on them being
     // available. This is something we can definitely improve upon.
     allCollections.fetch().then(function() {
         Backbone.history.start({
-            pushState: true,  // this enables matching the path of the URL
+            pushState: true,  // this enables matching the path of the URL hashchange
             root: '/vre/',
         });
     });

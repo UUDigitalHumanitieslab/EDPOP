@@ -1,6 +1,7 @@
 
 from rest_framework import viewsets
 from rest_framework import status
+from rest_framework import renderers
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSetMixin
 from rest_framework.response import Response
@@ -105,7 +106,7 @@ class SearchViewSet(ViewSetMixin, APIView):
             startRecord = request.query_params.get('startRecord')
         else:
             startRecord = 1
-        if search_source=="HPB":
+        if search_source=="hpb":
             url_string = HPB_SRU_URL
             try:
                 search_result = sru_query(url_string, searchterm, startRecord=startRecord)

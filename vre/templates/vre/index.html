@@ -1,12 +1,4 @@
 {% extends "vre/base.html" %}
 {% block content %}
-{% if user_collections %}
-    <ul>
-    {% for collection in user_collections %}
-        <li><a href="{{ collection.id }}/">{{ collection.description }}</a></li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>You do not have access to any collections. Contact the leader of your research group for access.</p>
-{% endif %}
+
 {% endblock content %}

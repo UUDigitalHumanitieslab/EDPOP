@@ -32,21 +32,32 @@
 </script>
 
 <script type="text/x-handlebars-template" id="collection-selector">
-    <select name="collections" multiple="multiple" style="width:50%">
-        <!-- style sheet with selector "select" does not seem to have any effect ? -->
-        <!-- {{#models}}<option value={{id}}>{{description}}</option>{{/models}} -->
+    <select name="collections" multiple="multiple" style="width: 50%;">
+        {{#models}}<option value={{id}}>{{description}}</option>{{/models}}
     </select>
     <button class="btn btn-primary" type="submit" id="add">Add</button>
 </script>
 
 <script type="text/x-handlebars-template" id="nav-dropdown">
-    <div class="dropdown-menu">
-         <a class="dropdown-item" href="#">HPB</a>
-         <div class="dropdown-divider"></div>
-        {{#myCollections}}
-            <a class="dropdown-item" href="#">{{description}}</a>
-        {{/myCollections}}
-    </div>
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown"
+        aria-haspopup="true" aria-expanded="false">Database <span class="caret"></span>
+    </a>
+    <ul class="dropdown-menu">
+        <li><a href="#hpb" id="hpb">HPB</a></li>
+        <li role="separator" class="divider"></li>
+        {{#collections}}
+            <li> <a href="#{{id}}" id="{{id}}">{{description}}</a></li>
+        {{/collections}}
+    </ul>
+</script>
+
+<script type="text/x-handlebars-template" id="search-view">
+    <form class="navbar-form navbar-left" id="search">
+        <div class="form-group">
+            <input type="text" class="form-control" name="search" placeholder="Query">
+        </div>
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
 </script>
 
 
