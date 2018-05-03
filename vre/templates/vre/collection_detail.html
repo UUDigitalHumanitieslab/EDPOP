@@ -4,7 +4,7 @@
     <h1>{{ collection.description}}</h1>
     <h2> Search CERL HPB to add items </h2>
 
-    <form id="search">
+    <!-- <form id="search">
     {% csrf_token %}
     	<div class="input-group mb-3">
     		<input type="text" class="form-control" name="search" placeholder="" aria-label="">
@@ -12,7 +12,7 @@
     			<button class="btn btn-primary" type="submit" id="search">Search</button>
     		</div>
     	</div>
-    </form>
+    </form> -->
 
 {% include "vre/item_detail.html" %}
     <a href="#" id="more_records" style="display:none"> Load more records </a>

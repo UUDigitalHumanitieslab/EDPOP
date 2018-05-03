@@ -367,6 +367,15 @@ var FieldAnnotationView = LazyTemplateView.extend({
     },
 });
 
+var SelectSourceView = LazyTemplateView.extend({
+    templateName: 'nav-dropdown',
+    render: function() {
+        this.$el.html(this.template(this.collection));
+        this.$el.appendTo($('nav'));
+    },
+    // potentially, route to HPB / or "collection.id" here
+});
+
 var RecordDetailView = LazyTemplateView.extend({
     el: '#result_detail',
     templateName: 'item-fields',
@@ -439,7 +448,7 @@ var VRERouter = Backbone.Router.extend({
             var records = collection.getRecords();
             recordsList.remove();
             recordsList = new RecordListView({collection: records});
-            recordsList.render().$el.insertAfter('#search');
+            recordsList.render().$el.appendTo($('body'));
         }
     },
 });
@@ -448,6 +457,8 @@ var VRERouter = Backbone.Router.extend({
 var JST = {};
 var allCollections = new VRECollections();
 var myCollections = new VRECollections().mine;
+myCollections.on('sync', function(){ 
+    dropDown = new SelectSourceView({collection: myCollections})})
 var allGroups = new ResearchGroups();
 var recordDetailModal = new RecordDetailView();
 var recordsList = new RecordListView();
