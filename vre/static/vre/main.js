@@ -29,7 +29,8 @@ function addCSRFToken(ajaxOptions) {
 
 function retrieveMoreRecords(event) {
     event.preventDefault();
-    $('#more_records').hide();
+    searchView.nextSearch();
+    /*$('#more_records').hide();
     var searchTerm = $('input[name="search"]').val();
     var noCurrentRecords = $.find('tr').length+1;
     var newResults = new HPBSearch();
@@ -37,7 +38,7 @@ function retrieveMoreRecords(event) {
         function () {
             results.add(newResults.models);
             $('#more_records').show();
-    });
+    });*/
 }
 
 function show_detail(event) {
@@ -270,20 +271,34 @@ var VRECollectionView = LazyTemplateView.extend({
 var SearchView= LazyTemplateView.extend({
     templateName: "search-view",
     events: {
-        'submit': 'submitSearch',
+        'submit': 'firstSearch',
     },
     source: "hpb",
     render: function() {
         this.$el.html(this.template());
         this.$el.appendTo($('.collapse'));
     },
-    submitSearch: function(event) {
-        event.preventDefault();
+    submitSearch: function(startRecord) {        
         var searchTerm = this.$('input').val();
-        results.query({params:{search:searchTerm, source:this.source}}).then( function () {
+        var startFrom = startRecord ? startRecord : 1;
+        var hold = results.query({params:{search:searchTerm, source:this.source, startRecord:startFrom}});
+        return hold;
+    },
+    firstSearch: function(event){
+        event.preventDefault();
+        this.submitSearch().then( function() {
             $('#more_records').show();
             records.reset(results.models);
         });
+    },
+    nextSearch: function(event) {
+        $('#more_records').hide();
+        var startRecord = len(records);
+        results = this.submitSearch(startRecord);
+        records.add(results.models);
+        if (len(records)!=results.total_results) { 
+            $('#more_records').show();
+        }
     },
 });
 
@@ -301,10 +316,11 @@ var RecordListView = LazyTemplateView.extend({
     },
     render: function() {
         this.$el.html(this.template({}));
-        this.vreCollectionsSelect.render();    
-        this.$el.prepend(this.vreCollectionsSelect.$el);
         this.$tbody = this.$('tbody');
         this.renderItems();
+        $('#HPB-info').hide();
+        this.vreCollectionsSelect.render();    
+        this.$el.prepend(this.vreCollectionsSelect.$el);
         return this;
     },
     renderItems: function() {
@@ -392,6 +408,7 @@ var SelectSourceView = LazyTemplateView.extend({
     },
     selectSource: function(event) {
         var source = event.target.id;
+        router.navigate(event.target.id);
         searchView.source = source;
     },
 });
@@ -416,6 +433,7 @@ var RecordDetailView = LazyTemplateView.extend({
             _.invokeMap(this.annotationRows, 'stopListening');
         }
         this.model = model;
+        console.log(this.model);
         this.annotations = new FlatAnnotations(null, {record: model});
         this.annotationRows = this.annotations.map(this.createRow);
         this.listenTo(this.annotations, 'add', this.insertRow);
@@ -456,31 +474,37 @@ var RecordDetailView = LazyTemplateView.extend({
 
 var VRERouter = Backbone.Router.extend({
     routes: {
-        ':id/': 'showCollection',
-        'hpb': 'showHPBPage',
+        ':id/': 'showDatabase',
+/*        'hpb': 'showHPBPage',*/
     },
-    showCollection: function(id) {
+    showDatabase: function(id) {
+        console.log(id);
+        searchView.render();
         // The if-condition is a bit of a hack, which can go away when we
         // convert to client side routing entirely.
-        if ($('#select_records').length === 0) {
-            // We are not on the HPB search results page, so display the
-            // records in the current selection instead.
+        if (id=="hpb") {
+            recordsList.remove();
+            records = new Records();
+            recordsList = new RecordListView({collection: records});
+            recordsList.render().$el.appendTo($('body'));
+            $('#HPB-info').show();
+        }
+        else {
+            // We are not on the HPB search page, so display the
+            // records in the current collection.
+            $('#HPB-info').hide();
             var collection = allCollections.get(id);
             records = collection.getRecords();
             recordsList.remove();
             recordsList = new RecordListView({collection: records});
-            recordsList.render().$el.insertAfter($('nav'));
-            searchView.render();
+            recordsList.render().$el.insertAfter($('#title-collection'));
         }
     },
-    showHPBPage: function() {
-
-    }
 });
 
 // Global object to hold the templates, initialized at page load below.
 var JST = {};
-var records;
+var records = new Records();
 var allCollections = new VRECollections();
 var myCollections = VRECollections.mine();
 var allGroups = new ResearchGroups();
@@ -490,7 +514,7 @@ myCollections.on("sync", function() {
     recordDetailModal = new RecordDetailView();
     dropDown = new SelectSourceView({collection:myCollections});
 });
-var recordsList = new RecordListView();
+var recordsList = new RecordListView({collection: records});
 var router = new VRERouter();
 var results = new HPBSearch();
 var searchView  = new SearchView();
@@ -515,4 +539,5 @@ $(function() {
         });
     });
     allGroups.fetch();
+
 });

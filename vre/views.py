@@ -53,6 +53,10 @@ def collection_detail(request, collection_id):
             )
 
 
+def hpb_info(request):
+    return render(request, 'vre/hpb.html')
+
+
 def add_records_to_collections(request, collection_id):
     records_and_collections = json.loads(request.body.decode())
     collections = records_and_collections['collections']
