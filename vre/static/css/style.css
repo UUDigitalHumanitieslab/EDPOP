@@ -2,6 +2,10 @@ h1 {
 	color: cornflowerblue;
 }
 
+#more-records {
+	display: none;
+}
+
 #HPB-info {
 	display: none;
 }

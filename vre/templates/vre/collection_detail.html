@@ -4,17 +4,7 @@
     <div class="page-header" id="title-collection">
         <h1>Search or browse {{collection.description}}</h1>
     </div>
-    <!-- <form id="search">
-    {% csrf_token %}
-    	<div class="input-group mb-3">
-    		<input type="text" class="form-control" name="search" placeholder="" aria-label="">
-    		<div class="input-group-btn">
-    			<button class="btn btn-primary" type="submit" id="search">Search</button>
-    		</div>
-    	</div>
-    </form> -->
 
 {% include "vre/item_detail.html" %}
-    <a href="#" id="more_records" style="display:none"> Load more records </a>
 </div>
 {% endblock content %}

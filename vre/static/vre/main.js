@@ -29,16 +29,7 @@ function addCSRFToken(ajaxOptions) {
 
 function retrieveMoreRecords(event) {
     event.preventDefault();
-    searchView.nextSearch();
-    /*$('#more_records').hide();
-    var searchTerm = $('input[name="search"]').val();
-    var noCurrentRecords = $.find('tr').length+1;
-    var newResults = new HPBSearch();
-    newResults.query({params:{search:searchTerm, startRecord:noCurrentRecords}}).then(
-        function () {
-            results.add(newResults.models);
-            $('#more_records').show();
-    });*/
+    searchView.nextSearch(event);
 }
 
 function show_detail(event) {
@@ -149,13 +140,14 @@ var Records = APICollection.extend({
     model: Record,
 });
 
-var HPBSearch = Records.extend({
+var SearchResults = Records.extend({
     url:'/vre/api/search',
     total_results: 0,
     parse: function(response) {
         this.total_results = response.total_results;
-        var displayString = "Showing ".concat(response.result_list.length, " of ", this.total_results, " results");    
-        $("h4").html(displayString);
+        /*
+        var displayString = "Showing ".concat(this.length, " of ", this.total_results, " results");    
+        $("h4").html(displayString);*/
         return response.result_list;
     }
 });
@@ -273,12 +265,12 @@ var SearchView= LazyTemplateView.extend({
     events: {
         'submit': 'firstSearch',
     },
-    source: "hpb",
     render: function() {
         this.$el.html(this.template());
         this.$el.appendTo($('.collapse'));
     },
-    submitSearch: function(startRecord) {        
+    submitSearch: function(startRecord) {
+        console.log(searchView.source);        
         var searchTerm = this.$('input').val();
         var startFrom = startRecord ? startRecord : 1;
         var hold = results.query({params:{search:searchTerm, source:this.source, startRecord:startFrom}});
@@ -287,18 +279,20 @@ var SearchView= LazyTemplateView.extend({
     firstSearch: function(event){
         event.preventDefault();
         this.submitSearch().then( function() {
-            $('#more_records').show();
+            $('#more-records').show();
             records.reset(results.models);
+            recordsList.render().$el.insertAfter($('#title-HPB'));
         });
     },
     nextSearch: function(event) {
-        $('#more_records').hide();
-        var startRecord = len(records);
-        results = this.submitSearch(startRecord);
-        records.add(results.models);
-        if (len(records)!=results.total_results) { 
-            $('#more_records').show();
-        }
+        $('#more-records').hide();
+        var startRecord = records.length;
+        this.submitSearch(startRecord).then( function() {
+            records.add(results.models);
+            if (records.length!=results.total_results) { 
+                $('#more-records').show();
+            }
+        });
     },
 });
 
@@ -406,7 +400,7 @@ var SelectSourceView = LazyTemplateView.extend({
         this.$el.html(this.template(collections));
         this.$el.prependTo($('.nav'));
     },
-    selectSource: function(event) {
+    setSource: function(event) {
         var source = event.target.id;
         router.navigate(event.target.id);
         searchView.source = source;
@@ -472,13 +466,31 @@ var RecordDetailView = LazyTemplateView.extend({
     },
 });
 
+/*var LoadMoreResultsView = LazyTemplateView.extend({
+    tagName: 'a',
+    el: '#more-records',
+    events: {
+        'click a': 'retrieveMoreResults',
+    },
+    initialize: function() {
+        this.render();
+    },
+    render: function() {
+        el.insertAfter($('#record-list'));
+        return this;
+    },
+    retrieveMoreResults: function(event) {
+        event.preventDefault();
+        searchView.nextSearch(event);
+    },
+});*/
+
 var VRERouter = Backbone.Router.extend({
     routes: {
         ':id/': 'showDatabase',
 /*        'hpb': 'showHPBPage',*/
     },
     showDatabase: function(id) {
-        console.log(id);
         searchView.render();
         // The if-condition is a bit of a hack, which can go away when we
         // convert to client side routing entirely.
@@ -486,12 +498,12 @@ var VRERouter = Backbone.Router.extend({
             recordsList.remove();
             records = new Records();
             recordsList = new RecordListView({collection: records});
-            recordsList.render().$el.appendTo($('body'));
             $('#HPB-info').show();
         }
         else {
             // We are not on the HPB search page, so display the
             // records in the current collection.
+            console.log("collection view")
             $('#HPB-info').hide();
             var collection = allCollections.get(id);
             records = collection.getRecords();
@@ -516,19 +528,17 @@ myCollections.on("sync", function() {
 });
 var recordsList = new RecordListView({collection: records});
 var router = new VRERouter();
-var results = new HPBSearch();
+var results = new SearchResults();
 var searchView  = new SearchView();
+//var moreResults = new LoadMoreResultsView();
 
 $(function() {
     $('script[type="text/x-handlebars-template"]').each(function(i, element) {
         $el = $(element);
         JST[$el.prop('id')] = Handlebars.compile($el.html());
     });
-    //$("#select_records").submit(return_selected_records);
-    $('#select_records a').click(show_detail);
     $('#result_detail').modal({show: false});
-    //$('#search').submit(submitSearch);
-    $('#more_records').click(retrieveMoreRecords);
+    $('#more-records').click(retrieveMoreRecords);
     // We fetch the collections and ensure that we have them before we handle
     // the route, because VRERouter.showCollection depends on them being
     // available. This is something we can definitely improve upon.
