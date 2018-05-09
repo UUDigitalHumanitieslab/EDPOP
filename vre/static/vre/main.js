@@ -276,6 +276,18 @@ var VRECollectionView = LazyTemplateView.extend({
         });
         records_and_collections.save();
     },
+    giveFeedback: function() {
+        var feedback_string = new String(); 
+-                $.each(json, function(k, v) {  
+-                    //display the key and value pair   
+-                    feedback_string = feedback_string.concat('Added ', v, ' record(s) to ', k, ". ");  
+-                });    
+-                $('#add_feedback').html(feedback_string).show(1000, function() {   
+-                    setTimeout(function() {    
+-                        $('#add_feedback').hide(1000); 
+-                    }, 2000)   
+-                });  
+    },  
 });
 
 var RecordListView = LazyTemplateView.extend({
