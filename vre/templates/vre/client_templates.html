@@ -19,14 +19,11 @@
 </script>
 
 <script type="text/x-handlebars-template" id="record-list">
-    <form id="select_records">
-        <button class="btn btn-primary" type="submit" id="add">Add</button>
-        <div class="alert alert-success" role="alert" id="add_feedback" style="display:none"></div>
-        <h4></h4>
-        <table class="table table-striped">
-            <tbody></tbody>
-        </table>
-    </form>
+    <div class="alert alert-success" role="alert" id="add_feedback" style="display:none"></div>
+    <h4></h4>
+    <table class="table table-striped">
+        <tbody></tbody>
+    </table>
 </script>
 
 <script type="text/x-handlebars-template" id="record-list-item">
@@ -35,8 +32,10 @@
 </script>
 
 <script type="text/x-handlebars-template" id="collection-selector">
-    <select name="collections" id="select-collections" multiple="multiple" style="width: 50%">
+    <select name="collections" multiple="multiple" style="width: 50%;">
+        {{#models}}<option value={{id}}>{{description}}</option>{{/models}}
     </select>
+    <button class="btn btn-primary" type="submit" id="add">Add</button>
 </script>
 
 <script type="text/x-handlebars-template" id="item-detail">

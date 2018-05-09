@@ -1,5 +1,6 @@
 
 from rest_framework import viewsets
+from rest_framework import renderers
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSetMixin
 from rest_framework.response import Response
@@ -97,15 +98,18 @@ class HPBViewSet(ViewSetMixin, APIView):
         searchterm = request.query_params.get('search')
         if not searchterm:
             return Response("search field empty", status=status.HTTP_400_BAD_REQUEST)
-        if searchterm:
-            try:
-                search_result = sru_query(url_string, searchterm)
-            except Exception as e:
-                return Response(e, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-            result_info = translate_sru_response_to_dict(
-                search_result.text
-            )
-            return Response(result_info)
+        if 'startRecord' in request.query_params:
+            startRecord = request.query_params.get('startRecord')
+        else:
+            startRecord = 1
+        try:
+            search_result = sru_query(url_string, searchterm, startRecord=startRecord)
+        except Exception as e:
+            return Response(e, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        result_info = translate_sru_response_to_dict(
+            search_result.text
+        )
+        return Response(result_info)
 
 class AnnotationViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = AnnotationSerializer
