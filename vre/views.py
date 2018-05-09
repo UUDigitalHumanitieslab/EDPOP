@@ -53,6 +53,10 @@ def collection_detail(request, collection_id):
             )
 
 
+def hpb_info(request):
+    return render(request, 'vre/hpb.html')
+
+
 def add_records_to_collections(request, collection_id):
     records_and_collections = json.loads(request.body.decode())
     collections = records_and_collections['collections']
@@ -79,6 +83,7 @@ def add_records_to_collections(request, collection_id):
                     )
                     new_record.save()
                     new_record.collection.add(collection)
+                record_counter += 1
         response_dict[collection.description] = record_counter
     return JsonResponse(response_dict)
 
