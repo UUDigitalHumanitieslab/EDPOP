@@ -269,8 +269,7 @@ var SearchView= LazyTemplateView.extend({
         this.$el.html(this.template());
         this.$el.appendTo($('.collapse'));
     },
-    submitSearch: function(startRecord) {
-        console.log(searchView.source);        
+    submitSearch: function(startRecord) {      
         var searchTerm = this.$('input').val();
         var startFrom = startRecord ? startRecord : 1;
         var hold = results.query({params:{search:searchTerm, source:this.source, startRecord:startFrom}});
@@ -389,9 +388,6 @@ var SelectSourceView = LazyTemplateView.extend({
     templateName: 'nav-dropdown',
     tagName: 'li',
     className: 'dropdown',
-    events: {
-        'click li': 'selectSource',
-    },
     initialize: function() {        
         this.render();
     },
@@ -399,11 +395,6 @@ var SelectSourceView = LazyTemplateView.extend({
         var collections = {'collections': this.collection.toJSON()};
         this.$el.html(this.template(collections));
         this.$el.prependTo($('.nav'));
-    },
-    setSource: function(event) {
-        var source = event.target.id;
-        router.navigate(event.target.id);
-        searchView.source = source;
     },
 });
 
@@ -427,7 +418,6 @@ var RecordDetailView = LazyTemplateView.extend({
             _.invokeMap(this.annotationRows, 'stopListening');
         }
         this.model = model;
-        console.log(this.model);
         this.annotations = new FlatAnnotations(null, {record: model});
         this.annotationRows = this.annotations.map(this.createRow);
         this.listenTo(this.annotations, 'add', this.insertRow);
@@ -488,7 +478,6 @@ var RecordDetailView = LazyTemplateView.extend({
 var VRERouter = Backbone.Router.extend({
     routes: {
         ':id/': 'showDatabase',
-/*        'hpb': 'showHPBPage',*/
     },
     showDatabase: function(id) {
         searchView.render();
@@ -503,7 +492,6 @@ var VRERouter = Backbone.Router.extend({
         else {
             // We are not on the HPB search page, so display the
             // records in the current collection.
-            console.log("collection view")
             $('#HPB-info').hide();
             var collection = allCollections.get(id);
             records = collection.getRecords();
@@ -511,6 +499,7 @@ var VRERouter = Backbone.Router.extend({
             recordsList = new RecordListView({collection: records});
             recordsList.render().$el.insertAfter($('#title-collection'));
         }
+        searchView.source = id;
     },
 });
 
@@ -527,9 +516,9 @@ myCollections.on("sync", function() {
     dropDown = new SelectSourceView({collection:myCollections});
 });
 var recordsList = new RecordListView({collection: records});
-var router = new VRERouter();
 var results = new SearchResults();
 var searchView  = new SearchView();
+var router = new VRERouter();
 //var moreResults = new LoadMoreResultsView();
 
 $(function() {
