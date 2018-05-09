@@ -294,26 +294,36 @@ var SearchView= LazyTemplateView.extend({
     submitSearch: function(startRecord) {      
         var searchTerm = this.$('input').val();
         var startFrom = startRecord ? startRecord : 1;
-        var hold = results.query({params:{search:searchTerm, source:this.source, startRecord:startFrom}});
-        return hold;
+        var searchPromise = results.query(
+            {params:{search:searchTerm, source:this.source, startRecord:startFrom},
+            error: function() {
+                console.log("error!");
+            },
+        });
+        return searchPromise;
     },
     firstSearch: function(event){
         event.preventDefault();
-        this.submitSearch().then( function() {
+        this.submitSearch().then(_.bind(function() {
             $('#more-records').show();
             records.reset(results.models);
             recordsList.render().$el.insertAfter($('#title-HPB'));
-        });
+            this.feedback();
+        }, this));
     },
     nextSearch: function(event) {
         $('#more-records').hide();
-        var startRecord = records.length;
-        this.submitSearch(startRecord).then( function() {
+        var startRecord = records.length+1;
+        this.submitSearch(startRecord).then( _.bind(function() {
             records.add(results.models);
-            if (records.length!=results.total_results) { 
-                $('#more-records').show();
-            }
-        });
+            this.feedback();
+        }, this));
+    },
+    feedback: function() {
+        if (records.length!=results.total_results) { 
+            $('#more-records').show();
+        }
+        $('#search-feedback').text("Showing "+records.length+" of "+results.total_results+" results");
     },
 });
 
