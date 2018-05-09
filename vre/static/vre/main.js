@@ -161,6 +161,13 @@ var Records = APICollection.extend({
 
 var HPBSearch = Records.extend({
     url:'/vre/api/search',
+    total_results: 0,
+    parse: function(response) {
+        this.total_results = response.total_results;
+        var displayString = "Showing ".concat(response.result_list.length, " of ", this.total_results, " results");    
+        $("h4").html(displayString);
+        return response.result_list;
+    }
 });
 
 /**
@@ -309,7 +316,7 @@ var RecordListView = LazyTemplateView.extend({
         return this;
     },
 });
-
+   
 /**
  * Displays a single model from a FlatAnnotations collection.
  */

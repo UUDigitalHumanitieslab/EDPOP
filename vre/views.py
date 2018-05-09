@@ -59,17 +59,16 @@ def add_records_to_collections(request, collection_id):
     if not collections:
         return JsonResponse({'error': 'cannot create records without collection id!'}, status=400)
     records = records_and_collections['records']
-    print(records)
     if not records:
         return JsonResponse({'error': 'no records selected!'}, status=400)
+    response_dict = {}
     for collection_id in collections:
         collection = get_object_or_404(Collection, pk=collection_id)
-        print(collection)
+        record_counter = 0
         for record in records:
             records_in_collection = [r.uri for r in collection.record_set.all()]
             uri = record["uri"]
-            if not uri in records_in_collection:
-                existing_record = Record.objects.filter(uri=uri)
+            if uri not in records_in_collection:
                 if existing_record:
                     existing_record[0].collection.add(collection)
                 else:
@@ -79,8 +78,8 @@ def add_records_to_collections(request, collection_id):
                     )
                     new_record.save()
                     new_record.collection.add(collection)
-    # to do: give a response of which records have been added to which collections
-    return JsonResponse({'success': 'records added!'})
+        response_dict[collection.description] = record_counter
+    return JsonResponse(response_dict)
 
 
 def item_detail(request, result):
