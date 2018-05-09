@@ -342,6 +342,10 @@ var FieldAnnotationView = LazyTemplateView.extend({
 var RecordDetailView = LazyTemplateView.extend({
     el: '#result_detail',
     templateName: 'item-fields',
+    events: {
+        'click #load_next': 'load',
+        'click #load_previous': 'load',
+    },
     initialize: function(options) {
         this.$title = this.$('.modal-title');
         this.$body = this.$('.modal-body');
@@ -394,6 +398,13 @@ var RecordDetailView = LazyTemplateView.extend({
         this.vreCollectionsSelect.clear();
         this.vreCollectionsSelect.setRecord(this.model).render();        
         return this;
+    },
+    load: function(event) {
+        var currentIndex = recordsList.collection.findIndex(this.model);
+        var nextIndex = event.target===$('#load_next')? currentIndex+1 : currentIndex-1;
+        var nextModel = recordsList.collection.at(nextIndex);
+        this.setModel(nextModel);
+        this.render();
     },
 });
 
