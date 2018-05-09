@@ -316,17 +316,7 @@ var RecordListView = LazyTemplateView.extend({
         return this;
     },
 });
-
-function submitSearch(event) {
-    event.preventDefault();
-    var searchTerm = $(event.target).find('input[name="search"]').val();
-    var results = new HPBSearch();
-    results.query({params:{search:searchTerm}});
-    var resultsView = new RecordListView({collection: results});
-    resultsView.render().$el.insertAfter('#search'); 
-};
-        
-        
+   
 /**
  * Displays a single model from a FlatAnnotations collection.
  */
