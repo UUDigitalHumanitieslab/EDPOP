@@ -124,9 +124,8 @@ var FlatFields = Backbone.Collection.extend({
         this.listenTo(this.record, 'change', _.flow([this.toFlat, this.set]));
     },
     toFlat: function(record) {
-        var id = record.id;
         return _.map(record.get('content'), function(value, key) {
-            return {id: id, key: key, value: value};
+            return {key: key, value: value};
         });
     },
 });
@@ -156,18 +155,23 @@ var FlatAnnotations = Backbone.Collection.extend({
         _.assign(this, _.pick(options, ['record']));
         this.underlying = this.record.getAnnotations();
         this.underlying.forEach(this.toFlat.bind(this));
-        this.listenTo(this.underlying, 'add change', this.toFlat);
-        this.on('add change', _.debounce(this.fromFlat), this);
+        this.markedGroups = new Backbone.Collection([]);
+        this.listenTo(this.underlying, 'add change:content', this.toFlat);
+        this.on('add change:key change:value', this.markGroup);
+        this.markedGroups.on('add', _.debounce(this.fromFlat), this);
         // this.listenTo(this.underlying, 'remove', TODO);
         // this.on('remove', TODO);
     },
     // translate the official representation to the flat one
     toFlat: function(annotation) {
+        if (annotation.isNew() || annotation.hasChanged()) {
+            annotation.save(null, {silent: true});
+        }
         var id = annotation.id,
             groupId = annotation.get('managing_group'),
             groupName = allGroups.get(groupId).get('name'),
             content = annotation.get('content'),
-            existing = this.filter({group: groupName}),
+            existing = _.map(this.filter({group: groupName}), 'attributes'),
             replacements = _.map(content, function(value, key) {
                 return {id: id, key: key, value: value, group: groupName};
             }),
@@ -177,24 +181,30 @@ var FlatAnnotations = Backbone.Collection.extend({
         this.remove(obsolete);
         this.add(replacements, {merge: true});
     },
+    markGroup: function(flatAnnotation) {
+        this.markedGroups.add({id: flatAnnotation.get('group')});
+    },
     // translate the flat representation to the official one, save immediately
-    fromFlat: function(flatAnnotation) {
-        var groupName = flatAnnotation.get('group'),
-            groupId = allGroups.findWhere({name: groupName}).id,
-            existing = this.underlying.findWhere({managing_group: groupId}),
-            id = existing && existing.id,
-            allFlat = this.where({group: groupName}),
-            content = _(allFlat).map('attributes').map(function(attributes) {
-                return [attributes.key, attributes.value];
-            }).fromPairs().value(),
-            replacement = {
+    fromFlat: function() {
+        var flat = this,
+            record = flat.record.get('id'),
+            flatPerGroup = flat.groupBy('group');
+        var newContent = flat.markedGroups.map('id').map(function(groupName) {
+            var groupId = allGroups.findWhere({name: groupName}).id,
+                existing = flat.underlying.findWhere({managing_group: groupId}),
+                id = existing && existing.id,
+                content = _(flatPerGroup[groupName]).map(function(model) {
+                    return [model.get('key'), model.get('value')];
+                }).fromPairs().value();
+            return {
                 id: id,
-                record: this.record.get('id'),
+                record: record,
                 managing_group: groupId,
                 content: content,
-            },
-            annotation = this.underlying.add(replacement, {merge: true});
-        annotation.save(null, {silent: true});
+            };
+        });
+        flat.underlying.add(newContent, {merge: true});
+        flat.markedGroups.reset();
     },
 });
 
@@ -338,6 +348,9 @@ var FieldView = LazyTemplateView.extend({
     events: {
         'click': 'edit',
     },
+    initialize: function(options) {
+        this.listenTo(this.model, 'change:key change:value', this.render);
+    },
     render: function() {
         this.$el.html(this.template(this.model.attributes));
         return this;
@@ -384,7 +397,7 @@ var RecordFieldsBaseView = LazyTemplateView.extend({
     templateName: 'field-list',
     initialize: function(options) {
         this.rows = this.collection.map(this.createRow.bind(this));
-        this.listenTo(this.collection, 'add change', this.insertRow);
+        this.listenTo(this.collection, 'add', this.insertRow);
     },
     createRow: function(model) {
         var row = new FieldView({model: model});
@@ -453,10 +466,15 @@ var RecordAnnotationsView = RecordFieldsBaseView.extend({
         this.rows.splice(index, 1, staticRow);
     },
     save: function(editRow) {
+        var model = editRow.model;
         // first, remove the inline form
         this.rows.splice(_.indexOf(this.rows, editRow), 1);
         editRow.remove();
-        // then, add the model (will re-insert static row because of add event)
+        // then, add the model
+        if (this.collection.get(model)) {
+            // re-insert if pre-existing, because .add (below) will not trigger
+            this.insertRow(model);
+        }
         this.collection.add(editRow.model, {merge: true});
     },
 });
