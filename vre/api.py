@@ -100,12 +100,11 @@ class SearchViewSet(ViewSetMixin, APIView):
         searchterm = request.query_params.get('search')
         if not searchterm:
             return Response("search field empty", status=status.HTTP_400_BAD_REQUEST)
-        search_source = request.query_params.get('source')
-        print(request.query_params)
         if 'startRecord' in request.query_params:
             startRecord = request.query_params.get('startRecord')
         else:
             startRecord = 1
+        search_source = request.query_params.get('source')
         if search_source=="hpb":
             url_string = HPB_SRU_URL
             try:
@@ -122,6 +121,7 @@ class SearchViewSet(ViewSetMixin, APIView):
             result_list = [RecordSerializer(result).data for result in search_results]
             result_info = {'total_results': len(search_results), 'result_list': result_list}
         return Response(result_info)
+
 
 class AnnotationViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = AnnotationSerializer

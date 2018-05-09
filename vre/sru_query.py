@@ -36,7 +36,7 @@ def translate_sru_response_to_dict(response_content):
     translationDictionary = load_translation_dictionary()
     soup = BeautifulSoup(response_content, 'lxml')
     records = soup.find_all('record')
-    no_records = int(soup.find('zs:numberofrecords').string)
+    total_results = int(soup.find('zs:numberofrecords').string)
     record_list = []
     for record in records:
         result = {}
@@ -57,7 +57,7 @@ def translate_sru_response_to_dict(response_content):
         result['uri'] = uri
         result['content'] = datafields
         record_list.append(result)
-    result_info = {'total_results': no_records, 'result_list': record_list}
+    result_info = {'total_results': total_results, 'result_list': record_list}
     return result_info
 
 

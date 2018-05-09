@@ -63,7 +63,6 @@ def add_records_to_collections(request, collection_id):
     if not collections:
         return JsonResponse({'error': 'cannot create records without collection id!'}, status=400)
     records = records_and_collections['records']
-    print(records)
     if not records:
         return JsonResponse({'error': 'no records selected!'}, status=400)
     response_dict = {}

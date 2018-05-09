@@ -335,43 +335,8 @@ var RecordListView = LazyTemplateView.extend({
         }
         return this;
     },
-    submitForm: function(event) {
-        event.preventDefault();
-        var selected_indices = this.$tbody.find(':checked').parents('tr').map( function() {
-            return this.rowIndex;
-        }).get();
-        selected_records = this.collection.filter( function(d, i) { 
-            return _.includes(selected_indices, i) 
-        });
-        var selected_collections = $('#select-collections').val();
-        var records_and_collections = {'records': selected_records, 'collections': selected_collections}
-        $.ajax(addCSRFToken({
-            url: 'add-selection',
-            contentType:'application/json',
-            data: JSON.stringify(records_and_collections),
-            success : function(json) {
-                var feedback_string = new String();
-                $.each(json, function(k, v) {
-                    //display the key and value pair
-                    feedback_string = feedback_string.concat('Added ', v, ' record(s) to ', k, ". ");
-                });
-                $('#add_feedback').html(feedback_string).show(1000, function() {
-                    setTimeout(function() {
-                        $('#add_feedback').hide(1000);
-                    }, 2000)
-                });
-                console.log("success"); // sanity check
-            },
-            // handle a non-successful response
-            error : function(xhr,errmsg,err) {
-                console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
-            },
-            method: 'POST'
-    }));
-    },
 });
-  
-        
+   
 /**
  * Displays a single model from a FlatAnnotations collection.
  */
@@ -401,6 +366,10 @@ var SelectSourceView = LazyTemplateView.extend({
 var RecordDetailView = LazyTemplateView.extend({
     el: '#result_detail',
     templateName: 'item-fields',
+    events: {
+        'click #load_next': 'load',
+        'click #load_previous': 'load',
+    },
     initialize: function(options) {
         this.$title = this.$('.modal-title');
         this.$body = this.$('.modal-body');
@@ -454,26 +423,14 @@ var RecordDetailView = LazyTemplateView.extend({
         this.vreCollectionsSelect.setRecord(this.model).render();        
         return this;
     },
-});
-
-/*var LoadMoreResultsView = LazyTemplateView.extend({
-    tagName: 'a',
-    el: '#more-records',
-    events: {
-        'click a': 'retrieveMoreResults',
-    },
-    initialize: function() {
+    load: function(event) {
+        var currentIndex = recordsList.collection.findIndex(this.model);
+        var nextIndex = event.target===$('#load_next')? currentIndex+1 : currentIndex-1;
+        var nextModel = recordsList.collection.at(nextIndex);
+        this.setModel(nextModel);
         this.render();
     },
-    render: function() {
-        el.insertAfter($('#record-list'));
-        return this;
-    },
-    retrieveMoreResults: function(event) {
-        event.preventDefault();
-        searchView.nextSearch(event);
-    },
-});*/
+});
 
 var VRERouter = Backbone.Router.extend({
     routes: {
