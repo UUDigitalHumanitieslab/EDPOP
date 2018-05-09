@@ -19,7 +19,6 @@
 </script>
 
 <script type="text/x-handlebars-template" id="record-list">
-    <div class="alert alert-success" role="alert" id="add_feedback" style="display:none"></div>
     <h4></h4>
     <table class="table table-striped">
         <tbody></tbody>
@@ -32,6 +31,8 @@
 </script>
 
 <script type="text/x-handlebars-template" id="collection-selector">
+    <div class="alert alert-success" role="alert"></div>
+    <div class="alert alert-warning" role="alert"></div>
     <select name="collections" multiple="multiple" style="width: 50%;">
         {{#models}}<option value={{id}}>{{description}}</option>{{/models}}
     </select>

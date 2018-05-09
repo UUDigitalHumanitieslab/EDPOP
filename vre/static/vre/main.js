@@ -245,6 +245,7 @@ var VRECollectionView = LazyTemplateView.extend({
     templateName: 'collection-selector',
     events: {
         'click #add': 'submitForm',
+        'sync': 'test',
     },
     render: function() {
         this.$el.html(this.template({models: this.collection.toJSON()}));
@@ -270,24 +271,33 @@ var VRECollectionView = LazyTemplateView.extend({
             selected_records = _(recordsList.items).filter({selected: true}).invokeMap('model.toJSON').value();
         }
         var selected_collections = this.$('select').val();
-        var records_and_collections = new AdditionsToCollections({
+        var records_and_collections = new AdditionsToCollections();
+        var additions = {
             'records': selected_records,
             'collections': selected_collections,
+        };
+        records_and_collections.save(additions, {
+            success: function(model, response) {
+                var feedbackString = '';
+                $.each(response, function(key, value) {
+                    feedbackString = feedbackString.concat('Added ', value, ' record(s) to ', key, ". "); 
+                });  
+                this.$('.alert-success').html(feedbackString).show(500, function() {   
+                    setTimeout(function() {    
+                        this.$('.alert-success').hide(500); 
+                    }, 2000);     
+                });
+            },
+            error: function(model, response) {
+                var feedbackString = response.responseJSON["error"];
+                this.$('.alert-warning').html(feedbackString).show(500, function() {   
+                    setTimeout(function() {    
+                        this.$('.alert-warning').hide(500); 
+                    }, 1000);  
+                });
+            },
         });
-        records_and_collections.save();
-    },
-    giveFeedback: function() {
-        var feedback_string = new String(); 
--                $.each(json, function(k, v) {  
--                    //display the key and value pair   
--                    feedback_string = feedback_string.concat('Added ', v, ' record(s) to ', k, ". ");  
--                });    
--                $('#add_feedback').html(feedback_string).show(1000, function() {   
--                    setTimeout(function() {    
--                        $('#add_feedback').hide(1000); 
--                    }, 2000)   
--                });  
-    },  
+    }, 
 });
 
 var RecordListView = LazyTemplateView.extend({
@@ -354,7 +364,6 @@ var RecordDetailView = LazyTemplateView.extend({
         this.$footer = this.$('.modal-footer');
         this.annotationRows = [];
         this.vreCollectionsSelect = new VRECollectionView({collection: myCollections});
-        this.$footer.prepend(this.vreCollectionsSelect.$el);
     },
     setModel: function(model) {
         if (this.model) {
@@ -398,7 +407,8 @@ var RecordDetailView = LazyTemplateView.extend({
             _(this.annotationRows).invokeMap('render').map('el').value()
         );
         this.vreCollectionsSelect.clear();
-        this.vreCollectionsSelect.setRecord(this.model).render();        
+        this.vreCollectionsSelect.setRecord(this.model).render();
+        this.$footer.prepend(this.vreCollectionsSelect.$el);        
         return this;
     },
     load: function(event) {
