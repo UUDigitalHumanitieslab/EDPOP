@@ -23,6 +23,8 @@
         class=form-control
         placeholder="Field"
         title="Field annotation name"
+        value="{{key}}"
+        {{#key}}disabled{{/key}}
     ></td>
     <td><input
         type=text
@@ -31,6 +33,7 @@
         class=form-control
         placeholder="Value"
         title="Field annotation value"
+        value="{{value}}"
     ></td>
     <td><form id=form-{{cid}}>
         <button type=reset class="btn btn-default">Cancel</button>

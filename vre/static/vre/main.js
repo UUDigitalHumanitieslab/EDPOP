@@ -157,7 +157,7 @@ var FlatAnnotations = Backbone.Collection.extend({
         this.underlying.forEach(this.toFlat.bind(this));
         this.markedGroups = new Backbone.Collection([]);
         this.listenTo(this.underlying, 'add change:content', this.toFlat);
-        this.on('add change:key change:value', this.markGroup);
+        this.on('add change:value', this.markGroup);
         this.markedGroups.on('add', _.debounce(this.fromFlat), this);
         // this.listenTo(this.underlying, 'remove', TODO);
         // this.on('remove', TODO);
@@ -349,7 +349,7 @@ var FieldView = LazyTemplateView.extend({
         'click': 'edit',
     },
     initialize: function(options) {
-        this.listenTo(this.model, 'change:key change:value', this.render);
+        this.listenTo(this.model, 'change:value', this.render);
     },
     render: function() {
         this.$el.html(this.template(this.model.attributes));
@@ -372,11 +372,9 @@ var AnnotationEditView = LazyTemplateView.extend({
         _.assign(this, _.pick(options, ['existing']));
     },
     render: function() {
-        this.$el.html(this.template(this));
-        var model = this.model;
-        this.$('input').val(function(index, oldValue) {
-            return model.get(this.name);
-        }).last().focus();  // TODO: focus doesn't work yet
+        this.$el.html(this.template(
+            _.extend({cid: this.cid}, this.model.attributes)
+        ));
         return this;
     },
     submit: function(event) {
