@@ -479,11 +479,11 @@ var RecordAnnotationsView = RecordFieldsBaseView.extend({
         this.rows.splice(_.indexOf(this.rows, editRow), 1);
         editRow.remove();
         // then, add the model
-        if (this.collection.get(model)) {
+        if (editRow.existing) {
             // re-insert if pre-existing, because .add (below) will not trigger
             this.insertRow(model);
         }
-        this.collection.add(editRow.model, {merge: true});
+        this.collection.add(model, {merge: true});
     },
 });
 
