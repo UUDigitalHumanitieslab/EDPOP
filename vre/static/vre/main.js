@@ -418,7 +418,7 @@ var RecordFieldsBaseView = LazyTemplateView.extend({
         }
     },
     render: function() {
-        this.$el.html(this.template({title: this.title}));
+        this.$el.html(this.template(this));
         this.$tbody = this.$('tbody');
         this.$tbody.append(_(this.rows).invokeMap('render').map('el').value());
         return this;
@@ -434,6 +434,13 @@ var RecordFieldsView = RecordFieldsBaseView.extend({
 
 var RecordAnnotationsView = RecordFieldsBaseView.extend({
     title: 'Annotations',
+    initialize: function(options) {
+        RecordFieldsBaseView.prototype.initialize.call(this, options);
+        this.editable = true;  // enables "New field" button
+    },
+    events: {
+        'click table + button': 'editEmpty',
+    },
     edit: function(model) {
         var group = groupMenu.model.get('name'),
             editTarget = model.clone().set('group', group),
@@ -455,6 +462,9 @@ var RecordAnnotationsView = RecordFieldsBaseView.extend({
             this.$tbody.append(newRow.render().el);
         }
         newRow.on({cancel: this.cancel, save: this.save}, this);
+    },
+    editEmpty: function() {
+        this.edit(new Backbone.Model);
     },
     cancel: function(editRow) {
         var staticRow, index = _.indexOf(this.rows, editRow);
