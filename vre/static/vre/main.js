@@ -132,7 +132,7 @@ var Record = Backbone.Model.extend({
 });
 
 var AdditionsToCollections = Backbone.Model.extend({
-    url: 'add-selection',
+    url: '/vre/add-selection',
 })
 
 var Records = APICollection.extend({
@@ -227,7 +227,6 @@ var VRECollectionView = LazyTemplateView.extend({
     templateName: 'collection-selector',
     events: {
         'click #add': 'submitForm',
-        'sync': 'test',
     },
     render: function() {
         this.$el.html(this.template({models: this.collection.toJSON()}));
@@ -271,7 +270,7 @@ var VRECollectionView = LazyTemplateView.extend({
                 });
             },
             error: function(model, response) {
-                var feedbackString = response.responseJSON["error"];
+                var feedbackString = response.responseJSON.error;
                 this.$('.alert-warning').html(feedbackString).show(500, function() {   
                     setTimeout(function() {    
                         this.$('.alert-warning').hide(500); 
@@ -279,7 +278,7 @@ var VRECollectionView = LazyTemplateView.extend({
                 });
             },
         });
-    }, 
+    },
 });
 
 var SearchView= LazyTemplateView.extend({
@@ -307,7 +306,10 @@ var SearchView= LazyTemplateView.extend({
         this.submitSearch().then(_.bind(function() {
             $('#more-records').show();
             records.reset(results.models);
-            recordsList.render().$el.insertAfter($('#title-HPB'));
+            if (!document.contains(recordsList.$el[0])) {
+                // records list is initialized and rendered but not yet added to DOM
+                recordsList.$el.insertAfter($('.page-header'));
+            }
             this.feedback();
         }, this));
     },
@@ -332,6 +334,7 @@ var RecordListView = LazyTemplateView.extend({
     tagName: 'form',
     templateName: 'record-list',
     initialize: function(options) {
+        console.log("RecordListView initialized");
         this.items = [];
         this.listenTo(this.collection, {
             add: this.addItem,
@@ -473,10 +476,8 @@ var VRERouter = Backbone.Router.extend({
         // The if-condition is a bit of a hack, which can go away when we
         // convert to client side routing entirely.
         if (id=="hpb") {
-            recordsList.remove();
-            records = new Records();
-            recordsList = new RecordListView({collection: records});
             $('#HPB-info').show();
+            //recordsList.render().$el.insertAfter($('.page-header'));
         }
         else {
             // We are not on the HPB search page, so display the
@@ -486,7 +487,7 @@ var VRERouter = Backbone.Router.extend({
             records = collection.getRecords();
             recordsList.remove();
             recordsList = new RecordListView({collection: records});
-            recordsList.render().$el.insertAfter($('#title-collection'));
+            recordsList.render().$el.insertAfter($('.page-header'));
         }
         searchView.source = id;
     },
@@ -508,7 +509,7 @@ var recordsList = new RecordListView({collection: records});
 var results = new SearchResults();
 var searchView  = new SearchView();
 var router = new VRERouter();
-//var moreResults = new LoadMoreResultsView();
+
 
 $(function() {
     $('script[type="text/x-handlebars-template"]').each(function(i, element) {
