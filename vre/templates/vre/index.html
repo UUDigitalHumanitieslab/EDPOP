@@ -1,12 +1,11 @@
 {% extends "vre/base.html" %}
 {% block content %}
-{% if user_collections %}
-    <ul>
-    {% for collection in user_collections %}
-        <li><a href="{{ collection.id }}/">{{ collection.description }}</a></li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>You do not have access to any collections. Contact the leader of your research group for access.</p>
-{% endif %}
+<div class="container-fluid">
+	<div class="page-header">
+		<h1>Welcome to the EDPOP Virtual Research Environment!</h1>
+	</div>
+	<div class="well well-lg">
+		Use the dropdown menu above to select which database (VRE collection or external database) you would like to browse or search.
+	</div>
+</div>
 {% endblock content %}

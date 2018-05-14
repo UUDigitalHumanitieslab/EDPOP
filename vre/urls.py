@@ -9,7 +9,7 @@ api_router = routers.DefaultRouter()
 api_router.register(r'researchgroups', api.ResearchGroupViewSet)
 api_router.register(r'collections', api.CollectionViewSet)
 api_router.register(r'records', api.RecordViewSet)
-api_router.register(r'search', api.HPBViewSet, base_name='search')
+api_router.register(r'search', api.SearchViewSet, base_name='search')
 api_router.register(r'annotations', api.AnnotationViewSet)
 
 urlpatterns = [
@@ -17,6 +17,7 @@ urlpatterns = [
     url(r'^(?P<collection_id>[0-9]+)/$', views.collection_detail, name='collection_overview'),
     url(r'^(?P<collection_id>[0-9]+)/add-selection$', views.add_records_to_collections, name='collection_add_items'),
     url(r'^item_detail/(.+)$', views.item_detail, name='item_detail'),
+    url(r'^hpb/$', views.hpb_info, name='hpb-info'),
     url(r'^api/', include(api_router.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]
