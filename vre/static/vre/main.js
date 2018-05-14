@@ -55,10 +55,10 @@ var APICollection = Backbone.Collection.extend({
     query: function(options) {
         var url = options.url || this.url;
         var urlParts = [url, '?'];
-        if (options.params) {
-            urlParts.push(objectAsUrlParams(options.params));
+        if (options.filters) {
+            urlParts.push(objectAsUrlParams(options.filters));
         }
-        var fetchOptions = _(options).omit(['params']).extend({
+        var fetchOptions = _(options).omit(['filters']).extend({
             url: urlParts.join(''),
         }).value();
         return this.fetch(fetchOptions);
@@ -294,7 +294,7 @@ var SearchView= LazyTemplateView.extend({
         var searchTerm = this.$('input').val();
         var startFrom = startRecord ? startRecord : 1;
         var searchPromise = results.query(
-            {params:{search:searchTerm, source:this.source, startRecord:startFrom},
+            {filters:{search:searchTerm, source:this.source, startRecord:startFrom},
             error: function() {
                 console.log("error!");
             },
@@ -334,7 +334,6 @@ var RecordListView = LazyTemplateView.extend({
     tagName: 'form',
     templateName: 'record-list',
     initialize: function(options) {
-        console.log("RecordListView initialized");
         this.items = [];
         this.listenTo(this.collection, {
             add: this.addItem,
@@ -477,13 +476,13 @@ var VRERouter = Backbone.Router.extend({
         // convert to client side routing entirely.
         if (id=="hpb") {
             $('#HPB-info').show();
-            //recordsList.render().$el.insertAfter($('.page-header'));
         }
         else {
             // We are not on the HPB search page, so display the
             // records in the current collection.
             $('#HPB-info').hide();
             var collection = allCollections.get(id);
+            console.log(collection);
             records = collection.getRecords();
             recordsList.remove();
             recordsList = new RecordListView({collection: records});
