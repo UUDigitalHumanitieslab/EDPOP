@@ -267,7 +267,6 @@ var SearchView= LazyTemplateView.extend({
     },
     render: function() {
         this.$el.html(this.template());
-        this.$el.appendTo($('.collapse'));
     },
     submitSearch: function(startRecord) {      
         var searchTerm = this.$('input').val();
@@ -359,7 +358,6 @@ var SelectSourceView = LazyTemplateView.extend({
     render: function() {
         var collections = {'collections': this.collection.toJSON()};
         this.$el.html(this.template(collections));
-        this.$el.prependTo($('.nav'));
     },
 });
 
@@ -438,6 +436,7 @@ var VRERouter = Backbone.Router.extend({
     },
     showDatabase: function(id) {
         searchView.render();
+        searchView.$el.appendTo($('.collapse'));;
         // The if-condition is a bit of a hack, which can go away when we
         // convert to client side routing entirely.
         if (id=="hpb") {
@@ -471,6 +470,7 @@ var dropDown;
 myCollections.on("sync", function() { 
     recordDetailModal = new RecordDetailView();
     dropDown = new SelectSourceView({collection:myCollections});
+    dropDown.$el.prependTo($('.nav'));
 });
 var recordsList = new RecordListView({collection: records});
 var results = new SearchResults();
