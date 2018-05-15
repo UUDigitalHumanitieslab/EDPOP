@@ -1,4 +1,4 @@
-from rest_framework import viewsets, renderers
+from rest_framework import viewsets, mixins, renderers
 from rest_framework.decorators import list_route
 
 from .serializers import *
@@ -63,6 +63,26 @@ class ListMineMixin(object):
         return super().perform_content_negotiation(request, force)
 
 
+class CreateReadModelViewSet(
+        mixins.CreateModelMixin,
+        mixins.ListModelMixin,
+        mixins.RetrieveModelMixin,
+        viewsets.GenericViewSet,
+    ):
+    """
+    A viewset that provides `retrieve`, `create`, and `list` actions.
+
+    Importantly, this class does not provide `update`, `partial_update`
+    or `destroy`.
+    To use it, override the class and set the `.queryset` and
+    `.serializer_class` attributes.
+
+    This class was copied from the example over here:
+    http://www.django-rest-framework.org/api-guide/viewsets/#custom-viewset-base-classes
+    """
+    pass
+
+
 class ResearchGroupViewSet(ListMineMixin, viewsets.ReadOnlyModelViewSet):
     serializer_class = ResearchGroupSerializer
     queryset = ResearchGroup.objects.all()
@@ -78,7 +98,7 @@ class CollectionViewSet(ListMineMixin, viewsets.ReadOnlyModelViewSet):
     filter_fields = ['managing_group__id']
 
 
-class RecordViewSet(viewsets.ReadOnlyModelViewSet):
+class RecordViewSet(CreateReadModelViewSet):
     serializer_class = RecordSerializer
     queryset = Record.objects.all()
     filter_fields = ['uri', 'collection__id']

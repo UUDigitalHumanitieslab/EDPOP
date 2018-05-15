@@ -165,7 +165,12 @@ var FlatAnnotations = Backbone.Collection.extend({
     // translate the official representation to the flat one
     toFlat: function(annotation) {
         if (annotation.isNew() || annotation.hasChanged()) {
-            annotation.save(null, {silent: true});
+            // Store the annotation either immediately or on record save.
+            if (this.record.isNew()) {
+                this.listenToOnce(annotation, 'change:record', function() {
+                    annotation.save(null, {silent: true});
+                });
+            } else annotation.save(null, {silent: true});
         }
         var id = annotation.id,
             groupId = annotation.get('managing_group'),
@@ -187,7 +192,8 @@ var FlatAnnotations = Backbone.Collection.extend({
     // translate the flat representation to the official one, save immediately
     fromFlat: function() {
         var flat = this,
-            record = flat.record.id,
+            record = flat.record,
+            recordId = record.id,
             flatPerGroup = flat.groupBy('group');
         var newContent = flat.markedGroups.map('id').map(function(groupName) {
             var groupId = allGroups.findWhere({name: groupName}).id,
@@ -198,10 +204,15 @@ var FlatAnnotations = Backbone.Collection.extend({
                 }).fromPairs().value();
             return {
                 id: id,
-                record: record,
+                record: recordId,
                 managing_group: groupId,
                 content: content,
             };
+        });
+        // At least one annotation exists, so now is the time to ensure
+        // the VRE knows the record.
+        if (record.isNew()) record.save().then(function() {
+            _.invokeMap(flat.underlying.models, 'set', 'record', record.id);
         });
         flat.underlying.add(newContent, {merge: true});
         flat.markedGroups.reset();
@@ -212,7 +223,9 @@ var Record = APIModel.extend({
     getAnnotations: function() {
         if (!this.annotations) {
             this.annotations = new Annotations();
-            this.annotations.query({filters: {record__id: this.id}});
+            if (!this.isNew()) this.annotations.query({
+                filters: {record__id: this.id}
+            });
         }
         return this.annotations;
     },
