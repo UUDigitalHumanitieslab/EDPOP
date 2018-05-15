@@ -1,0 +1,13 @@
+{% extends "vre/base.html" %}
+{% block content %}
+<div class="container-fluid">
+    <div class="page-header" id="title-HPB">
+        <h1>Search the CERL HPB Database</h1>
+    </div>
+    <div class="well well-lg"  id="HPB-info">
+        The HPB Database (previously called the Hand Press Book Database) is a steadily growing collection of files of catalogue records from major European and North American research libraries covering items of European printing of the hand-press period (c.1455-c.1830) integrated into one file. This makes it possible for information to be retrieved in one single search across all files. As the digitisation of collections in contributing libraries progresses, more and more catalogue records point to digital presentations of the early printed books.
+    </div>
+</div>
+<a href="#" id="more-records">Load more records</a>
+{% include "vre/item_detail.html" %}
+{% endblock content %}

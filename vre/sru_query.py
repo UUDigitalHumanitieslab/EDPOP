@@ -1,5 +1,4 @@
 import requests
-from lxml import etree
 import os
 import csv
 from bs4 import BeautifulSoup
@@ -13,12 +12,7 @@ def sru_explain(url_string):
     return response
 
 
-def parse_xml(response):
-    parsed = etree.XML(response.content)
-    return parsed
-
-
-def sru_query(url_string, query_string):
+def sru_query(url_string, query_string, startRecord=1):
     ''' given the url of a resource to query, and the query string,
     return a requests object with the server's response.
     '''
@@ -28,7 +22,8 @@ def sru_query(url_string, query_string):
         'recordPacking': 'xml',
         'operation': 'searchRetrieve',
         'version': '1.1',
-        'maximumRecords': 15
+        'maximumRecords': 15,
+        'startRecord': startRecord
     }
     payload['query'] = query_string
     response = requests.get(url_string, params=payload)
@@ -41,8 +36,10 @@ def translate_sru_response_to_dict(response_content):
     translationDictionary = load_translation_dictionary()
     soup = BeautifulSoup(response_content, 'lxml')
     records = soup.find_all('record')
+    total_results = int(soup.find('zs:numberofrecords').string)
     record_list = []
     for record in records:
+        result = {}
         ids = record.find_all('datafield', tag='035')
         # for multiple fields with tag "035", select one which does not start with a bracket
         # HPB specific!!
@@ -57,9 +54,11 @@ def translate_sru_response_to_dict(response_content):
                     datafields[description] = " ; ".join([sub.string for sub in subfields])
                 else:
                     datafields[description] = datafield.subfield.string
-        datafields['uri'] = uri
-        record_list.append(datafields)
-    return record_list
+        result['uri'] = uri
+        result['content'] = datafields
+        record_list.append(result)
+    result_info = {'total_results': total_results, 'result_list': record_list}
+    return result_info
 
 
 def load_translation_dictionary():

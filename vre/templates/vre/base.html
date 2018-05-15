@@ -14,9 +14,11 @@
             crossorigin="anonymous"
         >
         <link rel="stylesheet" type="text/css" href="{% static "css/style.css" %}">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
         {% endblock style %}
     </head>
     <body>
+        {% csrf_token %}
         <nav class="navbar navbar-default">
             {# see https://getbootstrap.com/docs/3.3/components/#navbar-default #}
             <div class="container-fluid">
@@ -27,9 +29,10 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="#" title="EDPOP Virtual Reasearch Environment">EDPOP VRE</a>
+                    <a class="navbar-brand" href="#" title="EDPOP Virtual Research Environment">EDPOP VRE</a>
                 </div>
                 <div class="collapse navbar-collapse">
+                    <ul class="nav navbar-nav"></ul>
                     <ul class="nav navbar-nav navbar-right">
                         <li id=vre-group-menu class=dropdown>
                             <a href="#" role=button class=dropdown-toggle data-toggle=dropdown aria-haspopup=true aria-expanded=false></a>
@@ -55,6 +58,7 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.3.3/backbone-min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
         <script src="{% static "vre/main.js" %}"></script>
         {% endblock scripts %}
         {% block templates %}

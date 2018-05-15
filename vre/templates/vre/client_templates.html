@@ -44,7 +44,8 @@
 </script>
 
 <script type="text/x-handlebars-template" id="record-list">
-    <input type="submit" value="Add">
+    <div class="alert alert-success" role="alert" id="add_feedback" style="display:none"></div>
+    <h4></h4>
     <table class="table table-striped">
         <tbody></tbody>
     </table>
@@ -55,6 +56,13 @@
     <td><a href="#">{{# content}}{{Title}}{{/ content}}</a></td>
 </script>
 
+<script type="text/x-handlebars-template" id="collection-selector">
+    <select name="collections" multiple="multiple" style="width: 30%;">
+        {{#models}}<option value={{id}}>{{description}}</option>{{/models}}
+    </select>
+    <button class="btn btn-primary" type="submit" id="add">Add to collection...</button>
+</script>
+
 <script type="text/x-handlebars-template" id="group-menu-header">
     Context: {{name}}<span class=caret></span>
 </script>
@@ -62,4 +70,50 @@
 <script type="text/x-handlebars-template" id="group-menu-item">
     <a href="#">{{name}}</a>
 </script>
+
+<script type="text/x-handlebars-template" id="nav-dropdown">
+    <a href="" class="dropdown-toggle" data-toggle="dropdown"
+        aria-haspopup="true" aria-expanded="false">Database <span class="caret"></span>
+    </a>
+    <ul class="dropdown-menu">
+        <li><a href="/vre/hpb" id="hpb">HPB</a></li>
+        <li role="separator" class="divider"></li>
+        {{#collections}}
+            <li> <a href="/vre/{{id}}" id="{{id}}">{{description}}</a></li>
+        {{/collections}}
+    </ul>
+</script>
+
+<script type="text/x-handlebars-template" id="search-view">
+    <form class="navbar-form navbar-left" id="search">
+        <div class="form-group">
+            <input type="text" class="form-control" name="search" placeholder="Query">
+        </div>
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+</script>
+
+<script type="text/x-handlebars-template" id="item-detail">
+    <div class="modal" id="record_detail" role=dialog>
+        <div class="modal-dialog" role=document>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button
+                        type="button"
+                        class="close"
+                        data-dismiss="modal"
+                        aria-label="Close"
+                    ><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title"></h4>
+                </div>
+                <div class="modal-body"></div>
+                <div class="modal-footer">
+                    <button type=button class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
+
 {% endverbatim %}

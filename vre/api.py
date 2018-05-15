@@ -1,8 +1,16 @@
-from rest_framework import viewsets, mixins, renderers
+from rest_framework import viewsets, mixins, renderers, status
+from rest_framework.views import APIView
+from rest_framework.viewsets import ViewSetMixin
+from rest_framework.response import Response
 from rest_framework.decorators import list_route
+from rest_framework.renderers import JSONRenderer
+
 
 from .serializers import *
 from .models import *
+from .sru_query import sru_query, translate_sru_response_to_dict
+
+HPB_SRU_URL = "http://sru.gbv.de/hpb"
 
 
 class ListMineMixin(object):
@@ -58,7 +66,7 @@ class ListMineMixin(object):
     # has a bug that sometimes causes it to send the wrong Accept header.
     def perform_content_negotiation(self, request, force=False):
         if self.action == 'mine':
-            renderer = renderers.JSONRenderer()
+            renderer = JSONRenderer()
             return renderer, renderer.media_type
         return super().perform_content_negotiation(request, force)
 
@@ -102,6 +110,34 @@ class RecordViewSet(CreateReadModelViewSet):
     serializer_class = RecordSerializer
     queryset = Record.objects.all()
     filter_fields = ['uri', 'collection__id']
+
+
+class SearchViewSet(ViewSetMixin, APIView):
+    def list(self, request, format=None):
+        searchterm = request.query_params.get('search')
+        if not searchterm:
+            return Response("search field empty", status=status.HTTP_400_BAD_REQUEST)
+        if 'startRecord' in request.query_params:
+            startRecord = request.query_params.get('startRecord')
+        else:
+            startRecord = 1
+        search_source = request.query_params.get('source')
+        if search_source=="hpb":
+            url_string = HPB_SRU_URL
+            try:
+                search_result = sru_query(url_string, searchterm, startRecord=startRecord)
+            except Exception as e:
+                return Response(e, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            result_info = translate_sru_response_to_dict(
+                search_result.text
+            )
+        else:
+            # searching records in collection: do they contain the search term anywhere in content?
+            records = Record.objects.filter(collection__id=search_source)
+            search_results = records.filter(content__icontains=searchterm)
+            result_list = [RecordSerializer(result).data for result in search_results]
+            result_info = {'total_results': len(search_results), 'result_list': result_list}
+        return Response(result_info)
 
 
 class AnnotationViewSet(viewsets.ModelViewSet):
