@@ -49,9 +49,20 @@ function objectAsUrlParams(object) {
 }
 
 /**
+ * Generic subclass that appends a slash to the model URL.
+ * This is required for interop with Django REST Framework.
+ */
+var APIModel = Backbone.Model.extend({
+    url: function() {
+        return Backbone.Model.prototype.url.call(this) + '/';
+    },
+});
+
+/**
  * Generic subclass that supports filtering at the backend.
  */
 var APICollection = Backbone.Collection.extend({
+    model: APIModel,
     query: function(options) {
         var url = options.url || this.url;
         var urlParts = [url, '?'];
@@ -65,46 +76,85 @@ var APICollection = Backbone.Collection.extend({
     },
 });
 
+// A single field of a single record.
+var Field = Backbone.Model.extend({
+    idAttribute: 'key',
+});
+
+/**
+ * This is an alternative, flat representation of the fields in a given
+ * option.record. Its purpose is to be easier to represent and manage from
+ * a view.
+ *
+ * normal: {id, uri, content}
+ * flat alternative: [{id, key, value}]
+ *
+ * Note that we extend directly from Backbone.Collection rather than from
+ * APICollection and that we don't set a URL. This is because we only talk
+ * to the server through the underlying Record model.
+ */
+var FlatFields = Backbone.Collection.extend({
+    model: Field,
+    initialize: function(models, options) {
+        _.assign(this, _.pick(options, ['record']));
+        if (this.record.has('content')) this.set(this.toFlat(this.record));
+        // Do the above line again when the record changes.
+        this.listenTo(this.record, 'change', _.flow([this.toFlat, this.set]));
+    },
+    toFlat: function(record) {
+        return _.map(record.get('content'), function(value, key) {
+            return {key: key, value: value};
+        });
+    },
+});
+
 var Annotations = APICollection.extend({
     url: '/vre/api/annotations',
 });
 
 /**
  * This is an alternative, flat representation of the annotations for a
- * given option.record. Its purpose is to be easier to represent and manage
- * from a view. It proxies to a normal Annotations (see above), using event
- * bindings to keep the two representations in sync.
+ * given option.record, similar to FlatFields. It proxies to a normal
+ * Annotations (see above), using event bindings to keep the two
+ * representations in sync. This requires some additional sophistication
+ * compared to FlatFields, because annotations allow editing and because
+ * there may be multiple underlying annotation objects.
  *
  * normal: {id, record, managing_group, content}
- * flat alternative: {id, key, value, group}
- *
- * Note that we extend directly from Backbone.Collection rather than from
- * APICollection and that we don't set a URL. This is because we only talk
- * to the server through the underlying Annotations collection.
+ * flat alternative: [{id, key, value, group}]
  */
-// (This is a trick we could use more often.)
 var FlatAnnotations = Backbone.Collection.extend({
     // comparator: can be set to keep this sorted
     // How to uniquely identify a field annotation.
     modelId: function(attributes) {
-        return attributes.key + attributes.id;
+        return attributes.key + ':' + attributes.group;
     },
     initialize: function(models, options) {
         _.assign(this, _.pick(options, ['record']));
         this.underlying = this.record.getAnnotations();
         this.underlying.forEach(this.toFlat.bind(this));
-        this.listenTo(this.underlying, 'add change', this.toFlat);
+        this.markedGroups = new Backbone.Collection([]);
+        this.listenTo(this.underlying, 'add change:content', this.toFlat);
+        this.on('add change:value', this.markGroup);
+        this.markedGroups.on('add', _.debounce(this.fromFlat), this);
         // this.listenTo(this.underlying, 'remove', TODO);
-        // this.on('add change', this.fromFlat);
         // this.on('remove', TODO);
     },
     // translate the official representation to the flat one
     toFlat: function(annotation) {
+        if (annotation.isNew() || annotation.hasChanged()) {
+            // Store the annotation either immediately or on record save.
+            if (this.record.isNew()) {
+                this.listenToOnce(annotation, 'change:record', function() {
+                    annotation.save(null, {silent: true});
+                });
+            } else annotation.save(null, {silent: true});
+        }
         var id = annotation.id,
             groupId = annotation.get('managing_group'),
             groupName = allGroups.get(groupId).get('name'),
             content = annotation.get('content'),
-            existing = this.filter({id: id}),
+            existing = _.map(this.filter({group: groupName}), 'attributes'),
             replacements = _.map(content, function(value, key) {
                 return {id: id, key: key, value: value, group: groupName};
             }),
@@ -114,26 +164,55 @@ var FlatAnnotations = Backbone.Collection.extend({
         this.remove(obsolete);
         this.add(replacements, {merge: true});
     },
-    // translate the flat representation to the official one
-    fromFlat: function(flatAnnotation) {
-        // TODO
+    markGroup: function(flatAnnotation) {
+        this.markedGroups.add({id: flatAnnotation.get('group')});
+    },
+    // translate the flat representation to the official one, save immediately
+    fromFlat: function() {
+        var flat = this,
+            record = flat.record,
+            recordId = record.id,
+            flatPerGroup = flat.groupBy('group');
+        var newContent = flat.markedGroups.map('id').map(function(groupName) {
+            var groupId = allGroups.findWhere({name: groupName}).id,
+                existing = flat.underlying.findWhere({managing_group: groupId}),
+                id = existing && existing.id,
+                content = _(flatPerGroup[groupName]).map(function(model) {
+                    return [model.get('key'), model.get('value')];
+                }).fromPairs().value();
+            return {
+                id: id,
+                record: recordId,
+                managing_group: groupId,
+                content: content,
+            };
+        });
+        // At least one annotation exists, so now is the time to ensure
+        // the VRE knows the record.
+        if (record.isNew()) record.save().then(function() {
+            _.invokeMap(flat.underlying.models, 'set', 'record', record.id);
+        });
+        flat.underlying.add(newContent, {merge: true});
+        flat.markedGroups.reset();
     },
 });
 
-var Record = Backbone.Model.extend({
-    idAttribute: 'uri',
+var Record = APIModel.extend({
+    urlRoot: '/vre/api/records',
     getAnnotations: function() {
         if (!this.annotations) {
             this.annotations = new Annotations();
-            this.annotations.query({filters: {record__uri: this.id}});
+            if (!this.isNew()) this.annotations.query({
+                params: {record__id: this.id}
+            });
         }
         return this.annotations;
     },
 });
 
 var AdditionsToCollections = Backbone.Model.extend({
-    url: 'add-selection',
-})
+    url: '/vre/add-selection',
+});
 
 var Records = APICollection.extend({
     url: '/vre/api/records',
@@ -146,7 +225,7 @@ var SearchResults = Records.extend({
     parse: function(response) {
         this.total_results = response.total_results;
         /*
-        var displayString = "Showing ".concat(this.length, " of ", this.total_results, " results");    
+        var displayString = "Showing ".concat(this.length, " of ", this.total_results, " results");
         $("h4").html(displayString);*/
         return response.result_list;
     }
@@ -159,7 +238,7 @@ var VRECollection = Backbone.Model.extend({
     getRecords: function() {
         if (!this.records) {
             this.records = new Records();
-            this.records.query({filters: {collection__id: this.id}});
+            this.records.query({params: {collection__id: this.id}});
         }
         return this.records;
     },
@@ -226,7 +305,7 @@ var RecordListItemView = LazyTemplateView.extend({
 var VRECollectionView = LazyTemplateView.extend({
     templateName: 'collection-selector',
     events: {
-        'click #add': 'submitForm',
+        'click button': 'submitForm',
     },
     render: function() {
         this.$el.html(this.template({models: this.collection.toJSON()}));
@@ -245,7 +324,7 @@ var VRECollectionView = LazyTemplateView.extend({
         var selected_records = [];
         if (this.model) {
             // adding to array as the api expects an array.
-            selected_records.push(this.model);
+            selected_records.push(this.model.toJSON());
             this.model = undefined;
         }
         else {
@@ -268,7 +347,7 @@ var SearchView= LazyTemplateView.extend({
     render: function() {
         this.$el.html(this.template());
     },
-    submitSearch: function(startRecord) {      
+    submitSearch: function(startRecord) {
         var searchTerm = this.$('input').val();
         var startFrom = startRecord ? startRecord : 1;
         var hold = results.query({params:{search:searchTerm, source:this.source, startRecord:startFrom}});
@@ -287,7 +366,7 @@ var SearchView= LazyTemplateView.extend({
         var startRecord = records.length;
         this.submitSearch(startRecord).then( function() {
             records.add(results.models);
-            if (records.length!=results.total_results) { 
+            if (records.length!=results.total_results) {
                 $('#more-records').show();
             }
         });
@@ -298,6 +377,11 @@ var SearchView= LazyTemplateView.extend({
 var RecordListView = LazyTemplateView.extend({
     tagName: 'form',
     templateName: 'record-list',
+    events: {
+        'submit': function(event) {
+            this.vreCollectionsSelect.submitForm(event);
+        },
+    },
     initialize: function(options) {
         this.items = [];
         this.listenTo(this.collection, {
@@ -311,7 +395,7 @@ var RecordListView = LazyTemplateView.extend({
         this.$tbody = this.$('tbody');
         this.renderItems();
         $('#HPB-info').hide();
-        this.vreCollectionsSelect.render();    
+        this.vreCollectionsSelect.render();
         this.$el.prepend(this.vreCollectionsSelect.$el);
         return this;
     },
@@ -335,16 +419,152 @@ var RecordListView = LazyTemplateView.extend({
         return this;
     },
 });
-   
+
 /**
- * Displays a single model from a FlatAnnotations collection.
+ * Displays a single model from a FlatFields or FlatAnnotations collection.
  */
-var FieldAnnotationView = LazyTemplateView.extend({
+var FieldView = LazyTemplateView.extend({
     tagName: 'tr',
-    templateName: 'item-field-annotation',
+    templateName: 'field-list-item',
+    events: {
+        'click': 'edit',
+    },
+    initialize: function(options) {
+        this.listenTo(this.model, 'change:value', this.render);
+    },
     render: function() {
         this.$el.html(this.template(this.model.attributes));
         return this;
+    },
+    edit: function(event) {
+        this.trigger('edit', this.model);
+    },
+});
+
+var AnnotationEditView = LazyTemplateView.extend({
+    tagName: 'tr',
+    className: 'form-inline',
+    templateName: 'field-list-item-edit',
+    events: {
+        'submit': 'submit',
+        'reset': 'reset',
+    },
+    initialize: function(options) {
+        _.assign(this, _.pick(options, ['existing']));
+    },
+    render: function() {
+        this.$el.html(this.template(
+            _.extend({cid: this.cid}, this.model.attributes)
+        ));
+        return this;
+    },
+    submit: function(event) {
+        event.preventDefault();
+        var model = this.model;
+        this.$('input').each(function(index, element) {
+            model.set(this.name, $(this).val());
+        });
+        this.trigger('save', this);
+    },
+    reset: function(event) {
+        event.preventDefault();
+        this.trigger('cancel', this);
+    },
+});
+
+var RecordFieldsBaseView = LazyTemplateView.extend({
+    templateName: 'field-list',
+    initialize: function(options) {
+        this.rows = this.collection.map(this.createRow.bind(this));
+        this.listenTo(this.collection, 'add', this.insertRow);
+    },
+    createRow: function(model) {
+        var row = new FieldView({model: model});
+        row.on('edit', this.edit, this);
+        return row;
+    },
+    insertRow: function(model) {
+        var row = this.createRow(model),
+            rows = this.rows,
+            el = row.render().el,
+            index = this.collection.indexOf(model);
+        if (index >= rows.length) {
+            rows.push(row);
+            this.$tbody.append(el);
+        } else {
+            rows.splice(index, 0, row);
+            this.$tbody.children().eq(index).before(el);
+        }
+    },
+    render: function() {
+        this.$el.html(this.template(this));
+        this.$tbody = this.$('tbody');
+        this.$tbody.append(_(this.rows).invokeMap('render').map('el').value());
+        return this;
+    },
+});
+
+var RecordFieldsView = RecordFieldsBaseView.extend({
+    title: 'Original content',
+    edit: function(model) {
+        this.trigger('edit', model);
+    },
+});
+
+var RecordAnnotationsView = RecordFieldsBaseView.extend({
+    title: 'Annotations',
+    initialize: function(options) {
+        RecordFieldsBaseView.prototype.initialize.call(this, options);
+        this.editable = true;  // enables "New field" button
+    },
+    events: {
+        'click table + button': 'editEmpty',
+    },
+    edit: function(model) {
+        var group = groupMenu.model.get('name'),
+            editTarget = model.clone().set('group', group),
+            preExisting = this.collection.get(editTarget),
+            newRow;
+        if (preExisting) {
+            var index = this.collection.indexOf(preExisting),
+                oldRow = this.rows[index];
+            newRow = new AnnotationEditView({
+                model: preExisting,
+                existing: true,
+            });
+            this.rows.splice(index, 1, newRow);
+            oldRow.$el.before(newRow.render().el);
+            oldRow.remove();
+        } else {
+            newRow = new AnnotationEditView({model: editTarget});
+            this.rows.push(newRow);
+            this.$tbody.append(newRow.render().el);
+        }
+        newRow.on({cancel: this.cancel, save: this.save}, this);
+    },
+    editEmpty: function() {
+        this.edit(new Backbone.Model());
+    },
+    cancel: function(editRow) {
+        var staticRow, index = _.indexOf(this.rows, editRow);
+        if (editRow.existing) {
+            staticRow = this.createRow(editRow.model);
+            editRow.$el.after(staticRow.render().el);
+        }
+        editRow.remove();
+        this.rows.splice(index, 1, staticRow);
+    },
+    save: function(editRow) {
+        var model = editRow.model;
+        // first, remove the inline form
+        this.rows.splice(_.indexOf(this.rows, editRow), 1);
+        editRow.remove();
+        // then, add the model
+        if (editRow.existing) {
+            // re-insert if pre-existing, because .add (below) will not trigger
+            this.insertRow(model);
+        }
+        this.collection.add(model, {merge: true});
     },
 });
 
@@ -352,7 +572,7 @@ var SelectSourceView = LazyTemplateView.extend({
     templateName: 'nav-dropdown',
     tagName: 'li',
     className: 'dropdown',
-    initialize: function() {        
+    initialize: function() {
         this.render();
     },
     render: function() {
@@ -372,53 +592,31 @@ var RecordDetailView = LazyTemplateView.extend({
         this.$title = this.$('.modal-title');
         this.$body = this.$('.modal-body');
         this.$footer = this.$('.modal-footer');
-        this.annotationRows = [];
         this.vreCollectionsSelect = new VRECollectionView({collection: myCollections});
-        this.$footer.prepend(this.vreCollectionsSelect.$el);
+        this.$footer.prepend(this.vreCollectionsSelect.render().$el);
     },
     setModel: function(model) {
         if (this.model) {
             if (this.model === model) return this;
-            this.stopListening(this.annotations);
-            this.annotations.stopListening();
-            _.invokeMap(this.annotations.models, 'stopListening');
-            _.invokeMap(this.annotationRows, 'stopListening');
+            this.annotationsView.remove().off();
+            this.fieldsView.remove().off();
         }
         this.model = model;
-        this.annotations = new FlatAnnotations(null, {record: model});
-        this.annotationRows = this.annotations.map(this.createRow);
-        this.listenTo(this.annotations, 'add', this.insertRow);
+        this.fieldsView = new RecordFieldsView({
+            collection: new FlatFields(null, {record: model}),
+        });
+        this.annotationsView = new RecordAnnotationsView({
+            collection: new FlatAnnotations(null, {record: model}),
+        });
+        this.vreCollectionsSelect.setRecord(model);
+        this.annotationsView.listenTo(this.fieldsView, 'edit', this.annotationsView.edit);
         return this;
     },
-    createRow: function(annotation) {
-        return new FieldAnnotationView({model: annotation});
-    },
-    insertRow: function(annotation, collection, options) {
-        var row = this.createRow(annotation),
-            el = row.render().el,
-            index = collection.indexOf(annotation);
-        if (index + 1 === collection.length) {
-            this.annotationRows.push(row);
-            this.$('tbody').last().append(row.render().el);
-        } else {
-            this.annotationRows.splice(index, 0, row);
-            this.$('tbody').last().children().eq(index).before(el);
-        }
-    },
     render: function() {
-        var attributes = this.model.get('content');
-        var dataAsArray = _(attributes).map(function(value, key) {
-            return {key: key, value: value};
-        }).value();
         this.$title.text(this.model.get('uri'));
-        _.invokeMap(this.annotationRows, 'remove');
-        this.$body.html(this.template({fields: dataAsArray}));
         this.$el.modal('show');
-        this.$('tbody').last().append(
-            _(this.annotationRows).invokeMap('render').map('el').value()
-        );
-        this.vreCollectionsSelect.clear();
-        this.vreCollectionsSelect.setRecord(this.model).render();        
+        this.fieldsView.render().$el.appendTo(this.$body);
+        this.annotationsView.render().$el.appendTo(this.$body);
         return this;
     },
     load: function(event) {
@@ -430,13 +628,69 @@ var RecordDetailView = LazyTemplateView.extend({
     },
 });
 
+var GroupMenuItemView = LazyTemplateView.extend({
+    tagName: 'li',
+    templateName: 'group-menu-item',
+    events: {
+        'click': 'select',
+    },
+    render: function() {
+        this.$el.html(this.template(this.model.attributes));
+        return this;
+    },
+    select: function(event) {
+        this.trigger('select', this.model);
+    },
+    activate: function(model) {
+        if (model === this.model) {
+            this.$el.addClass('active');
+        } else {
+            this.$el.removeClass('active');
+        }
+    },
+});
+
+var GroupMenuView = LazyTemplateView.extend({
+    el: '#vre-group-menu',
+    templateName: 'group-menu-header',
+    initialize: function(options) {
+        this.$header = this.$('.dropdown-toggle');
+        this.$list = this.$('.dropdown-menu');
+        this.items = [];
+        this.resetItems(this.collection);
+        this.listenTo(this.collection, 'update reset', this.resetItems);
+    },
+    resetItems: function(collection) {
+        _.invokeMap(this.items, 'remove');
+        this.items = this.collection.map(_.bind(function(group) {
+            var item = new GroupMenuItemView({model: group});
+            item.on('select', this.select, this);
+            item.listenTo(this, 'select', item.activate);
+            return item;
+        }, this));
+        this.$list.append(_(this.items).invokeMap('render').map('el').value());
+        if (!this.model || !this.collection.includes(this.model)) {
+            this.select(this.collection.first());
+        }
+    },
+    select: function(model) {
+        if (model === this.model) return;
+        this.model = model;
+        this.render();
+        this.trigger('select', model);
+    },
+    render: function() {
+        this.$header.html(this.template(this.model.attributes));
+    },
+});
+
 var VRERouter = Backbone.Router.extend({
     routes: {
         ':id/': 'showDatabase',
     },
     showDatabase: function(id) {
         searchView.render();
-        searchView.$el.appendTo($('.collapse'));;
+        searchView.$el.appendTo($('.collapse').first());
         // The if-condition is a bit of a hack, which can go away when we
         // convert to client side routing entirely.
         if (id=="hpb") {
@@ -465,23 +719,25 @@ var records = new Records();
 var allCollections = new VRECollections();
 var myCollections = VRECollections.mine();
 var allGroups = new ResearchGroups();
+var myGroups, groupMenu;
 var recordDetailModal;
 var dropDown;
-myCollections.on("sync", function() { 
-    recordDetailModal = new RecordDetailView();
-    dropDown = new SelectSourceView({collection:myCollections});
-    dropDown.$el.prependTo($('.nav'));
-});
 var recordsList = new RecordListView({collection: records});
 var results = new SearchResults();
 var searchView  = new SearchView();
 var router = new VRERouter();
 //var moreResults = new LoadMoreResultsView();
 
+function prepareCollectionViews() {
+    recordDetailModal = new RecordDetailView();
+    dropDown = new SelectSourceView({collection:myCollections});
+    dropDown.$el.prependTo($('.nav').first());
+}
+
 $(function() {
     $('script[type="text/x-handlebars-template"]').each(function(i, element) {
         $el = $(element);
-        JST[$el.prop('id')] = Handlebars.compile($el.html());
+        JST[$el.prop('id')] = Handlebars.compile($el.html(), {compat: true});
     });
     $('#result_detail').modal({show: false});
     $('#more-records').click(retrieveMoreRecords);
@@ -495,5 +751,11 @@ $(function() {
         });
     });
     allGroups.fetch();
-
+    myGroups = ResearchGroups.mine();
+    groupMenu = new GroupMenuView({collection: myGroups});
+    if (myCollections.length) {
+        prepareCollectionViews();
+    } else {
+        myCollections.on("sync", prepareCollectionViews);
+    }
 });
