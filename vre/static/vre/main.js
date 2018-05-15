@@ -187,7 +187,7 @@ var FlatAnnotations = Backbone.Collection.extend({
     // translate the flat representation to the official one, save immediately
     fromFlat: function() {
         var flat = this,
-            record = flat.record.get('id'),
+            record = flat.record.id,
             flatPerGroup = flat.groupBy('group');
         var newContent = flat.markedGroups.map('id').map(function(groupName) {
             var groupId = allGroups.findWhere({name: groupName}).id,
@@ -209,11 +209,10 @@ var FlatAnnotations = Backbone.Collection.extend({
 });
 
 var Record = APIModel.extend({
-    idAttribute: 'uri',
     getAnnotations: function() {
         if (!this.annotations) {
             this.annotations = new Annotations();
-            this.annotations.query({filters: {record__uri: this.id}});
+            this.annotations.query({filters: {record__id: this.id}});
         }
         return this.annotations;
     },
