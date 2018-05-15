@@ -198,6 +198,7 @@ var FlatAnnotations = Backbone.Collection.extend({
 });
 
 var Record = APIModel.extend({
+    urlRoot: '/vre/api/records',
     getAnnotations: function() {
         if (!this.annotations) {
             this.annotations = new Annotations();
@@ -210,7 +211,7 @@ var Record = APIModel.extend({
 });
 
 var AdditionsToCollections = Backbone.Model.extend({
-    url: 'add-selection',
+    url: '/vre/add-selection',
 });
 
 var Records = APICollection.extend({
@@ -304,7 +305,7 @@ var RecordListItemView = LazyTemplateView.extend({
 var VRECollectionView = LazyTemplateView.extend({
     templateName: 'collection-selector',
     events: {
-        'click #add': 'submitForm',
+        'click button': 'submitForm',
     },
     render: function() {
         this.$el.html(this.template({models: this.collection.toJSON()}));
@@ -323,7 +324,7 @@ var VRECollectionView = LazyTemplateView.extend({
         var selected_records = [];
         if (this.model) {
             // adding to array as the api expects an array.
-            selected_records.push(this.model);
+            selected_records.push(this.model.toJSON());
             this.model = undefined;
         }
         else {
@@ -376,6 +377,11 @@ var SearchView= LazyTemplateView.extend({
 var RecordListView = LazyTemplateView.extend({
     tagName: 'form',
     templateName: 'record-list',
+    events: {
+        'submit': function(event) {
+            this.vreCollectionsSelect.submitForm(event);
+        },
+    },
     initialize: function(options) {
         this.items = [];
         this.listenTo(this.collection, {
@@ -537,7 +543,7 @@ var RecordAnnotationsView = RecordFieldsBaseView.extend({
         newRow.on({cancel: this.cancel, save: this.save}, this);
     },
     editEmpty: function() {
-        this.edit(new Backbone.Model);
+        this.edit(new Backbone.Model());
     },
     cancel: function(editRow) {
         var staticRow, index = _.indexOf(this.rows, editRow);
@@ -587,7 +593,7 @@ var RecordDetailView = LazyTemplateView.extend({
         this.$body = this.$('.modal-body');
         this.$footer = this.$('.modal-footer');
         this.vreCollectionsSelect = new VRECollectionView({collection: myCollections});
-        this.$footer.prepend(this.vreCollectionsSelect.$el);
+        this.$footer.prepend(this.vreCollectionsSelect.render().$el);
     },
     setModel: function(model) {
         if (this.model) {
@@ -602,6 +608,7 @@ var RecordDetailView = LazyTemplateView.extend({
         this.annotationsView = new RecordAnnotationsView({
             collection: new FlatAnnotations(null, {record: model}),
         });
+        this.vreCollectionsSelect.setRecord(model);
         this.annotationsView.listenTo(this.fieldsView, 'edit', this.annotationsView.edit);
         return this;
     },
