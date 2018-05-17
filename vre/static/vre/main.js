@@ -610,13 +610,13 @@ var RecordDetailView = LazyTemplateView.extend({
         });
         this.vreCollectionsSelect.setRecord(model);
         this.annotationsView.listenTo(this.fieldsView, 'edit', this.annotationsView.edit);
+        this.$title.text(this.model.get('uri'));
+        this.fieldsView.render().$el.appendTo(this.$body);
+        this.annotationsView.render().$el.appendTo(this.$body);
         return this;
     },
     render: function() {
-        this.$title.text(this.model.get('uri'));
         this.$el.modal('show');
-        this.fieldsView.render().$el.appendTo(this.$body);
-        this.annotationsView.render().$el.appendTo(this.$body);
         return this;
     },
     load: function(event) {
