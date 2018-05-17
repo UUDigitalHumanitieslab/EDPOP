@@ -621,7 +621,7 @@ var RecordDetailView = LazyTemplateView.extend({
     },
     load: function(event) {
         var currentIndex = recordsList.collection.findIndex(this.model);
-        var nextIndex = event.target===$('#load_next')? currentIndex+1 : currentIndex-1;
+        var nextIndex = event.target.id==='load_next'? currentIndex+1 : currentIndex-1;
         var nextModel = recordsList.collection.at(nextIndex);
         this.setModel(nextModel);
         this.render();
