@@ -49,6 +49,31 @@ function objectAsUrlParams(object) {
 }
 
 /**
+/* Sorting in a canonical order, for FlatFields and FlatAnnotations.
+*/
+function canonicalSort(key) {
+    var canonicalOrder = {
+        'Title': 0,
+        'Uniform Title': 4,
+        'Varying Form of Title': 5,
+        'Author': 8,
+        'Collaborator': 12,
+        'Production': 16,
+        'Publisher': 20,
+        'Added Entry - Corporate Name': 24,
+        'Extent': 28,
+        'Language': 32,
+        'Citation/Reference': 36,
+        'Location of Originals': 40,
+        'Note': 44,
+        'With Note': 48,
+        'Subject Headings': 52,
+    };
+    var index = key in canonicalOrder? canonicalOrder[key] : 100;
+    return index;
+}
+
+/**
  * Generic subclass that appends a slash to the model URL.
  * This is required for interop with Django REST Framework.
  */
@@ -96,25 +121,7 @@ var Field = Backbone.Model.extend({
 var FlatFields = Backbone.Collection.extend({
     model: Field,
     comparator: function(item) {
-        var canonicalOrder = {
-            'Title': 0,
-            'Uniform Title': 4,
-            'Varying Form of Title': 5,
-            'Author': 8,
-            'Collaborator': 12,
-            'Production': 16,
-            'Publisher': 20,
-            'Added Entry - Corporate Name': 24,
-            'Extent': 28,
-            'Language': 32,
-            'Citation/Reference': 36,
-            'Location of Originals': 40,
-            'Note': 44,
-            'With Note': 48,
-            'Subject Headings': 52,
-        };
-        var index = item.attributes.key in canonicalOrder? canonicalOrder[item.attributes.key] : 100;
-        return index;
+        return canonicalSort(item.attributes.key);
     },
     initialize: function(models, options) {
         _.assign(this, _.pick(options, ['record']));
@@ -147,6 +154,9 @@ var Annotations = APICollection.extend({
 var FlatAnnotations = Backbone.Collection.extend({
     // comparator: can be set to keep this sorted
     // How to uniquely identify a field annotation.
+    comparator: function(item) {
+        return canonicalSort(item.attributes.key);
+    },
     modelId: function(attributes) {
         return attributes.key + ':' + attributes.group;
     },
