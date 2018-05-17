@@ -690,7 +690,7 @@ var VRERouter = Backbone.Router.extend({
     },
     showDatabase: function(id) {
         searchView.render();
-        searchView.$el.appendTo($('.collapse').first());
+        searchView.$el.appendTo($('.page-header').first());
         // The if-condition is a bit of a hack, which can go away when we
         // convert to client side routing entirely.
         if (id=="hpb") {
@@ -731,7 +731,7 @@ var router = new VRERouter();
 function prepareCollectionViews() {
     recordDetailModal = new RecordDetailView();
     dropDown = new SelectSourceView({collection:myCollections});
-    dropDown.$el.prependTo($('.nav').first());
+    dropDown.$el.appendTo($('.nav').first());
 }
 
 $(function() {

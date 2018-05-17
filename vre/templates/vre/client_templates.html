@@ -85,11 +85,16 @@
 </script>
 
 <script type="text/x-handlebars-template" id="search-view">
-    <form class="navbar-form navbar-left" id="search">
-        <div class="form-group">
+    <form id="search">
+        <div class="input-group">
             <input type="text" class="form-control" name="search" placeholder="Query">
+            <div class="input-group-btn">
+                <button type="submit" class="btn btn-primary">Search</button>
+                <button class="btn btn-default" id="search-info">
+                    <span class="glyphicon glyphicon-info-sign" id="search-info" aria-hidden="true"></span>
+                </button>
+            </div>
         </div>
-        <button type="submit" class="btn btn-primary">Search</button>
     </form>
 </script>
 
