@@ -1,3 +1,7 @@
+.alert {
+	display: none;
+}
+
 h1 {
 	color: cornflowerblue;
 }

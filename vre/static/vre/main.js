@@ -318,6 +318,7 @@ var VRECollectionView = LazyTemplateView.extend({
     },
     clear: function() {
         this.$el.val(null).trigger('change');
+        return this;
     },
     submitForm: function(event) {
         event.preventDefault();
@@ -331,11 +332,32 @@ var VRECollectionView = LazyTemplateView.extend({
             selected_records = _(recordsList.items).filter({selected: true}).invokeMap('model.toJSON').value();
         }
         var selected_collections = this.$('select').val();
-        var records_and_collections = new AdditionsToCollections({
+        var records_and_collections = new AdditionsToCollections();
+        var additions = {
             'records': selected_records,
             'collections': selected_collections,
+        };
+        records_and_collections.save(additions, {
+            success: function(model, response) {
+                var feedbackString = '';
+                $.each(response, function(key, value) {
+                    feedbackString = feedbackString.concat('Added ', value, ' record(s) to ', key, ". ");
+                });
+                this.$('.alert-success').html(feedbackString).show(500, function() {
+                    setTimeout(function() {
+                        this.$('.alert-success').hide(500);
+                    }, 2000);
+                });
+            },
+            error: function(model, response) {
+                var feedbackString = response.responseJSON.error;
+                this.$('.alert-warning').html(feedbackString).show(500, function() {
+                    setTimeout(function() {
+                        this.$('.alert-warning').hide(500);
+                    }, 1000);
+                });
+            },
         });
-        records_and_collections.save();
     },
 });
 
@@ -350,26 +372,39 @@ var SearchView= LazyTemplateView.extend({
     submitSearch: function(startRecord) {
         var searchTerm = this.$('input').val();
         var startFrom = startRecord ? startRecord : 1;
-        var hold = results.query({params:{search:searchTerm, source:this.source, startRecord:startFrom}});
-        return hold;
+        var searchPromise = results.query(
+            {params:{search:searchTerm, source:this.source, startRecord:startFrom},
+            error: function() {
+                console.log("error!");
+            },
+        });
+        return searchPromise;
     },
     firstSearch: function(event){
         event.preventDefault();
-        this.submitSearch().then( function() {
+        this.submitSearch().then(_.bind(function() {
             $('#more-records').show();
             records.reset(results.models);
-            recordsList.render().$el.insertAfter($('#title-HPB'));
-        });
+            if (!document.contains(recordsList.$el[0])) {
+                // records list is initialized and rendered but not yet added to DOM
+                recordsList.$el.insertAfter($('.page-header'));
+            }
+            this.feedback();
+        }, this));
     },
     nextSearch: function(event) {
         $('#more-records').hide();
-        var startRecord = records.length;
-        this.submitSearch(startRecord).then( function() {
+        var startRecord = records.length+1;
+        this.submitSearch(startRecord).then( _.bind(function() {
             records.add(results.models);
-            if (records.length!=results.total_results) {
-                $('#more-records').show();
-            }
-        });
+            this.feedback();
+        }, this));
+    },
+    feedback: function() {
+        if (records.length!=results.total_results) {
+            $('#more-records').show();
+        }
+        $('#search-feedback').text("Showing "+records.length+" of "+results.total_results+" results");
     },
 });
 
@@ -608,7 +643,7 @@ var RecordDetailView = LazyTemplateView.extend({
         this.annotationsView = new RecordAnnotationsView({
             collection: new FlatAnnotations(null, {record: model}),
         });
-        this.vreCollectionsSelect.setRecord(model);
+        this.vreCollectionsSelect.clear().setRecord(model);
         this.annotationsView.listenTo(this.fieldsView, 'edit', this.annotationsView.edit);
         this.$title.text(this.model.get('uri'));
         this.fieldsView.render().$el.appendTo(this.$body);
@@ -694,9 +729,6 @@ var VRERouter = Backbone.Router.extend({
         // The if-condition is a bit of a hack, which can go away when we
         // convert to client side routing entirely.
         if (id=="hpb") {
-            recordsList.remove();
-            records = new Records();
-            recordsList = new RecordListView({collection: records});
             $('#HPB-info').show();
         }
         else {
@@ -704,10 +736,11 @@ var VRERouter = Backbone.Router.extend({
             // records in the current collection.
             $('#HPB-info').hide();
             var collection = allCollections.get(id);
+            console.log(collection);
             records = collection.getRecords();
             recordsList.remove();
             recordsList = new RecordListView({collection: records});
-            recordsList.render().$el.insertAfter($('#title-collection'));
+            recordsList.render().$el.insertAfter($('.page-header'));
         }
         searchView.source = id;
     },
@@ -726,7 +759,7 @@ var recordsList = new RecordListView({collection: records});
 var results = new SearchResults();
 var searchView  = new SearchView();
 var router = new VRERouter();
-//var moreResults = new LoadMoreResultsView();
+
 
 function prepareCollectionViews() {
     recordDetailModal = new RecordDetailView();
