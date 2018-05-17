@@ -3,6 +3,12 @@ from rest_framework import serializers
 from .models import ResearchGroup, Collection, Record, Annotation
 
 
+class OwnGroupsPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
+    """ Customized field that gets the queryset dynamically. """
+    def get_queryset(self):
+        return self.context['request'].user.researchgroups.all()
+
+
 class ResearchGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = ResearchGroup
@@ -26,8 +32,8 @@ class RecordSerializer(serializers.ModelSerializer):
 
 
 class AnnotationSerializer(serializers.ModelSerializer):
-    record = serializers.PrimaryKeyRelatedField(read_only=True)
-    managing_group = serializers.PrimaryKeyRelatedField(read_only=True)
+    record = serializers.PrimaryKeyRelatedField(queryset=Record.objects.all())
+    managing_group = OwnGroupsPrimaryKeyRelatedField()
 
     class Meta:
         model = Annotation

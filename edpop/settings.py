@@ -25,6 +25,15 @@ SECRET_KEY = '(0vb2e%m!)ol05+c)l$u99d)5cw!_d89$45bvz$ynu1(uh404f'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# Dummy caching for development mode so we don't need to empty our
+# cache every time.
+# https://docs.djangoproject.com/en/1.11/topics/cache/#dummy-caching-for-development
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+    }
+}
+
 ALLOWED_HOSTS = []
 
 

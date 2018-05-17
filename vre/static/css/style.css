@@ -6,6 +6,10 @@ h1 {
 	color: cornflowerblue;
 }
 
+#result_detail td {
+	cursor: pointer;
+}
+
 #more-records {
 	display: none;
 }
