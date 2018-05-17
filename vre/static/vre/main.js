@@ -55,10 +55,10 @@ var APICollection = Backbone.Collection.extend({
     query: function(options) {
         var url = options.url || this.url;
         var urlParts = [url, '?'];
-        if (options.filters) {
-            urlParts.push(objectAsUrlParams(options.filters));
+        if (options.params) {
+            urlParts.push(objectAsUrlParams(options.params));
         }
-        var fetchOptions = _(options).omit(['filters']).extend({
+        var fetchOptions = _(options).omit(['params']).extend({
             url: urlParts.join(''),
         }).value();
         return this.fetch(fetchOptions);
@@ -294,7 +294,7 @@ var SearchView= LazyTemplateView.extend({
         var searchTerm = this.$('input').val();
         var startFrom = startRecord ? startRecord : 1;
         var searchPromise = results.query(
-            {filters:{search:searchTerm, source:this.source, startRecord:startFrom},
+            {params:{search:searchTerm, source:this.source, startRecord:startFrom},
             error: function() {
                 console.log("error!");
             },
