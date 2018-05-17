@@ -95,6 +95,27 @@ var Field = Backbone.Model.extend({
  */
 var FlatFields = Backbone.Collection.extend({
     model: Field,
+    comparator: function(item) {
+        var canonicalOrder = {
+            'Title': 0,
+            'Uniform Title': 4,
+            'Varying Form of Title': 5,
+            'Author': 8,
+            'Collaborator': 12,
+            'Production': 16,
+            'Publisher': 20,
+            'Added Entry - Corporate Name': 24,
+            'Extent': 28,
+            'Language': 32,
+            'Citation/Reference': 36,
+            'Location of Originals': 40,
+            'Note': 44,
+            'With Note': 48,
+            'Subject Headings': 52,
+        };
+        var index = item.attributes.key in canonicalOrder? canonicalOrder[item.attributes.key] : 100;
+        return index;
+    },
     initialize: function(models, options) {
         _.assign(this, _.pick(options, ['record']));
         if (this.record.has('content')) this.set(this.toFlat(this.record));
@@ -736,7 +757,6 @@ var VRERouter = Backbone.Router.extend({
             // records in the current collection.
             $('#HPB-info').hide();
             var collection = allCollections.get(id);
-            console.log(collection);
             records = collection.getRecords();
             recordsList.remove();
             recordsList = new RecordListView({collection: records});
