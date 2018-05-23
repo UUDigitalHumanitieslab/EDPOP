@@ -11,6 +11,24 @@ function getValue(index, item) {
     return $(item).data('value');
 }
 
+var canonicalOrder = {
+    'Title': 1,
+    'Uniform Title': 4,
+    'Varying Form of Title': 5,
+    'Author': 8,
+    'Collaborator': 12,
+    'Production': 16,
+    'Publisher': 20,
+    'Added Entry - Corporate Name': 24,
+    'Extent': 28,
+    'Language': 32,
+    'Citation/Reference': 36,
+    'Location of Originals': 40,
+    'Note': 44,
+    'With Note': 48,
+    'Subject Headings': 52,
+};
+
 /**
  * Insert the CSRF token header into $.ajax-compatible request options.
  * Returns a new object, does not mutate the original object.
@@ -52,24 +70,7 @@ function objectAsUrlParams(object) {
 /* Sorting in a canonical order, for FlatFields and FlatAnnotations.
 */
 function canonicalSort(key) {
-    var canonicalOrder = {
-        'Title': 0,
-        'Uniform Title': 4,
-        'Varying Form of Title': 5,
-        'Author': 8,
-        'Collaborator': 12,
-        'Production': 16,
-        'Publisher': 20,
-        'Added Entry - Corporate Name': 24,
-        'Extent': 28,
-        'Language': 32,
-        'Citation/Reference': 36,
-        'Location of Originals': 40,
-        'Note': 44,
-        'With Note': 48,
-        'Subject Headings': 52,
-    };
-    var index = key in canonicalOrder? canonicalOrder[key] : 100;
+    var index = (canonicalOrder[key] || 100);
     return index;
 }
 
