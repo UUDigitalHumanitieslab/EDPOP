@@ -11,6 +11,24 @@ function getValue(index, item) {
     return $(item).data('value');
 }
 
+var canonicalOrder = {
+    'Title': 1,
+    'Uniform Title': 4,
+    'Varying Form of Title': 5,
+    'Author': 8,
+    'Collaborator': 12,
+    'Production': 16,
+    'Publisher': 20,
+    'Added Entry - Corporate Name': 24,
+    'Extent': 28,
+    'Language': 32,
+    'Citation/Reference': 36,
+    'Location of Originals': 40,
+    'Note': 44,
+    'With Note': 48,
+    'Subject Headings': 52,
+};
+
 /**
  * Insert the CSRF token header into $.ajax-compatible request options.
  * Returns a new object, does not mutate the original object.
@@ -46,6 +64,14 @@ function show_detail(event) {
  */
 function objectAsUrlParams(object) {
     return _(object).entries().invokeMap('join', '=').join('&');
+}
+
+/**
+/* Sorting in a canonical order, for FlatFields and FlatAnnotations.
+*/
+function canonicalSort(key) {
+    var index = (canonicalOrder[key] || 100);
+    return index;
 }
 
 /**
@@ -95,6 +121,9 @@ var Field = Backbone.Model.extend({
  */
 var FlatFields = Backbone.Collection.extend({
     model: Field,
+    comparator: function(item) {
+        return canonicalSort(item.attributes.key);
+    },
     initialize: function(models, options) {
         _.assign(this, _.pick(options, ['record']));
         if (this.record.has('content')) this.set(this.toFlat(this.record));
@@ -126,6 +155,9 @@ var Annotations = APICollection.extend({
 var FlatAnnotations = Backbone.Collection.extend({
     // comparator: can be set to keep this sorted
     // How to uniquely identify a field annotation.
+    comparator: function(item) {
+        return canonicalSort(item.attributes.key);
+    },
     modelId: function(attributes) {
         return attributes.key + ':' + attributes.group;
     },
@@ -736,7 +768,6 @@ var VRERouter = Backbone.Router.extend({
             // records in the current collection.
             $('#HPB-info').hide();
             var collection = allCollections.get(id);
-            console.log(collection);
             records = collection.getRecords();
             recordsList.remove();
             recordsList = new RecordListView({collection: records});
