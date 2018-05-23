@@ -88,7 +88,7 @@ var Field = Backbone.Model.extend({
  * a view.
  *
  * normal: {id, uri, content}
- * flat alternative: [{id, key, value}]
+ * flat alternative: [{key, value}]
  *
  * Note that we extend directly from Backbone.Collection rather than from
  * APICollection and that we don't set a URL. This is because we only talk
@@ -125,7 +125,7 @@ var Annotations = APICollection.extend({
  * there may be multiple underlying annotation objects.
  *
  * normal: {id, record, managing_group, content}
- * flat alternative: [{id, key, value, group}]
+ * flat alternative: [{key, value, group}]
  */
 var FlatAnnotations = Backbone.Collection.extend({
     // comparator: can be set to keep this sorted
