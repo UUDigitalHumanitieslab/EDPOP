@@ -409,8 +409,13 @@ var SearchView= LazyTemplateView.extend({
         var startFrom = startRecord ? startRecord : 1;
         var searchPromise = results.query(
             {params:{search:searchTerm, source:this.source, startRecord:startFrom},
-            error: function() {
-                console.log("error!");
+            error: function(collection, response, options) {
+                var alert = new AlertView({
+                    level: 'warning',
+                    message: 'error!',
+                });
+                alert.render().$el.insertAfter('.page-header');
+                alert.animateIn();
             },
         });
         return searchPromise;
