@@ -290,25 +290,6 @@ var LazyTemplateView = Backbone.View.extend({
     },
 });
 
-var RecordListItemView = LazyTemplateView.extend({
-    tagName: 'tr',
-    templateName: 'record-list-item',
-    events: {
-        'change input': 'toggle',
-        'click a': 'display',
-    },
-    render: function() {
-        this.$el.html(this.template(this.model.attributes));
-        return this;
-    },
-    toggle: function(event) {
-        this.selected = event.target.checked;
-    },
-    display: function(event) {
-        recordDetailModal.setModel(this.model).render();
-    },
-});
-
 var VRECollectionView = LazyTemplateView.extend({
     templateName: 'collection-selector',
     events: {
@@ -416,6 +397,25 @@ var SearchView= LazyTemplateView.extend({
     },
 });
 
+
+var RecordListItemView = LazyTemplateView.extend({
+    tagName: 'tr',
+    templateName: 'record-list-item',
+    events: {
+        'change input': 'toggle',
+        'click a': 'display',
+    },
+    render: function() {
+        this.$el.html(this.template(this.model.attributes));
+        return this;
+    },
+    toggle: function(event) {
+        this.selected = event.target.checked;
+    },
+    display: function(event) {
+        recordDetailModal.setModel(this.model).render();
+    },
+});
 
 var RecordListView = LazyTemplateView.extend({
     tagName: 'form',
