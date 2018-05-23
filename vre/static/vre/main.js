@@ -1,16 +1,3 @@
-
-function isChecked(index, item) {
-    return item.checked;
-}
-
-function getContent(index, item) {
-    return $(item).data('content');
-}
-
-function getValue(index, item) {
-    return $(item).data('value');
-}
-
 var canonicalOrder = {
     'Title': 1,
     'Uniform Title': 4,
@@ -48,13 +35,6 @@ function addCSRFToken(ajaxOptions) {
 function retrieveMoreRecords(event) {
     event.preventDefault();
     searchView.nextSearch(event);
-}
-
-function show_detail(event) {
-    event.preventDefault();
-    var sisterCheckbox = $(this).parents('tr').find('input');
-    var jsonData = sisterCheckbox.data('content');
-    renderRecordDetail(jsonData);
 }
 
 /**
