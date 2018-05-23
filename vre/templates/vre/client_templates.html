@@ -90,7 +90,20 @@
             <input type="text" class="form-control" name="search" placeholder="Query">
             <div class="input-group-btn">
                 <button type="submit" class="btn btn-primary">Search</button>
-                <button class="btn btn-default" id="search-info">
+                <button 
+                    type="button" 
+                    class="btn btn-default" 
+                    id="search-info" 
+                    data-toggle="popover" 
+                    title="Search in HPB fields" 
+                    data-content="
+                    <table><tbody>
+                        <tr><td>pica.tit=yourQuery</td> <td>Search only in title field </td></tr>
+                        <tr><td>pica.per=yourQuery</td> <td>Search only in author field</td></tr>
+                        <tr><td>pica.pub=yourQuery</td> <td>Search only publisher / publishing place</td></tr>
+                        <tr><td>pica.yop=yearQuery</td> <td> Get only records published in a specific year </td></tr>
+                    </tbody></table>"
+                    data-placement="bottom">
                     <span class="glyphicon glyphicon-info-sign" id="search-info" aria-hidden="true"></span>
                 </button>
             </div>
