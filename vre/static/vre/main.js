@@ -32,11 +32,6 @@ function addCSRFToken(ajaxOptions) {
     Backbone.sync = _.overArgs(Backbone.sync, [id, id, addCSRFToken]);
 }());
 
-function retrieveMoreRecords(event) {
-    event.preventDefault();
-    searchView.nextSearch(event);
-}
-
 /**
  * Perform the following transformation:
  * (from)  {foo: 'bar', foobar: 'baz'}
@@ -405,6 +400,7 @@ var SearchView= LazyTemplateView.extend({
         }, this));
     },
     nextSearch: function(event) {
+        event.preventDefault();
         $('#more-records').hide();
         var startRecord = records.length+1;
         this.submitSearch(startRecord).then( _.bind(function() {
@@ -784,7 +780,7 @@ $(function() {
         JST[$el.prop('id')] = Handlebars.compile($el.html(), {compat: true});
     });
     $('#result_detail').modal({show: false});
-    $('#more-records').click(retrieveMoreRecords);
+    $('#more-records').click(searchView.nextSearch.bind(searchView));
     // We fetch the collections and ensure that we have them before we handle
     // the route, because VRERouter.showCollection depends on them being
     // available. This is something we can definitely improve upon.
