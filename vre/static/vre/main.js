@@ -290,6 +290,56 @@ var LazyTemplateView = Backbone.View.extend({
     },
 });
 
+/**
+ * Reusable alert view. Meant to be displayed once and then discarded.
+ *
+ * The methods with a `complete` parameter accept three types of values:
+ *
+ *  1. any function, which will be executed after the animation completes;
+ *  2. a string, which should be the name of a method of the alert view;
+ *  3. undefined, in which case nothing is done after the animation completes.
+ */
+var AlertView = LazyTemplateView.extend({
+    ease: 500,
+    delay: 2000,
+    className: 'alert',
+    attributes: {
+        role: 'alert',
+    },
+    initialize: function(options) {
+        _.assign(this, _.pick(options, ['level', 'message', 'ease', 'delay']));
+    },
+    render: function() {
+        this.$el.addClass(this.getLevelClass()).html(this.message);
+        return this;
+    },
+    // Show and hide automatically, then execute `complete`.
+    animate: function(complete) {
+        var followUp = _.bind(this.animateOut, this, complete);
+        // The _.partial(...) below is a shorthand for _.bind(function() {
+        //     _.delay(followUp, this.delay);
+        // }, this), where _.delay in turn is a shorthand for setTimeout.
+        return this.animateIn(_.partial(_.delay, followUp, this.delay));
+    },
+    // Show with ease and then execute `complete`.
+    animateIn: function(complete) {
+        this.$el.show(this.ease, this.wrapComplete(complete));
+        return this;
+    },
+    // Hide with ease and then execute `complete`.
+    animateOut: function(complete) {
+        this.$el.hide(this.ease, this.wrapComplete(complete));
+        return this;
+    },
+    getLevelClass: function() {
+        return 'alert-' + this.level;
+    },
+    // Utility function that enables the "string as method name" magic.
+    wrapComplete: function(complete) {
+        return this[complete] && this[complete].bind(this) || complete;
+    },
+});
+
 var VRECollectionView = LazyTemplateView.extend({
     templateName: 'collection-selector',
     events: {
@@ -320,32 +370,29 @@ var VRECollectionView = LazyTemplateView.extend({
             selected_records = _(recordsList.items).filter({selected: true}).invokeMap('model.toJSON').value();
         }
         var selected_collections = this.$('select').val();
-        var records_and_collections = new AdditionsToCollections();
-        var additions = {
+        var records_and_collections = new AdditionsToCollections({
             'records': selected_records,
             'collections': selected_collections,
-        };
-        records_and_collections.save(additions, {
-            success: function(model, response) {
-                var feedbackString = '';
-                $.each(response, function(key, value) {
-                    feedbackString = feedbackString.concat('Added ', value, ' record(s) to ', key, ". ");
-                });
-                this.$('.alert-success').html(feedbackString).show(500, function() {
-                    setTimeout(function() {
-                        this.$('.alert-success').hide(500);
-                    }, 2000);
-                });
-            },
-            error: function(model, response) {
-                var feedbackString = response.responseJSON.error;
-                this.$('.alert-warning').html(feedbackString).show(500, function() {
-                    setTimeout(function() {
-                        this.$('.alert-warning').hide(500);
-                    }, 1000);
-                });
-            },
         });
+        records_and_collections.save().then(
+            this.showSuccess.bind(this),
+            this.showError.bind(this),
+        );
+    },
+    showSuccess: function(model, response) {
+        var feedbackString = '';
+        $.each(model, function(key, value) {
+            feedbackString = feedbackString.concat('Added ', value, ' record(s) to ', key, ". ");
+        });
+        this.showAlert('success', feedbackString);
+    },
+    showError: function(model, response) {
+        this.showAlert('warning', response.responseJSON.error);
+    },
+    showAlert: function(level, message) {
+        var alert = new AlertView({level: level, message: message});
+        alert.render().$el.prependTo(this.el);
+        alert.animate('remove');
     },
 });
 
