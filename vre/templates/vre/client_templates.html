@@ -57,10 +57,13 @@
 </script>
 
 <script type="text/x-handlebars-template" id="collection-selector">
-    <select name="collections" multiple="multiple" style="width: 30%;">
-        {{#models}}<option value={{id}}>{{description}}</option>{{/models}}
-    </select>
-    <button class="btn btn-primary" type="submit">Add to collection...</button>
+    <label for="collection-select">
+        Choose collections:
+        <select name="collections" multiple="multiple" style="width: 100%; id="collection-select">
+            {{#models}}<option value={{id}}>{{description}}</option>{{/models}}
+        </select>
+    </label>
+    <button class="btn btn-primary" type="submit">Add</button>
 </script>
 
 <script type="text/x-handlebars-template" id="group-menu-header">
