@@ -366,8 +366,7 @@ var VRECollectionView = LazyTemplateView.extend({
             'collections': selected_collections,
         };
         records_and_collections.save(additions, {
-            success: _.bind( function(model, response, options) {
-                console.log(options);
+            success: _.bind( function(model, response) {
                 var feedbackString = '';
                 $.each(response, function(key, value) {
                     feedbackString = feedbackString.concat('Added ', value, ' record(s) to ', key, ". ");
@@ -378,8 +377,7 @@ var VRECollectionView = LazyTemplateView.extend({
                     }, 2000);
                 });
             }, this),
-            error: _.bind(function(model, response, options) {
-                console.log(options);
+            error: _.bind(function(model, response) {
                 var feedbackString = response.responseJSON.error;
                 this.$('.alert-warning').html(feedbackString).show(500, function() {
                     setTimeout(function() {
