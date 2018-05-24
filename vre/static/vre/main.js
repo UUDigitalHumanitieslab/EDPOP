@@ -404,8 +404,18 @@ var SearchView= LazyTemplateView.extend({
     },
     render: function() {
         this.$el.html(this.template());
+        return this;
+    },
+    showPending: function() {
+        this.$('button').text('Searching...');
+        return this;
+    },
+    showIdle: function() {
+        this.$('button').text('Search');
+        return this;
     },
     submitSearch: function(startRecord) {
+        this.showPending();
         var searchTerm = this.$('input').val();
         var startFrom = startRecord ? startRecord : 1;
         var searchPromise = results.query(
@@ -419,6 +429,7 @@ var SearchView= LazyTemplateView.extend({
                 alert.animateIn();
             },
         });
+        searchPromise.always(this.showIdle.bind(this));
         return searchPromise;
     },
     firstSearch: function(event){
