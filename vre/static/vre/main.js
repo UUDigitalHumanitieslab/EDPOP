@@ -412,7 +412,7 @@ var SearchView= LazyTemplateView.extend({
             error: function(collection, response, options) {
                 var alert = new AlertView({
                     level: 'warning',
-                    message: 'error!',
+                    message: JST['failed-search-message'](response),
                 });
                 alert.render().$el.insertAfter('.page-header');
                 alert.animateIn();
