@@ -13,3 +13,12 @@ h1 {
 #HPB-info {
 	display: none;
 }
+
+.popover {
+	max-width: 100%;
+}
+
+table#hpb-info-table {
+	color: red;
+	padding: 10px;
+}
