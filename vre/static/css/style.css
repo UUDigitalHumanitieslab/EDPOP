@@ -18,7 +18,10 @@ h1 {
 	max-width: 100%;
 }
 
-table#hpb-info-table {
-	color: red;
-	padding: 10px;
+table#hpb-info-table td:nth-child(odd) {
+	font-weight: bold;
+}
+
+#search-info{
+	display: none;
 }

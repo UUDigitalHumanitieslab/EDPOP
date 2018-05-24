@@ -698,7 +698,13 @@ var VRERouter = Backbone.Router.extend({
             records = new Records();
             recordsList = new RecordListView({collection: records});
             $('#HPB-info').show();
-            $('#search-info').popover({'html': true, 'container': 'body', 'placement': 'left'});
+            $('#search-info').show();
+            $('#search-info').popover({
+                'html': true, 
+                'content': JST['hpb-search-info'](), 
+                'container': 'body', 
+                'placement': 'left'
+            });
         }
         else {
             // We are not on the HPB search page, so display the

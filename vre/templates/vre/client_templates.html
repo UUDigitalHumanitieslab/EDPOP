@@ -95,9 +95,9 @@
                     class="btn btn-default" 
                     id="search-info" 
                     data-toggle="popover" 
-                    title="Search in HPB fields"
+                    title="Advanced search in HPB"
                     data-placement="left">
-                    <span class="glyphicon glyphicon-info-sign" id="search-info" aria-hidden="true"></span>
+                    <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
                 </button>
             </div>
         </div>
@@ -105,12 +105,14 @@
 </script>
 
 <script type="text/x-handlebars-template" id="hpb-search-info">
-    <table id="hpb-info-table"><tbody>
-        <tr><td>pica.tit=yourQuery</td> <td>Search only in title field </td></tr>
-        <tr><td>pica.per=yourQuery</td> <td>Search only in author field</td></tr>
-        <tr><td>pica.pub=yourQuery</td> <td>Search only publisher / publishing place</td></tr>
-        <tr><td>pica.yop=yearQuery</td> <td> Get only records published in a specific year </td></tr>
-    </tbody></table>
+    <table class="table" id="hpb-info-table">
+        <tbody>
+            <tr><td>pica.tit=yourQuery</td> <td>Search in title, uniform title and varying title field </td></tr>
+            <tr><td>pica.per=yourQuery</td> <td>Search in author and collaborator field</td></tr>
+            <tr><td>pica.pub=yourQuery</td> <td>Search in fields related to publisher</td></tr>
+            <tr><td>pica.yop=yearQuery</td> <td>Get only records published in a specific year </td></tr>
+        </tbody>
+    </table>
 </script>
 
 <script type="text/x-handlebars-template" id="item-detail">
