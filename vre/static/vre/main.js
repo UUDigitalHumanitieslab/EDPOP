@@ -256,9 +256,6 @@ var SearchResults = Records.extend({
     total_results: 0,
     parse: function(response) {
         this.total_results = response.total_results;
-        /*
-        var displayString = "Showing ".concat(this.length, " of ", this.total_results, " results");
-        $("h4").html(displayString);*/
         return response.result_list;
     }
 });
@@ -358,7 +355,6 @@ var VRECollectionView = LazyTemplateView.extend({
         if (this.model) {
             // adding to array as the api expects an array.
             selected_records.push(this.model.toJSON());
-            this.model = undefined;
         }
         else {
             selected_records = _(recordsList.items).filter({selected: true}).invokeMap('model.toJSON').value();
@@ -370,7 +366,7 @@ var VRECollectionView = LazyTemplateView.extend({
             'collections': selected_collections,
         };
         records_and_collections.save(additions, {
-            success: function(model, response) {
+            success: _.bind( function(model, response) {
                 var feedbackString = '';
                 $.each(response, function(key, value) {
                     feedbackString = feedbackString.concat('Added ', value, ' record(s) to ', key, ". ");
@@ -380,15 +376,15 @@ var VRECollectionView = LazyTemplateView.extend({
                         this.$('.alert-success').hide(500);
                     }, 2000);
                 });
-            },
-            error: function(model, response) {
+            }, this),
+            error: _.bind(function(model, response) {
                 var feedbackString = response.responseJSON.error;
                 this.$('.alert-warning').html(feedbackString).show(500, function() {
                     setTimeout(function() {
                         this.$('.alert-warning').hide(500);
                     }, 1000);
                 });
-            },
+            }, this),
         });
     },
 });
