@@ -1,10 +1,12 @@
 {% extends "vre/base.html" %}
 {% block content %}
-<div class="container-fluid">
+<div class="container">
     <div class="page-header" id="title-collection">
         <h1>Search or browse {{collection.description}}</h1>
     </div>
+</div>
 
+<div class="container">
 {% include "vre/item_detail.html" %}
 </div>
 {% endblock content %}
