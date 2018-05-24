@@ -302,7 +302,8 @@ var LazyTemplateView = Backbone.View.extend({
 var AlertView = LazyTemplateView.extend({
     ease: 500,
     delay: 2000,
-    className: 'alert',
+    className: 'alert alert-dismissible',
+    templateName: 'alert-view',
     attributes: {
         role: 'alert',
     },
@@ -310,7 +311,7 @@ var AlertView = LazyTemplateView.extend({
         _.assign(this, _.pick(options, ['level', 'message', 'ease', 'delay']));
     },
     render: function() {
-        this.$el.addClass(this.getLevelClass()).html(this.message);
+        this.$el.addClass(this.getLevelClass()).html(this.template(this));
         return this;
     },
     // Show and hide automatically, then execute `complete`.
