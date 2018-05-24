@@ -11,6 +11,24 @@ function getValue(index, item) {
     return $(item).data('value');
 }
 
+var canonicalOrder = {
+    'Title': 1,
+    'Uniform Title': 4,
+    'Varying Form of Title': 5,
+    'Author': 8,
+    'Collaborator': 12,
+    'Production': 16,
+    'Publisher': 20,
+    'Added Entry - Corporate Name': 24,
+    'Extent': 28,
+    'Language': 32,
+    'Citation/Reference': 36,
+    'Location of Originals': 40,
+    'Note': 44,
+    'With Note': 48,
+    'Subject Headings': 52,
+};
+
 /**
  * Insert the CSRF token header into $.ajax-compatible request options.
  * Returns a new object, does not mutate the original object.
@@ -46,6 +64,14 @@ function show_detail(event) {
  */
 function objectAsUrlParams(object) {
     return _(object).entries().invokeMap('join', '=').join('&');
+}
+
+/**
+/* Sorting in a canonical order, for FlatFields and FlatAnnotations.
+*/
+function canonicalSort(key) {
+    var index = (canonicalOrder[key] || 100);
+    return index;
 }
 
 /**
@@ -95,6 +121,9 @@ var Field = Backbone.Model.extend({
  */
 var FlatFields = Backbone.Collection.extend({
     model: Field,
+    comparator: function(item) {
+        return canonicalSort(item.attributes.key);
+    },
     initialize: function(models, options) {
         _.assign(this, _.pick(options, ['record']));
         if (this.record.has('content')) this.set(this.toFlat(this.record));
@@ -126,6 +155,9 @@ var Annotations = APICollection.extend({
 var FlatAnnotations = Backbone.Collection.extend({
     // comparator: can be set to keep this sorted
     // How to uniquely identify a field annotation.
+    comparator: function(item) {
+        return canonicalSort(item.attributes.key);
+    },
     modelId: function(attributes) {
         return attributes.key + ':' + attributes.group;
     },
@@ -224,9 +256,6 @@ var SearchResults = Records.extend({
     total_results: 0,
     parse: function(response) {
         this.total_results = response.total_results;
-        /*
-        var displayString = "Showing ".concat(this.length, " of ", this.total_results, " results");
-        $("h4").html(displayString);*/
         return response.result_list;
     }
 });
@@ -318,6 +347,7 @@ var VRECollectionView = LazyTemplateView.extend({
     },
     clear: function() {
         this.$el.val(null).trigger('change');
+        return this;
     },
     submitForm: function(event) {
         event.preventDefault();
@@ -325,17 +355,37 @@ var VRECollectionView = LazyTemplateView.extend({
         if (this.model) {
             // adding to array as the api expects an array.
             selected_records.push(this.model.toJSON());
-            this.model = undefined;
         }
         else {
             selected_records = _(recordsList.items).filter({selected: true}).invokeMap('model.toJSON').value();
         }
         var selected_collections = this.$('select').val();
-        var records_and_collections = new AdditionsToCollections({
+        var records_and_collections = new AdditionsToCollections();
+        var additions = {
             'records': selected_records,
             'collections': selected_collections,
+        };
+        records_and_collections.save(additions, {
+            success: _.bind( function(model, response) {
+                var feedbackString = '';
+                $.each(response, function(key, value) {
+                    feedbackString = feedbackString.concat('Added ', value, ' record(s) to ', key, ". ");
+                });
+                this.$('.alert-success').html(feedbackString).show(500, function() {
+                    setTimeout(function() {
+                        this.$('.alert-success').hide(500);
+                    }, 2000);
+                });
+            }, this),
+            error: _.bind(function(model, response) {
+                var feedbackString = response.responseJSON.error;
+                this.$('.alert-warning').html(feedbackString).show(500, function() {
+                    setTimeout(function() {
+                        this.$('.alert-warning').hide(500);
+                    }, 1000);
+                });
+            }, this),
         });
-        records_and_collections.save();
     },
 });
 
@@ -350,26 +400,39 @@ var SearchView= LazyTemplateView.extend({
     submitSearch: function(startRecord) {
         var searchTerm = this.$('input').val();
         var startFrom = startRecord ? startRecord : 1;
-        var hold = results.query({params:{search:searchTerm, source:this.source, startRecord:startFrom}});
-        return hold;
+        var searchPromise = results.query(
+            {params:{search:searchTerm, source:this.source, startRecord:startFrom},
+            error: function() {
+                console.log("error!");
+            },
+        });
+        return searchPromise;
     },
     firstSearch: function(event){
         event.preventDefault();
-        this.submitSearch().then( function() {
+        this.submitSearch().then(_.bind(function() {
             $('#more-records').show();
             records.reset(results.models);
-            recordsList.render().$el.insertAfter($('#title-HPB'));
-        });
+            if (!document.contains(recordsList.$el[0])) {
+                // records list is initialized and rendered but not yet added to DOM
+                recordsList.$el.insertAfter($('.page-header'));
+            }
+            this.feedback();
+        }, this));
     },
     nextSearch: function(event) {
         $('#more-records').hide();
-        var startRecord = records.length;
-        this.submitSearch(startRecord).then( function() {
+        var startRecord = records.length+1;
+        this.submitSearch(startRecord).then( _.bind(function() {
             records.add(results.models);
-            if (records.length!=results.total_results) {
-                $('#more-records').show();
-            }
-        });
+            this.feedback();
+        }, this));
+    },
+    feedback: function() {
+        if (records.length!=results.total_results) {
+            $('#more-records').show();
+        }
+        $('#search-feedback').text("Showing "+records.length+" of "+results.total_results+" results");
     },
 });
 
@@ -608,20 +671,20 @@ var RecordDetailView = LazyTemplateView.extend({
         this.annotationsView = new RecordAnnotationsView({
             collection: new FlatAnnotations(null, {record: model}),
         });
-        this.vreCollectionsSelect.setRecord(model);
+        this.vreCollectionsSelect.clear().setRecord(model);
         this.annotationsView.listenTo(this.fieldsView, 'edit', this.annotationsView.edit);
-        return this;
-    },
-    render: function() {
         this.$title.text(this.model.get('uri'));
-        this.$el.modal('show');
         this.fieldsView.render().$el.appendTo(this.$body);
         this.annotationsView.render().$el.appendTo(this.$body);
         return this;
     },
+    render: function() {
+        this.$el.modal('show');
+        return this;
+    },
     load: function(event) {
         var currentIndex = recordsList.collection.findIndex(this.model);
-        var nextIndex = event.target===$('#load_next')? currentIndex+1 : currentIndex-1;
+        var nextIndex = event.target.id==='load_next'? currentIndex+1 : currentIndex-1;
         var nextModel = recordsList.collection.at(nextIndex);
         this.setModel(nextModel);
         this.render();
@@ -694,9 +757,6 @@ var VRERouter = Backbone.Router.extend({
         // The if-condition is a bit of a hack, which can go away when we
         // convert to client side routing entirely.
         if (id=="hpb") {
-            recordsList.remove();
-            records = new Records();
-            recordsList = new RecordListView({collection: records});
             $('#HPB-info').show();
             $('#search-info').show();
             $('#search-info').popover({
@@ -714,7 +774,7 @@ var VRERouter = Backbone.Router.extend({
             records = collection.getRecords();
             recordsList.remove();
             recordsList = new RecordListView({collection: records});
-            recordsList.render().$el.insertAfter($('#title-collection'));
+            recordsList.render().$el.insertAfter($('.page-header'));
         }
         searchView.source = id;
     },
@@ -733,7 +793,7 @@ var recordsList = new RecordListView({collection: records});
 var results = new SearchResults();
 var searchView  = new SearchView();
 var router = new VRERouter();
-//var moreResults = new LoadMoreResultsView();
+
 
 function prepareCollectionViews() {
     recordDetailModal = new RecordDetailView();

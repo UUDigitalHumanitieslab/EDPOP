@@ -1,9 +1,17 @@
 import requests
 import os
 import csv
+
 from bs4 import BeautifulSoup
 
+from django.conf import settings
+
 HPB_URI = 'http://hpb.cerl.org/record/{}'
+READABLE_FIELDS_FILE = os.path.join(
+    settings.BASE_DIR,
+    "vre",
+    "M21_readable_fields.csv",
+)
 
 
 def sru_explain(url_string):
@@ -63,7 +71,7 @@ def translate_sru_response_to_dict(response_content):
 
 def load_translation_dictionary():
     translationDictionary = {}
-    with open(os.path.abspath("vre/M21_readable_fields.csv")) as dictionaryFile:
+    with open(READABLE_FIELDS_FILE) as dictionaryFile:
         reader = csv.DictReader(dictionaryFile)
         for row in reader:
             translationDictionary[row['Tag number']] = row[' Tag description'].strip()
