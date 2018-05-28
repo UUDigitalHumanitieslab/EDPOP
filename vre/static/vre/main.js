@@ -231,9 +231,6 @@ var SearchResults = Records.extend({
     total_results: 0,
     parse: function(response) {
         this.total_results = response.total_results;
-        /*
-        var displayString = "Showing ".concat(this.length, " of ", this.total_results, " results");
-        $("h4").html(displayString);*/
         return response.result_list;
     }
 });
@@ -365,7 +362,6 @@ var VRECollectionView = LazyTemplateView.extend({
         if (this.model) {
             // adding to array as the api expects an array.
             selected_records.push(this.model.toJSON());
-            this.model = undefined;
         }
         else {
             selected_records = _(recordsList.items).filter({selected: true}).invokeMap('model.toJSON').value();
@@ -407,15 +403,16 @@ var SearchView= LazyTemplateView.extend({
         return this;
     },
     showPending: function() {
-        this.$('button').text('Searching...');
+        this.$('button').first().text('Searching...');
         return this;
     },
     showIdle: function() {
-        this.$('button').text('Search');
+        this.$('button').first().text('Search');
         return this;
     },
     submitSearch: function(startRecord) {
         this.showPending();
+        var myElement = this.el;
         var searchTerm = this.$('input').val();
         var startFrom = startRecord ? startRecord : 1;
         var searchPromise = results.query(
@@ -797,11 +794,18 @@ var VRERouter = Backbone.Router.extend({
     },
     showDatabase: function(id) {
         searchView.render();
-        searchView.$el.appendTo($('.collapse').first());
+        searchView.$el.appendTo($('.page-header').first());
         // The if-condition is a bit of a hack, which can go away when we
         // convert to client side routing entirely.
         if (id=="hpb") {
             $('#HPB-info').show();
+            $('#search-info').show();
+            $('#search-info').popover({
+                'html': true, 
+                'content': JST['hpb-search-info'](), 
+                'container': 'body', 
+                'placement': 'left'
+            });
         }
         else {
             // We are not on the HPB search page, so display the
@@ -835,7 +839,7 @@ var router = new VRERouter();
 function prepareCollectionViews() {
     recordDetailModal = new RecordDetailView();
     dropDown = new SelectSourceView({collection:myCollections});
-    dropDown.$el.prependTo($('.nav').first());
+    dropDown.$el.appendTo($('.nav').first());
 }
 
 $(function() {

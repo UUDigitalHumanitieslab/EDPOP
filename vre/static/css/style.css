@@ -17,3 +17,15 @@ h1 {
 #HPB-info {
 	display: none;
 }
+
+.popover {
+	max-width: 100%;
+}
+
+table#hpb-info-table td:nth-child(odd) {
+	font-weight: bold;
+}
+
+#search-info{
+	display: none;
+}

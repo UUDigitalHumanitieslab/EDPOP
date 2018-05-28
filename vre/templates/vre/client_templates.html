@@ -56,10 +56,13 @@
 </script>
 
 <script type="text/x-handlebars-template" id="collection-selector">
-    <select name="collections" multiple="multiple" style="width: 25%;">
-        {{#models}}<option value={{id}}>{{description}}</option>{{/models}}
-    </select>
-    <button class="btn btn-primary" type="submit">Add to collection...</button>
+    <label for="collection-select">
+        Choose collections:
+        <select name="collections" multiple="multiple" style="width: 100%; id="collection-select">
+            {{#models}}<option value={{id}}>{{description}}</option>{{/models}}
+        </select>
+    </label>
+    <button class="btn btn-primary" type="submit">Add</button>
 </script>
 
 <script type="text/x-handlebars-template" id="group-menu-header">
@@ -84,12 +87,34 @@
 </script>
 
 <script type="text/x-handlebars-template" id="search-view">
-    <form class="navbar-form navbar-left" id="search">
-        <div class="form-group">
+    <form id="search">
+        <div class="input-group">
             <input type="text" class="form-control" name="search" placeholder="Query">
+            <div class="input-group-btn">
+                <button type="submit" class="btn btn-primary">Search</button>
+                <button 
+                    type="button" 
+                    class="btn btn-default" 
+                    id="search-info" 
+                    data-toggle="popover" 
+                    title="Advanced search in HPB"
+                    data-placement="left">
+                    <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+                </button>
+            </div>
         </div>
-        <button type="submit" class="btn btn-primary">Search</button>
     </form>
+</script>
+
+<script type="text/x-handlebars-template" id="hpb-search-info">
+    <table class="table" id="hpb-info-table">
+        <tbody>
+            <tr><td>pica.tit=yourQuery</td> <td>Search in title, uniform title and varying title field </td></tr>
+            <tr><td>pica.per=yourQuery</td> <td>Search in author and collaborator field</td></tr>
+            <tr><td>pica.pub=yourQuery</td> <td>Search in fields related to publisher</td></tr>
+            <tr><td>pica.yop=yearQuery</td> <td>Get only records published in a specific year </td></tr>
+        </tbody>
+    </table>
 </script>
 
 <script type="text/x-handlebars-template" id="failed-search-message">

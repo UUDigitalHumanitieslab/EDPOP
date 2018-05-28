@@ -126,7 +126,7 @@ class SearchViewSet(ViewSetMixin, APIView):
         else:
             startRecord = 1
         search_source = request.query_params.get('source')
-        if search_source=="hpb":
+        if search_source == "hpb":
             url_string = HPB_SRU_URL
             try:
                 search_result = sru_query(url_string, searchterm, startRecord=startRecord)
@@ -141,9 +141,20 @@ class SearchViewSet(ViewSetMixin, APIView):
         else:
             # searching records in collection: do they contain the search term anywhere in content?
             records = Record.objects.filter(collection__id=search_source)
+            record_ids = records.values_list('id', flat=True)
             search_results = records.filter(content__icontains=searchterm)
+            # searching all annotations for the search term, and retrieving associated records
+            annotation_results = Annotation.objects.filter(
+                record__in=record_ids
+            ).filter(
+                content__icontains=searchterm
+            ).select_related('record') #this saves database lookups
             result_list = [RecordSerializer(result).data for result in search_results]
-            result_info = {'total_results': len(search_results), 'result_list': result_list}
+            for ann in annotation_results:
+                new_result = RecordSerializer(ann.record).data
+                if not new_result in result_list:
+                    result_list.append(new_result)
+            result_info = {'total_results': len(result_list), 'result_list': result_list}
         return Response(result_info)
 
 
