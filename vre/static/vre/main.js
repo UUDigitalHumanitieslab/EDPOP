@@ -337,6 +337,8 @@ var VRECollectionView = LazyTemplateView.extend({
         'click button': 'submitForm',
     },
     render: function() {
+        this.collection.remove(currentVRECollection);
+        console.log(currentVRECollection, this.collection);
         this.$el.html(this.template({models: this.collection.toJSON()}));
         this.$('select').select2();
         return this;
@@ -656,7 +658,6 @@ var RecordDetailView = LazyTemplateView.extend({
         this.$body = this.$('.modal-body');
         this.$footer = this.$('.modal-footer');
         this.vreCollectionsSelect = new VRECollectionView({collection: myCollections});
-        this.$footer.prepend(this.vreCollectionsSelect.render().$el);
     },
     setModel: function(model) {
         if (this.model) {
@@ -679,6 +680,7 @@ var RecordDetailView = LazyTemplateView.extend({
         return this;
     },
     render: function() {
+        this.$footer.prepend(this.vreCollectionsSelect.render().$el);
         this.$el.modal('show');
         return this;
     },
@@ -770,8 +772,8 @@ var VRERouter = Backbone.Router.extend({
             // We are not on the HPB search page, so display the
             // records in the current collection.
             $('#HPB-info').hide();
-            var collection = allCollections.get(id);
-            records = collection.getRecords();
+            currentVRECollection = allCollections.get(id);
+            records = currentVRECollection.getRecords();
             recordsList.remove();
             recordsList = new RecordListView({collection: records});
             recordsList.render().$el.insertAfter($('.page-header'));
@@ -782,6 +784,7 @@ var VRERouter = Backbone.Router.extend({
 
 // Global object to hold the templates, initialized at page load below.
 var JST = {};
+var currentVRECollection;
 var records = new Records();
 var allCollections = new VRECollections();
 var myCollections = VRECollections.mine();
