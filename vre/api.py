@@ -147,9 +147,7 @@ class SearchViewSet(ViewSetMixin, APIView):
                 new_result = RecordSerializer(ann.record).data
                 if not new_result in result_list:
                     result_list.append(new_result)
-            print(result_list)
             result_info = {'total_results': len(result_list), 'result_list': result_list}
-            print(len(result_list))
         return Response(result_info)
 
 
