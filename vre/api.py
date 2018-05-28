@@ -144,7 +144,9 @@ class SearchViewSet(ViewSetMixin, APIView):
             ).select_related('record') #this saves database lookups
             result_list = [RecordSerializer(result).data for result in search_results]
             for ann in annotation_results:
-                result_list.append(RecordSerializer(ann.record).data)
+                new_result = RecordSerializer(ann.record).data
+                if not new_result in result_list:
+                    result_list.append(new_result)
             result_info = {'total_results': len(result_list), 'result_list': result_list}
         return Response(result_info)
 
