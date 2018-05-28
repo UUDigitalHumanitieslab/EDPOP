@@ -335,10 +335,10 @@ var VRECollectionView = LazyTemplateView.extend({
     templateName: 'collection-selector',
     events: {
         'click button': 'submitForm',
+        'change select': 'activateButton',
     },
     render: function() {
         this.collection.remove(currentVRECollection);
-        console.log(currentVRECollection, this.collection);
         this.$el.html(this.template({models: this.collection.toJSON()}));
         this.$('select').select2();
         return this;
@@ -350,6 +350,15 @@ var VRECollectionView = LazyTemplateView.extend({
     clear: function() {
         this.$el.val(null).trigger('change');
         return this;
+    },
+    activateButton: function(event) {
+        event.preventDefault();
+        if (this.$('select').val().length) {
+            this.$('button').removeClass("disabled");
+        }
+        else {
+            this.$('button').addClass("disabled");
+        }
     },
     submitForm: function(event) {
         event.preventDefault();
