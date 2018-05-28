@@ -673,7 +673,9 @@ var RecordDetailView = LazyTemplateView.extend({
         });
         this.vreCollectionsSelect.clear().setRecord(model);
         this.annotationsView.listenTo(this.fieldsView, 'edit', this.annotationsView.edit);
-        this.$title.text(this.model.get('uri'));
+        var uriText = this.model.get('uri')
+        this.$title.text(uriText);
+        document.getElementById("uri-link").href = uriText;
         this.fieldsView.render().$el.appendTo(this.$body);
         this.annotationsView.render().$el.appendTo(this.$body);
         return this;
