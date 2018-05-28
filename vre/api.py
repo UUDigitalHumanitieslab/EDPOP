@@ -138,7 +138,7 @@ class SearchViewSet(ViewSetMixin, APIView):
             # searching all annotations for the search term, and retrieving associated records
             annotation_results = Annotation.objects.filter(content__icontains=searchterm)
             record_ids = annotation_results.values_list('record', flat=True)
-            associated_records = Record.objects.filter(id__in=record_ids)
+            associated_records = records.filter(id__in=record_ids)
             all_results = search_results.union(associated_records)
             result_list = [RecordSerializer(result).data for result in all_results]
             result_info = {'total_results': len(result_list), 'result_list': result_list}
