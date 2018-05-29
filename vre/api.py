@@ -11,6 +11,10 @@ from .models import *
 from .sru_query import sru_query, translate_sru_response_to_dict
 
 HPB_SRU_URL = "http://sru.gbv.de/hpb"
+ERROR_MESSAGE_500 = (
+    'The server doesn\'t feel too well right now. '
+    'If the problem persists, please contact the maintainer.'
+)
 
 
 class ListMineMixin(object):
@@ -126,8 +130,11 @@ class SearchViewSet(ViewSetMixin, APIView):
             url_string = HPB_SRU_URL
             try:
                 search_result = sru_query(url_string, searchterm, startRecord=startRecord)
-            except Exception as e:
-                return Response(e, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            except:
+                return Response(
+                    ERROR_MESSAGE_500,
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                )
             result_info = translate_sru_response_to_dict(
                 search_result.text
             )

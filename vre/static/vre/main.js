@@ -1,16 +1,3 @@
-
-function isChecked(index, item) {
-    return item.checked;
-}
-
-function getContent(index, item) {
-    return $(item).data('content');
-}
-
-function getValue(index, item) {
-    return $(item).data('value');
-}
-
 var canonicalOrder = {
     'Title': 1,
     'Uniform Title': 4,
@@ -44,18 +31,6 @@ function addCSRFToken(ajaxOptions) {
     var id = _.identity;
     Backbone.sync = _.overArgs(Backbone.sync, [id, id, addCSRFToken]);
 }());
-
-function retrieveMoreRecords(event) {
-    event.preventDefault();
-    searchView.nextSearch(event);
-}
-
-function show_detail(event) {
-    event.preventDefault();
-    var sisterCheckbox = $(this).parents('tr').find('input');
-    var jsonData = sisterCheckbox.data('content');
-    renderRecordDetail(jsonData);
-}
 
 /**
  * Perform the following transformation:
@@ -113,7 +88,7 @@ var Field = Backbone.Model.extend({
  * a view.
  *
  * normal: {id, uri, content}
- * flat alternative: [{id, key, value}]
+ * flat alternative: [{key, value}]
  *
  * Note that we extend directly from Backbone.Collection rather than from
  * APICollection and that we don't set a URL. This is because we only talk
@@ -150,7 +125,7 @@ var Annotations = APICollection.extend({
  * there may be multiple underlying annotation objects.
  *
  * normal: {id, record, managing_group, content}
- * flat alternative: [{id, key, value, group}]
+ * flat alternative: [{key, value, group}]
  */
 var FlatAnnotations = Backbone.Collection.extend({
     // comparator: can be set to keep this sorted
@@ -312,22 +287,54 @@ var LazyTemplateView = Backbone.View.extend({
     },
 });
 
-var RecordListItemView = LazyTemplateView.extend({
-    tagName: 'tr',
-    templateName: 'record-list-item',
-    events: {
-        'change input': 'toggle',
-        'click a': 'display',
+/**
+ * Reusable alert view. Meant to be displayed once and then discarded.
+ *
+ * The methods with a `complete` parameter accept three types of values:
+ *
+ *  1. any function, which will be executed after the animation completes;
+ *  2. a string, which should be the name of a method of the alert view;
+ *  3. undefined, in which case nothing is done after the animation completes.
+ */
+var AlertView = LazyTemplateView.extend({
+    ease: 500,
+    delay: 2000,
+    className: 'alert alert-dismissible',
+    templateName: 'alert-view',
+    attributes: {
+        role: 'alert',
+    },
+    initialize: function(options) {
+        _.assign(this, _.pick(options, ['level', 'message', 'ease', 'delay']));
     },
     render: function() {
-        this.$el.html(this.template(this.model.attributes));
+        this.$el.addClass(this.getLevelClass()).html(this.template(this));
         return this;
     },
-    toggle: function(event) {
-        this.selected = event.target.checked;
+    // Show and hide automatically, then execute `complete`.
+    animate: function(complete) {
+        var followUp = _.bind(this.animateOut, this, complete);
+        // The _.partial(...) below is a shorthand for _.bind(function() {
+        //     _.delay(followUp, this.delay);
+        // }, this), where _.delay in turn is a shorthand for setTimeout.
+        return this.animateIn(_.partial(_.delay, followUp, this.delay));
     },
-    display: function(event) {
-        recordDetailModal.setModel(this.model).render();
+    // Show with ease and then execute `complete`.
+    animateIn: function(complete) {
+        this.$el.show(this.ease, this.wrapComplete(complete));
+        return this;
+    },
+    // Hide with ease and then execute `complete`.
+    animateOut: function(complete) {
+        this.$el.hide(this.ease, this.wrapComplete(complete));
+        return this;
+    },
+    getLevelClass: function() {
+        return 'alert-' + this.level;
+    },
+    // Utility function that enables the "string as method name" magic.
+    wrapComplete: function(complete) {
+        return this[complete] && this[complete].bind(this) || complete;
     },
 });
 
@@ -360,32 +367,29 @@ var VRECollectionView = LazyTemplateView.extend({
             selected_records = _(recordsList.items).filter({selected: true}).invokeMap('model.toJSON').value();
         }
         var selected_collections = this.$('select').val();
-        var records_and_collections = new AdditionsToCollections();
-        var additions = {
+        var records_and_collections = new AdditionsToCollections({
             'records': selected_records,
             'collections': selected_collections,
-        };
-        records_and_collections.save(additions, {
-            success: _.bind( function(model, response) {
-                var feedbackString = '';
-                $.each(response, function(key, value) {
-                    feedbackString = feedbackString.concat('Added ', value, ' record(s) to ', key, ". ");
-                });
-                this.$('.alert-success').html(feedbackString).show(500, function() {
-                    setTimeout(function() {
-                        this.$('.alert-success').hide(500);
-                    }, 2000);
-                });
-            }, this),
-            error: _.bind(function(model, response) {
-                var feedbackString = response.responseJSON.error;
-                this.$('.alert-warning').html(feedbackString).show(500, function() {
-                    setTimeout(function() {
-                        this.$('.alert-warning').hide(500);
-                    }, 1000);
-                });
-            }, this),
         });
+        records_and_collections.save().then(
+            this.showSuccess.bind(this),
+            this.showError.bind(this),
+        );
+    },
+    showSuccess: function(model, response) {
+        var feedbackString = '';
+        $.each(model, function(key, value) {
+            feedbackString = feedbackString.concat('Added ', value, ' record(s) to ', key, ". ");
+        });
+        this.showAlert('success', feedbackString);
+    },
+    showError: function(model, response) {
+        this.showAlert('warning', response.responseJSON.error);
+    },
+    showAlert: function(level, message) {
+        var alert = new AlertView({level: level, message: message});
+        alert.render().$el.prependTo(this.el);
+        alert.animate('remove');
     },
 });
 
@@ -396,16 +400,33 @@ var SearchView= LazyTemplateView.extend({
     },
     render: function() {
         this.$el.html(this.template());
+        return this;
+    },
+    showPending: function() {
+        this.$('button').first().text('Searching...');
+        return this;
+    },
+    showIdle: function() {
+        this.$('button').first().text('Search');
+        return this;
     },
     submitSearch: function(startRecord) {
+        this.showPending();
+        var myElement = this.el;
         var searchTerm = this.$('input').val();
         var startFrom = startRecord ? startRecord : 1;
         var searchPromise = results.query(
             {params:{search:searchTerm, source:this.source, startRecord:startFrom},
-            error: function() {
-                console.log("error!");
+            error: function(collection, response, options) {
+                var alert = new AlertView({
+                    level: 'warning',
+                    message: JST['failed-search-message'](response),
+                });
+                alert.render().$el.insertAfter('.page-header');
+                alert.animateIn();
             },
         });
+        searchPromise.always(this.showIdle.bind(this));
         return searchPromise;
     },
     firstSearch: function(event){
@@ -421,6 +442,7 @@ var SearchView= LazyTemplateView.extend({
         }, this));
     },
     nextSearch: function(event) {
+        event.preventDefault();
         $('#more-records').hide();
         var startRecord = records.length+1;
         this.submitSearch(startRecord).then( _.bind(function() {
@@ -436,6 +458,25 @@ var SearchView= LazyTemplateView.extend({
     },
 });
 
+
+var RecordListItemView = LazyTemplateView.extend({
+    tagName: 'tr',
+    templateName: 'record-list-item',
+    events: {
+        'change input': 'toggle',
+        'click a': 'display',
+    },
+    render: function() {
+        this.$el.html(this.template(this.model.attributes));
+        return this;
+    },
+    toggle: function(event) {
+        this.selected = event.target.checked;
+    },
+    display: function(event) {
+        recordDetailModal.setModel(this.model).render();
+    },
+});
 
 var RecordListView = LazyTemplateView.extend({
     tagName: 'form',
@@ -807,7 +848,7 @@ $(function() {
         JST[$el.prop('id')] = Handlebars.compile($el.html(), {compat: true});
     });
     $('#result_detail').modal({show: false});
-    $('#more-records').click(retrieveMoreRecords);
+    $('#more-records').click(searchView.nextSearch.bind(searchView));
     // We fetch the collections and ensure that we have them before we handle
     // the route, because VRERouter.showCollection depends on them being
     // available. This is something we can definitely improve upon.
