@@ -464,16 +464,47 @@ var SearchView= LazyTemplateView.extend({
     },
 });
 
-var SelectAllView = LazyTemplateView.extend({
-    className: 'checkbox',
-    templateName: 'select-all-view',
-    render: function() {
-        this.$el.html(this.template({}));
+/**
+ * Common base for views that provide behaviour revolving around a
+ * single checkbox. When deriving a subclass, bind the `toggle`
+ * method to the right checkbox and set `this.$checkbox` in the
+ * `render` method.
+ */
+var SelectableView = LazyTemplateView.extend({
+    toggle: function(event) {
+        // The assignment in the if condition is on purpose (assign + check).
+        if (this.selected = event.target.checked) {
+            this.trigger('check');
+        } else {
+            this.trigger('uncheck');
+        }
+    },
+    check: function() {
+        this.$checkbox.prop('checked', true);
+        this.selected = true;
+        return this;
+    },
+    uncheck: function() {
+        this.$checkbox.prop('checked', false);
+        this.selected = false;
         return this;
     },
 });
 
-var RecordListItemView = LazyTemplateView.extend({
+var SelectAllView = SelectableView.extend({
+    className: 'checkbox',
+    templateName: 'select-all-view',
+    events: {
+        'change input': 'toggle',
+    },
+    render: function() {
+        this.$el.html(this.template({}));
+        this.$checkbox = this.$('input');
+        return this;
+    },
+});
+
+var RecordListItemView = SelectableView.extend({
     tagName: 'tr',
     templateName: 'record-list-item',
     events: {
@@ -482,10 +513,8 @@ var RecordListItemView = LazyTemplateView.extend({
     },
     render: function() {
         this.$el.html(this.template(this.model.attributes));
+        this.$checkbox = this.$('input');
         return this;
-    },
-    toggle: function(event) {
-        this.selected = event.target.checked;
     },
     display: function(event) {
         recordDetailModal.setModel(this.model).render();
@@ -502,6 +531,7 @@ var RecordListView = LazyTemplateView.extend({
     },
     initialize: function(options) {
         this.items = [];
+        this.checkedCount = 0;
         this.listenTo(this.collection, {
             add: this.addItem,
             reset: this.render,
@@ -525,6 +555,7 @@ var RecordListView = LazyTemplateView.extend({
     },
     addItem: function(model, collection, options) {
         var item = new RecordListItemView({model: model});
+        item.on({check: this.checkOne, uncheck: this.uncheckOne}, this);
         var index;
         if (options && (index = options.index) != null && index !== this.items.length) {
             // Insert at the front or in the middle.
@@ -538,8 +569,36 @@ var RecordListView = LazyTemplateView.extend({
         return this;
     },
     showSelectAll: function() {
-        this.selectAllView = new SelectAllView();
-        this.$('table').before(this.selectAllView.render().el);
+        var selectAllView = this.selectAllView = new SelectAllView();
+        this.$('table').before(selectAllView.render().el);
+        selectAllView.on({
+            check: this.checkAll,
+            uncheck: this.uncheckAll,
+        }, this).listenTo(this, {
+            allChecked: selectAllView.check,
+            notAllChecked: selectAllView.uncheck,
+        });
+    },
+    checkOne: function() {
+        if (++this.checkedCount === this.collection.length) {
+            this.trigger('allChecked');
+        }
+        return this;
+    },
+    uncheckOne: function() {
+        --this.checkedCount;
+        this.trigger('notAllChecked');
+        return this;
+    },
+    checkAll: function() {
+        this.checkedCount = this.collection.length;
+        _.invokeMap(this.items, 'check');
+        return this;
+    },
+    uncheckAll: function() {
+        this.checkedCount = 0;
+        _.invokeMap(this.items, 'uncheck');
+        return this;
     },
 });
 
