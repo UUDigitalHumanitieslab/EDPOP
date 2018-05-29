@@ -242,7 +242,11 @@ var VRECollection = Backbone.Model.extend({
     getRecords: function() {
         if (!this.records) {
             this.records = new Records();
-            this.records.query({params: {collection__id: this.id}});
+            this.records.query({
+                params: {collection__id: this.id},
+            }).then(function(collection) {
+                collection.trigger('complete');
+            });
         }
         return this.records;
     },
@@ -451,13 +455,23 @@ var SearchView= LazyTemplateView.extend({
         }, this));
     },
     feedback: function() {
-        if (records.length!=results.total_results) {
+        if (records.length === results.total_results) {
+            records.trigger('complete');
+        } else {
             $('#more-records').show();
         }
         $('#search-feedback').text("Showing "+records.length+" of "+results.total_results+" results");
     },
 });
 
+var SelectAllView = LazyTemplateView.extend({
+    className: 'checkbox',
+    templateName: 'select-all-view',
+    render: function() {
+        this.$el.html(this.template({}));
+        return this;
+    },
+});
 
 var RecordListItemView = LazyTemplateView.extend({
     tagName: 'tr',
@@ -491,6 +505,7 @@ var RecordListView = LazyTemplateView.extend({
         this.listenTo(this.collection, {
             add: this.addItem,
             reset: this.render,
+            complete: this.showSelectAll,
         });
         this.vreCollectionsSelect = new VRECollectionView({collection: myCollections});
     },
@@ -521,6 +536,10 @@ var RecordListView = LazyTemplateView.extend({
             this.$tbody.append(item.render().el);
         }
         return this;
+    },
+    showSelectAll: function() {
+        this.selectAllView = new SelectAllView();
+        this.$('table').before(this.selectAllView.render().el);
     },
 });
 
@@ -803,9 +822,9 @@ var VRERouter = Backbone.Router.extend({
             $('#HPB-info').show();
             $('#search-info').show();
             $('#search-info').popover({
-                'html': true, 
-                'content': JST['hpb-search-info'](), 
-                'container': 'body', 
+                'html': true,
+                'content': JST['hpb-search-info'](),
+                'container': 'body',
                 'placement': 'left'
             });
         }
