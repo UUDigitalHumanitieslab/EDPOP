@@ -58,7 +58,7 @@
 <script type="text/x-handlebars-template" id="collection-selector">
     <label for="collection-select">
         Choose collections:
-        <select name="collections" multiple="multiple" style="width: 100%; id="collection-select">
+        <select name="collections" multiple="multiple" style="width: 100%;" id="collection-select">
             {{#models}}<option value={{id}}>{{description}}</option>{{/models}}
         </select>
     </label>
@@ -92,11 +92,11 @@
             <input type="text" class="form-control" name="search" placeholder="Query">
             <div class="input-group-btn">
                 <button type="submit" class="btn btn-primary">Search</button>
-                <button 
-                    type="button" 
-                    class="btn btn-default" 
-                    id="search-info" 
-                    data-toggle="popover" 
+                <button
+                    type="button"
+                    class="btn btn-default"
+                    id="search-info"
+                    data-toggle="popover"
                     title="Advanced search in HPB"
                     data-placement="left">
                     <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
