@@ -56,8 +56,6 @@
 </script>
 
 <script type="text/x-handlebars-template" id="collection-selector">
-    <div class="alert alert-success" role="alert"></div>
-    <div class="alert alert-warning" role="alert"></div>
     <label for="collection-select">
         Choose collections:
         <select name="collections" multiple="multiple" style="width: 100%; id="collection-select">
@@ -117,6 +115,16 @@
             <tr><td>pica.yop=yearQuery</td> <td>Get only records published in a specific year </td></tr>
         </tbody>
     </table>
+</script>
+
+<script type="text/x-handlebars-template" id="failed-search-message">
+    Search failed: {{responseJSON}}<br>
+    Status code: {{status}}.
+</script>
+
+<script type="text/x-handlebars-template" id="alert-view">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    {{{message}}}
 </script>
 
 {% endverbatim %}
