@@ -338,8 +338,9 @@ var VRECollectionView = LazyTemplateView.extend({
         'change select': 'activateButton',
     },
     render: function() {
-        this.collection.remove(currentVRECollection);
-        this.$el.html(this.template({models: this.collection.toJSON()}));
+        var shownCollections = this.collection.without(currentVRECollection);
+        console.log(this.collection, shownCollections)
+        this.$el.html(this.template({models: shownCollections}));
         this.$('select').select2();
         return this;
     },
@@ -781,7 +782,7 @@ var VRERouter = Backbone.Router.extend({
             // We are not on the HPB search page, so display the
             // records in the current collection.
             $('#HPB-info').hide();
-            currentVRECollection = allCollections.get(id);
+            currentVRECollection = myCollections.get(id);
             records = currentVRECollection.getRecords();
             recordsList.remove();
             recordsList = new RecordListView({collection: records});
