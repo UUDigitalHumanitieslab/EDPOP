@@ -388,14 +388,14 @@ var VRECollectionView = LazyTemplateView.extend({
             this.showError.bind(this),
         );
     },
-    showSuccess: function(model, response) {
+    showSuccess: function(response) {
         var feedbackString = '';
-        $.each(model, function(key, value) {
+        $.each(response, function(key, value) {
             feedbackString = feedbackString.concat('Added ', value, ' record(s) to ', key, ". ");
         });
         this.showAlert('success', feedbackString);
     },
-    showError: function(model, response) {
+    showError: function(response) {
         this.showAlert('warning', response.responseJSON.error);
     },
     showAlert: function(level, message) {
