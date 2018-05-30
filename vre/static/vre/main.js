@@ -338,9 +338,10 @@ var VRECollectionView = LazyTemplateView.extend({
         'change select': 'activateButton',
     },
     render: function() {
-        var shownCollections = this.collection.without(currentVRECollection);
-        console.log(this.collection, shownCollections)
-        this.$el.html(this.template({models: shownCollections}));
+        var shownCollections = this.collection.clone();
+        shownCollections.remove(currentVRECollection);
+        console.log(this.collection, shownCollections);
+        this.$el.html(this.template({models: shownCollections.toJSON()}));
         this.$('select').select2();
         return this;
     },
