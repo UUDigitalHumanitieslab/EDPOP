@@ -342,9 +342,13 @@ var VRECollectionView = LazyTemplateView.extend({
     templateName: 'collection-selector',
     events: {
         'click button': 'submitForm',
+        'change select': 'activateButton',
     },
     render: function() {
-        this.$el.html(this.template({models: this.collection.toJSON()}));
+        var shownCollections = this.collection.clone();
+        shownCollections.remove(currentVRECollection);
+        console.log(this.collection, shownCollections);
+        this.$el.html(this.template({models: shownCollections.toJSON()}));
         this.$('select').select2();
         return this;
     },
@@ -355,6 +359,15 @@ var VRECollectionView = LazyTemplateView.extend({
     clear: function() {
         this.$el.val(null).trigger('change');
         return this;
+    },
+    activateButton: function(event) {
+        event.preventDefault();
+        if (this.$('select').val().length) {
+            this.$('button').removeClass("disabled");
+        }
+        else {
+            this.$('button').addClass("disabled");
+        }
     },
     submitForm: function(event) {
         event.preventDefault();
@@ -697,7 +710,6 @@ var RecordDetailView = LazyTemplateView.extend({
         this.$body = this.$('.modal-body');
         this.$footer = this.$('.modal-footer');
         this.vreCollectionsSelect = new VRECollectionView({collection: myCollections});
-        this.$footer.prepend(this.vreCollectionsSelect.render().$el);
     },
     setModel: function(model) {
         if (this.model) {
@@ -722,6 +734,7 @@ var RecordDetailView = LazyTemplateView.extend({
         return this;
     },
     render: function() {
+        this.$footer.prepend(this.vreCollectionsSelect.render().$el);
         this.$el.modal('show');
         return this;
     },
@@ -813,8 +826,8 @@ var VRERouter = Backbone.Router.extend({
             // We are not on the HPB search page, so display the
             // records in the current collection.
             $('#HPB-info').hide();
-            var collection = allCollections.get(id);
-            records = collection.getRecords();
+            currentVRECollection = myCollections.get(id);
+            records = currentVRECollection.getRecords();
             recordsList.remove();
             recordsList = new RecordListView({collection: records});
             recordsList.render().$el.insertAfter($('.page-header'));
@@ -825,6 +838,7 @@ var VRERouter = Backbone.Router.extend({
 
 // Global object to hold the templates, initialized at page load below.
 var JST = {};
+var currentVRECollection;
 var records = new Records();
 var allCollections = new VRECollections();
 var myCollections = VRECollections.mine();
