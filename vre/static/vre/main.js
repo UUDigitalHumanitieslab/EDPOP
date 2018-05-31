@@ -241,10 +241,14 @@ var SearchResults = Records.extend({
 var VRECollection = Backbone.Model.extend({
     getRecords: function() {
         if (!this.records) {
-            this.records = new Records();
-            this.records.query({params: {collection__id: this.id}});
+            var records = this.records = new Records();
+            records.query({
+                params: {collection__id: this.id},
+            }).then(function() {
+                records.trigger('complete');
+            });
         }
-        return this.records;
+        return records;
     },
 });
 
@@ -462,15 +466,56 @@ var SearchView= LazyTemplateView.extend({
         }, this));
     },
     feedback: function() {
-        if (records.length!=results.total_results) {
+        if (records.length === results.total_results) {
+            records.trigger('complete');
+        } else {
             $('#more-records').show();
         }
         $('#search-feedback').text("Showing "+records.length+" of "+results.total_results+" results");
     },
 });
 
+/**
+ * Common base for views that provide behaviour revolving around a
+ * single checkbox. When deriving a subclass, bind the `toggle`
+ * method to the right checkbox and set `this.$checkbox` in the
+ * `render` method.
+ */
+var SelectableView = LazyTemplateView.extend({
+    toggle: function(event) {
+        // The assignment in the if condition is on purpose (assign + check).
+        if (this.selected = event.target.checked) {
+            this.trigger('check');
+        } else {
+            this.trigger('uncheck');
+        }
+    },
+    check: function() {
+        this.$checkbox.prop('checked', true);
+        this.selected = true;
+        return this;
+    },
+    uncheck: function() {
+        this.$checkbox.prop('checked', false);
+        this.selected = false;
+        return this;
+    },
+});
 
-var RecordListItemView = LazyTemplateView.extend({
+var SelectAllView = SelectableView.extend({
+    className: 'checkbox',
+    templateName: 'select-all-view',
+    events: {
+        'change input': 'toggle',
+    },
+    render: function() {
+        this.$el.html(this.template({}));
+        this.$checkbox = this.$('input');
+        return this;
+    },
+});
+
+var RecordListItemView = SelectableView.extend({
     tagName: 'tr',
     templateName: 'record-list-item',
     events: {
@@ -479,10 +524,8 @@ var RecordListItemView = LazyTemplateView.extend({
     },
     render: function() {
         this.$el.html(this.template(this.model.attributes));
+        this.$checkbox = this.$('input');
         return this;
-    },
-    toggle: function(event) {
-        this.selected = event.target.checked;
     },
     display: function(event) {
         recordDetailModal.setModel(this.model).render();
@@ -496,12 +539,15 @@ var RecordListView = LazyTemplateView.extend({
         'submit': function(event) {
             this.vreCollectionsSelect.submitForm(event);
         },
+        'click #more-records': 'loadMore',
     },
     initialize: function(options) {
         this.items = [];
+        this.checkedCount = 0;
         this.listenTo(this.collection, {
             add: this.addItem,
             reset: this.render,
+            complete: this.showSelectAll,
         });
         this.vreCollectionsSelect = new VRECollectionView({collection: myCollections});
     },
@@ -521,6 +567,7 @@ var RecordListView = LazyTemplateView.extend({
     },
     addItem: function(model, collection, options) {
         var item = new RecordListItemView({model: model});
+        item.on({check: this.checkOne, uncheck: this.uncheckOne}, this);
         var index;
         if (options && (index = options.index) != null && index !== this.items.length) {
             // Insert at the front or in the middle.
@@ -531,6 +578,41 @@ var RecordListView = LazyTemplateView.extend({
             this.items.push(item);
             this.$tbody.append(item.render().el);
         }
+        return this;
+    },
+    loadMore: function(event) {
+        searchView.nextSearch(event);
+    },
+    showSelectAll: function() {
+        var selectAllView = this.selectAllView = new SelectAllView();
+        this.$('table').before(selectAllView.render().el);
+        selectAllView.on({
+            check: this.checkAll,
+            uncheck: this.uncheckAll,
+        }, this).listenTo(this, {
+            allChecked: selectAllView.check,
+            notAllChecked: selectAllView.uncheck,
+        });
+    },
+    checkOne: function() {
+        if (++this.checkedCount === this.collection.length) {
+            this.trigger('allChecked');
+        }
+        return this;
+    },
+    uncheckOne: function() {
+        --this.checkedCount;
+        this.trigger('notAllChecked');
+        return this;
+    },
+    checkAll: function() {
+        this.checkedCount = this.collection.length;
+        _.invokeMap(this.items, 'check');
+        return this;
+    },
+    uncheckAll: function() {
+        this.checkedCount = 0;
+        _.invokeMap(this.items, 'uncheck');
         return this;
     },
 });
@@ -724,7 +806,7 @@ var RecordDetailView = LazyTemplateView.extend({
         });
         this.vreCollectionsSelect.clear().setRecord(model);
         this.annotationsView.listenTo(this.fieldsView, 'edit', this.annotationsView.edit);
-        var uriText = this.model.get('uri')
+        var uriText = this.model.get('uri');
         this.$title.text(uriText);
         document.getElementById("uri-link").href = uriText;
         this.fieldsView.render().$el.appendTo(this.$body);
@@ -814,9 +896,9 @@ var VRERouter = Backbone.Router.extend({
             $('#HPB-info').show();
             $('#search-info').show();
             $('#search-info').popover({
-                'html': true, 
-                'content': JST['hpb-search-info'](), 
-                'container': 'body', 
+                'html': true,
+                'content': JST['hpb-search-info'](),
+                'container': 'body',
                 'placement': 'left'
             });
         }
@@ -862,7 +944,6 @@ $(function() {
         JST[$el.prop('id')] = Handlebars.compile($el.html(), {compat: true});
     });
     $('#result_detail').modal({show: false});
-    $('#more-records').click(searchView.nextSearch.bind(searchView));
     // We fetch the collections and ensure that we have them before we handle
     // the route, because VRERouter.showCollection depends on them being
     // available. This is something we can definitely improve upon.
