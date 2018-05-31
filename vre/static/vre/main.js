@@ -426,7 +426,6 @@ var SearchView= LazyTemplateView.extend({
         this.showPending();
         var myElement = this.el;
         var searchTerm = this.$('input').val();
-        var startFrom = startRecord ? startRecord : 1;
         var searchPromise = results.query(
             {params:{search:searchTerm, source:this.source, startRecord:startFrom},
             error: function(collection, response, options) {
