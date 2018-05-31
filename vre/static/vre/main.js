@@ -340,7 +340,6 @@ var VRECollectionView = LazyTemplateView.extend({
     render: function() {
         var shownCollections = this.collection.clone();
         shownCollections.remove(currentVRECollection);
-        console.log(this.collection, shownCollections);
         this.$el.html(this.template({models: shownCollections.toJSON()}));
         this.$('select').select2();
         return this;
@@ -412,7 +411,6 @@ var SearchView= LazyTemplateView.extend({
     },
     submitSearch: function(startRecord) {
         var searchTerm = this.$('input').val();
-        var startFrom = startRecord ? startRecord : 1;
         var searchPromise = results.query(
             {params:{search:searchTerm, source:this.source, startRecord:startFrom},
             error: function() {
