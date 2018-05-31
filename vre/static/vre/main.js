@@ -427,7 +427,7 @@ var SearchView= LazyTemplateView.extend({
         var myElement = this.el;
         var searchTerm = this.$('input').val();
         var searchPromise = results.query(
-            {params:{search:searchTerm, source:this.source, startRecord:startFrom},
+            {params:{search:searchTerm, source:this.source, startRecord:startRecord},
             error: function(collection, response, options) {
                 var alert = new AlertView({
                     level: 'warning',
@@ -442,7 +442,7 @@ var SearchView= LazyTemplateView.extend({
     },
     firstSearch: function(event){
         event.preventDefault();
-        this.submitSearch().then(_.bind(function() {
+        this.submitSearch(1).then(_.bind(function() {
             $('#more-records').show();
             records.reset(results.models);
             if (!document.contains(recordsList.$el[0])) {
@@ -469,6 +469,26 @@ var SearchView= LazyTemplateView.extend({
     },
 });
 
+var AdvancedSearchView = LazyTemplateView.extend({
+    templateName: 'hpb-search-info',
+    events: {
+        'click a': 'fill',
+    },
+    render: function() {
+        $('#search-info').show();
+        $('#search-info').popover({
+            'html': true, 
+            'content': this.$el.html(this.template()), 
+            'container': 'body', 
+            'placement': 'left'
+        });
+    },
+    fill: function(event) {
+        event.preventDefault();
+        fillIn = event.target.textContent.slice(0, -9);
+        $('#query-input').val(fillIn);
+    },
+});
 
 var RecordListItemView = LazyTemplateView.extend({
     tagName: 'tr',
@@ -812,13 +832,8 @@ var VRERouter = Backbone.Router.extend({
         // convert to client side routing entirely.
         if (id=="hpb") {
             $('#HPB-info').show();
-            $('#search-info').show();
-            $('#search-info').popover({
-                'html': true, 
-                'content': JST['hpb-search-info'](), 
-                'container': 'body', 
-                'placement': 'left'
-            });
+            var advancedSearchView = new AdvancedSearchView();
+            advancedSearchView.render();
         }
         else {
             // We are not on the HPB search page, so display the
