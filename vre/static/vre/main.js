@@ -787,7 +787,16 @@ var GroupMenuView = LazyTemplateView.extend({
         }, this));
         this.$list.append(_(this.items).invokeMap('render').map('el').value());
         if (!this.model || !this.collection.includes(this.model)) {
-            this.select(this.collection.first());
+            if (localStorage.getItem('researchGroup')) {
+                var savedId = localStorage.getItem('researchGroup');
+                var savedGroup = this.collection.find( function(group) { 
+                    return group.attributes.id==savedId;
+                });
+                this.select(savedGroup);
+            }
+            else {
+                this.select(this.collection.first());
+            }
         }
     },
     select: function(model) {
@@ -795,6 +804,7 @@ var GroupMenuView = LazyTemplateView.extend({
         this.model = model;
         this.render();
         this.trigger('select', model);
+        localStorage.setItem('researchGroup', model.attributes.id);
     },
     render: function() {
         this.$header.html(this.template(this.model.attributes));
