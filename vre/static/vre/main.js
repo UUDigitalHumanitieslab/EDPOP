@@ -241,14 +241,14 @@ var SearchResults = Records.extend({
 var VRECollection = Backbone.Model.extend({
     getRecords: function() {
         if (!this.records) {
-            this.records = new Records();
-            this.records.query({
+            var records = this.records = new Records();
+            records.query({
                 params: {collection__id: this.id},
-            }).then(function(collection) {
-                collection.trigger('complete');
+            }).then(function() {
+                records.trigger('complete');
             });
         }
-        return this.records;
+        return records;
     },
 });
 
@@ -528,6 +528,7 @@ var RecordListView = LazyTemplateView.extend({
         'submit': function(event) {
             this.vreCollectionsSelect.submitForm(event);
         },
+        'click #more-records': 'loadMore',
     },
     initialize: function(options) {
         this.items = [];
@@ -567,6 +568,9 @@ var RecordListView = LazyTemplateView.extend({
             this.$tbody.append(item.render().el);
         }
         return this;
+    },
+    loadMore: function(event) {
+        searchView.nextSearch(event);
     },
     showSelectAll: function() {
         var selectAllView = this.selectAllView = new SelectAllView();
@@ -928,7 +932,6 @@ $(function() {
         JST[$el.prop('id')] = Handlebars.compile($el.html(), {compat: true});
     });
     $('#result_detail').modal({show: false});
-    $('#more-records').click(searchView.nextSearch.bind(searchView));
     // We fetch the collections and ensure that we have them before we handle
     // the route, because VRERouter.showCollection depends on them being
     // available. This is something we can definitely improve upon.
