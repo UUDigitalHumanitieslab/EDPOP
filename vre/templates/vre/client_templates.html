@@ -96,7 +96,7 @@
 <script type="text/x-handlebars-template" id="search-view">
     <form id="search">
         <div class="input-group">
-            <input type="text" class="form-control" name="search" placeholder="Query">
+            <input type="text" class="form-control" name="search" id="query-input" placeholder="Query">
             <div class="input-group-btn">
                 <button type="submit" class="btn btn-primary">Search</button>
                 <button
@@ -116,10 +116,10 @@
 <script type="text/x-handlebars-template" id="hpb-search-info">
     <table class="table" id="hpb-info-table">
         <tbody>
-            <tr><td>pica.tit=yourQuery</td> <td>Search in title, uniform title and varying title field </td></tr>
-            <tr><td>pica.per=yourQuery</td> <td>Search in author and collaborator field</td></tr>
-            <tr><td>pica.pub=yourQuery</td> <td>Search in fields related to publisher</td></tr>
-            <tr><td>pica.yop=yearQuery</td> <td>Get only records published in a specific year </td></tr>
+            <tr><td><a href=''>pica.tit=yourQuery</a></td> <td>Search in title, uniform title and varying title field </td></tr>
+            <tr><td><a href=''>pica.per=yourQuery</a></td> <td>Search in author and collaborator field</td></tr>
+            <tr><td><a href=''>pica.pub=yourQuery</a></td> <td>Search in fields related to publisher</td></tr>
+            <tr><td><a href=''>pica.yop=yearQuery</a></td> <td>Get only records published in a specific year </td></tr>
         </tbody>
     </table>
 </script>
