@@ -474,8 +474,7 @@ var SearchView= LazyTemplateView.extend({
         $('#search-feedback').text("Showing "+records.length+" of "+results.total_results+" results");
     },
     fill: function(fillText) {
-        var currentText = this.$('#query-input').val();
-        this.$('#query-input').val(fillText+currentText);
+        this.$('#query-input').val(fillText);
     },
 });
 
