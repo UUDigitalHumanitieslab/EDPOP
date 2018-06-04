@@ -789,16 +789,23 @@ var RecordAnnotationsView = RecordFieldsBaseView.extend({
     },
 });
 
-var SelectSourceView = LazyTemplateView.extend({
-    templateName: 'nav-dropdown',
+var SelectDatabaseView = LazyTemplateView.extend({
+    templateName: 'database-menu',
     tagName: 'li',
     className: 'dropdown',
+    events: {
+        'click li': 'select',
+    },
     initialize: function() {
         this.render();
     },
     render: function() {
         var collections = {'collections': this.collection.toJSON()};
         this.$el.html(this.template(collections));
+    },
+    select: function(event) {
+        selectedDB = event.target.innerText;
+        this.$el.html(this.template({'selected-db': selectedDB, 'collections': this.collection.toJSON()}));
     },
 });
 
@@ -920,6 +927,7 @@ var VRERouter = Backbone.Router.extend({
         ':id/': 'showDatabase',
     },
     showDatabase: function(id) {
+        console.log("hello");
         searchView.render();
         searchView.$el.appendTo($('.page-header').first());
         // The if-condition is a bit of a hack, which can go away when we
@@ -969,7 +977,7 @@ var router = new VRERouter();
 
 function prepareCollectionViews() {
     recordDetailModal = new RecordDetailView();
-    dropDown = new SelectSourceView({collection:myCollections});
+    dropDown = new SelectDatabaseView({collection:myCollections});
     dropDown.$el.appendTo($('.nav').first());
 }
 
