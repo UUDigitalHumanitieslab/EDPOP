@@ -893,7 +893,14 @@ var GroupMenuView = LazyTemplateView.extend({
         }, this));
         this.$list.append(_(this.items).invokeMap('render').map('el').value());
         if (!this.model || !this.collection.includes(this.model)) {
-            this.select(this.collection.first());
+            var savedId = localStorage.getItem('researchGroup');
+            if (savedId) {
+                var savedGroup = this.collection.get(savedId);
+                this.select(savedGroup);
+            }
+            else {
+                this.select(this.collection.first());
+            }
         }
     },
     select: function(model) {
@@ -901,6 +908,7 @@ var GroupMenuView = LazyTemplateView.extend({
         this.model = model;
         this.render();
         this.trigger('select', model);
+        localStorage.setItem('researchGroup', model.attributes.id);
     },
     render: function() {
         this.$header.html(this.template(this.model.attributes));
