@@ -787,11 +787,9 @@ var GroupMenuView = LazyTemplateView.extend({
         }, this));
         this.$list.append(_(this.items).invokeMap('render').map('el').value());
         if (!this.model || !this.collection.includes(this.model)) {
-            if (localStorage.getItem('researchGroup')) {
-                var savedId = localStorage.getItem('researchGroup');
-                var savedGroup = this.collection.find( function(group) { 
-                    return group.attributes.id==savedId;
-                });
+            var savedId = localStorage.getItem('researchGroup');
+            if (savedId) {
+                var savedGroup = this.collection.get(savedId);
                 this.select(savedGroup);
             }
             else {
