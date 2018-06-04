@@ -43,8 +43,15 @@
     </form></td>
 </script>
 
+<script type="text/x-handlebars-template" id="select-all-view">
+    <label>
+        <input type=checkbox> Select all
+    </label>
+</script>
+
 <script type="text/x-handlebars-template" id="record-list">
     <h4 id="search-feedback"></h4>
+    <a href="#" id="more-records">Load more records</a>
     <table class="table table-striped">
         <tbody></tbody>
     </table>
@@ -58,7 +65,7 @@
 <script type="text/x-handlebars-template" id="collection-selector">
     <label for="collection-select">
         Choose collections:
-        <select name="collections" multiple="multiple" style="width: 100%; id="collection-select">
+        <select name="collections" multiple="multiple" style="width: 100%;" id="collection-select">
             {{#models}}<option value={{id}}>{{description}}</option>{{/models}}
         </select>
     </label>
@@ -92,11 +99,11 @@
             <input type="text" class="form-control" name="search" id="query-input" placeholder="Query">
             <div class="input-group-btn">
                 <button type="submit" class="btn btn-primary">Search</button>
-                <button 
-                    type="button" 
-                    class="btn btn-default" 
-                    id="search-info" 
-                    data-toggle="popover" 
+                <button
+                    type="button"
+                    class="btn btn-default"
+                    id="search-info"
+                    data-toggle="popover"
                     title="Advanced search in HPB"
                     data-placement="left">
                     <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
