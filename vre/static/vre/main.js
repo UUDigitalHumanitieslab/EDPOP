@@ -467,6 +467,10 @@ var SearchView= LazyTemplateView.extend({
         }
         $('#search-feedback').text("Showing "+records.length+" of "+results.total_results+" results");
     },
+    fill: function(fillText) {
+        var currentText = this.$('#query-input').val();
+        this.$('#query-input').val(fillText+currentText);
+    },
 });
 
 var AdvancedSearchView = LazyTemplateView.extend({
@@ -486,7 +490,7 @@ var AdvancedSearchView = LazyTemplateView.extend({
     fill: function(event) {
         event.preventDefault();
         fillIn = event.target.textContent.slice(0, -9);
-        $('#query-input').val(fillIn);
+        this.trigger('fill', fillIn);
     },
 });
 
@@ -834,6 +838,7 @@ var VRERouter = Backbone.Router.extend({
             $('#HPB-info').show();
             var advancedSearchView = new AdvancedSearchView();
             advancedSearchView.render();
+            searchView.listenTo(advancedSearchView, 'fill', searchView.fill);
         }
         else {
             // We are not on the HPB search page, so display the
