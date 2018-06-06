@@ -4,10 +4,10 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render, render_to_response
+from django.core import serializers
 
 from .sru_query import sru_query, translate_sru_response_to_dict
 from .models import Record, ResearchGroup, Collection
-from .api import CollectionView
 
 CERL_SRU_URL = "http://sru.cerl.org/thesaurus"
 HPB_SRU_URL = "http://sru.gbv.de/hpb"
@@ -20,8 +20,7 @@ def index(request):
     # user_collections = Collection.objects.filter(
     #     managing_group__in=user_groups
     # )
-    all_collections = json.dumps(list(Collection.objects.all()))
-    print(all_collections)
+    all_collections = serializers.serialize('json', Collection.objects.all())
     return render(
         request,
         'vre/index.html',
