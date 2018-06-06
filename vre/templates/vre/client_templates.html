@@ -85,10 +85,10 @@
         id="database-menu-title" aria-haspopup="true" aria-expanded="false"> <b>Database:</b> {{selected-db}} <span class="caret"></span>
     </a>
     <ul class="dropdown-menu">
-        <li><a href="/vre/hpb" id="hpb">HPB</a></li>
+        <li><a href="hpb/" id="hpb">HPB</a></li>
         <li role="separator" class="divider"></li>
         {{#collections}}
-            <li> <a href="/vre/{{id}}" id="{{id}}">{{description}}</a></li>
+            <li> <a href="{{id}}/" id="{{id}}">{{description}}</a></li>
         {{/collections}}
     </ul>
 </script>
@@ -132,6 +132,32 @@
 <script type="text/x-handlebars-template" id="alert-view">
     <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
     {{{message}}}
+</script>
+
+<script type="text/x-handlebars-template" id="result-detail">
+    <div class="modal-dialog" role=document>
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="btn btn-default" id="load_previous">
+                    <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                </button>
+                <button class="btn btn-default" id="load_next">
+                    <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                </button>
+                <button
+                    type="button"
+                    class="close"
+                    data-dismiss="modal"
+                    aria-label="Close"
+                ><span aria-hidden="true">&times;</span></button>
+                <a id="uri-link" target="blank"><h4 class="modal-title"></h4></a>
+            </div>
+            <div class="modal-body"></div>
+            <div class="modal-footer">
+                <button type=button class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
 </script>
 
 {% endverbatim %}

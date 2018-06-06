@@ -248,7 +248,7 @@ var VRECollection = Backbone.Model.extend({
                 records.trigger('complete');
             });
         }
-        return records;
+        return this.records;
     },
 });
 
@@ -804,21 +804,30 @@ var SelectDatabaseView = LazyTemplateView.extend({
         this.$el.html(this.template(collections));
     },
     select: function(event) {
+        event.preventDefault();
+        href = $(event.target).attr('href');
+        Backbone.history.navigate(href, true);
         selectedDB = event.target.innerText;
+        console.log(selectedDB, href);
         this.$el.html(this.template({'selected-db': selectedDB, 'collections': this.collection.toJSON()}));
     },
 });
 
 var RecordDetailView = LazyTemplateView.extend({
-    el: '#result_detail',
-    templateName: 'item-fields',
+    templateName: 'result-detail',
+    tagName: 'div',
+    className: 'modal',
+    attributes: {
+        'role': 'dialog',
+    },
     events: {
         'click #load_next': 'load',
         'click #load_previous': 'load',
     },
     initialize: function(options) {
-        this.$title = this.$('.modal-title');
+        this.$el.html(this.template(this.model));
         this.$body = this.$('.modal-body');
+        this.$title = this.$('.modal-title');
         this.$footer = this.$('.modal-footer');
         this.vreCollectionsSelect = new VRECollectionView({collection: myCollections});
     },
@@ -839,7 +848,7 @@ var RecordDetailView = LazyTemplateView.extend({
         this.annotationsView.listenTo(this.fieldsView, 'edit', this.annotationsView.edit);
         var uriText = this.model.get('uri');
         this.$title.text(uriText);
-        document.getElementById("uri-link").href = uriText;
+        this.$("#uri-link").href = uriText;
         this.fieldsView.render().$el.appendTo(this.$body);
         this.annotationsView.render().$el.appendTo(this.$body);
         return this;
@@ -927,7 +936,6 @@ var VRERouter = Backbone.Router.extend({
         ':id/': 'showDatabase',
     },
     showDatabase: function(id) {
-        console.log("hello");
         searchView.render();
         searchView.$el.appendTo($('.page-header').first());
         // The if-condition is a bit of a hack, which can go away when we
@@ -963,7 +971,6 @@ var VRERouter = Backbone.Router.extend({
 var JST = {};
 var currentVRECollection;
 var records = new Records();
-var allCollections = new VRECollections();
 var myCollections = VRECollections.mine();
 var allGroups = new ResearchGroups();
 var myGroups, groupMenu;
@@ -990,11 +997,10 @@ $(function() {
     // We fetch the collections and ensure that we have them before we handle
     // the route, because VRERouter.showCollection depends on them being
     // available. This is something we can definitely improve upon.
-    allCollections.fetch().then(function() {
-        Backbone.history.start({
-            pushState: true,  // this enables matching the path of the URL hashchange
-            root: '/vre/',
-        });
+    console.log(allCollections);
+    Backbone.history.start({
+        pushState: true,  // this enables matching the path of the URL hashchange
+        root: '/vre/',
     });
     allGroups.fetch();
     myGroups = ResearchGroups.mine();
@@ -1002,6 +1008,6 @@ $(function() {
     if (myCollections.length) {
         prepareCollectionViews();
     } else {
-        myCollections.on("sync", prepareCollectionViews);
+        myCollections.on("sync", prepareCollectionViews());
     }
 });
