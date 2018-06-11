@@ -240,15 +240,15 @@ var SearchResults = Records.extend({
  */
 var VRECollection = Backbone.Model.extend({
     getRecords: function() {
-        if (!this.records) {
-            var records = this.records = new Records();
-            records.query({
-                params: {collection__id: this.id},
-            }).then(function() {
-                records.trigger('complete');
-            });
+        if (!records) {
+            var records = new Records();
         }
-        return this.records;
+        records.query({
+            params: {collection__id: this.id},
+        }).then(function() {
+            records.trigger('complete');
+        });
+        return records;
     },
 });
 
@@ -484,6 +484,7 @@ var AdvancedSearchView = LazyTemplateView.extend({
         'click a': 'fill',
     },
     render: function() {
+        this.$el.html(this.template());
         $('#search-info').show();
         $('#search-info').popover({
             'html': true, 
@@ -496,6 +497,30 @@ var AdvancedSearchView = LazyTemplateView.extend({
         event.preventDefault();
         fillIn = event.target.textContent.slice(0, -9);
         this.trigger('fill', fillIn);
+    },
+});
+
+var HPBView = LazyTemplateView.extend({
+    templateName:"hpb-view",
+    id: "content",
+    initialize: function() {
+        this.render();
+    },
+    render: function() {
+        this.$el.html(this.template());
+        return this;
+    },
+});
+
+var CollectionView = LazyTemplateView.extend({
+    templateName:"collection-view",
+    id:"content",
+    initialize: function() {
+        this.render();
+    },
+    render: function() {
+        this.$el.html(this.template(this.model.attributes));
+        return this;
     },
 });
 
@@ -808,7 +833,6 @@ var SelectDatabaseView = LazyTemplateView.extend({
         href = $(event.target).attr('href');
         Backbone.history.navigate(href, true);
         selectedDB = event.target.innerText;
-        console.log(selectedDB, href);
         this.$el.html(this.template({'selected-db': selectedDB, 'collections': this.collection.toJSON()}));
     },
 });
@@ -832,6 +856,7 @@ var RecordDetailView = LazyTemplateView.extend({
         this.vreCollectionsSelect = new VRECollectionView({collection: myCollections});
     },
     setModel: function(model) {
+        console.log("setting model");
         if (this.model) {
             if (this.model === model) return this;
             this.annotationsView.remove().off();
@@ -844,7 +869,8 @@ var RecordDetailView = LazyTemplateView.extend({
         this.annotationsView = new RecordAnnotationsView({
             collection: new FlatAnnotations(null, {record: model}),
         });
-        this.vreCollectionsSelect.clear().setRecord(model);
+        this.vreCollectionsSelect.render();
+        this.vreCollectionsSelect.setRecord(model);
         this.annotationsView.listenTo(this.fieldsView, 'edit', this.annotationsView.edit);
         var uriText = this.model.get('uri');
         this.$title.text(uriText);
@@ -854,7 +880,8 @@ var RecordDetailView = LazyTemplateView.extend({
         return this;
     },
     render: function() {
-        this.$footer.prepend(this.vreCollectionsSelect.render().$el);
+        console.log("rendering");
+        this.$footer.prepend(this.vreCollectionsSelect.$el);
         this.$el.modal('show');
         return this;
     },
@@ -936,34 +963,32 @@ var VRERouter = Backbone.Router.extend({
         ':id/': 'showDatabase',
     },
     showDatabase: function(id) {
-        searchView.render();
-        searchView.$el.appendTo($('.page-header').first());
         // The if-condition is a bit of a hack, which can go away when we
         // convert to client side routing entirely.
+        searchView  = new SearchView().render();
+        searchView.source = id;
         if (id=="hpb") {
-            $('#HPB-info').show();
+            $('#content').empty();
+            hpbView = new HPBView();
+            $('#content').replaceWith(hpbView.$el);
+            searchView.$el.appendTo($('.page-header').first());
             var advancedSearchView = new AdvancedSearchView();
             advancedSearchView.render();
             searchView.listenTo(advancedSearchView, 'fill', searchView.fill);
-            $('#search-info').show();
-            $('#search-info').popover({
-                'html': true,
-                'content': JST['hpb-search-info'](),
-                'container': 'body',
-                'placement': 'left'
-            });
         }
         else {
             // We are not on the HPB search page, so display the
             // records in the current collection.
-            $('#HPB-info').hide();
             currentVRECollection = myCollections.get(id);
+            collectionView = new CollectionView({model:currentVRECollection});
+            $('#content').replaceWith(collectionView.$el);
+            searchView.$el.appendTo($('.page-header').first());
             records = currentVRECollection.getRecords();
+            console.log(records);
             recordsList.remove();
             recordsList = new RecordListView({collection: records});
             recordsList.render().$el.insertAfter($('.page-header'));
         }
-        searchView.source = id;
     },
 });
 
@@ -971,16 +996,17 @@ var VRERouter = Backbone.Router.extend({
 var JST = {};
 var currentVRECollection;
 var records = new Records();
-var myCollections = VRECollections.mine();
+var myCollections = new VRECollections();
 var allGroups = new ResearchGroups();
-var myGroups, groupMenu;
+var myGroups;
+var groupMenu;
+var searchView;
 var recordDetailModal;
 var dropDown;
 var recordsList = new RecordListView({collection: records});
 var results = new SearchResults();
-var searchView  = new SearchView();
 var router = new VRERouter();
-
+var hpbView, collectionView;
 
 function prepareCollectionViews() {
     recordDetailModal = new RecordDetailView();
@@ -997,17 +1023,13 @@ $(function() {
     // We fetch the collections and ensure that we have them before we handle
     // the route, because VRERouter.showCollection depends on them being
     // available. This is something we can definitely improve upon.
-    console.log(allCollections);
+    myCollections.reset(prefetchedCollections);
+    allGroups.reset(prefetchedGroups);
     Backbone.history.start({
         pushState: true,  // this enables matching the path of the URL hashchange
         root: '/vre/',
     });
-    allGroups.fetch();
     myGroups = ResearchGroups.mine();
     groupMenu = new GroupMenuView({collection: myGroups});
-    if (myCollections.length) {
-        prepareCollectionViews();
-    } else {
-        myCollections.on("sync", prepareCollectionViews());
-    }
+    prepareCollectionViews();
 });

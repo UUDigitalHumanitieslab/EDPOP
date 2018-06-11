@@ -118,6 +118,7 @@ class RecordViewSet(CreateReadModelViewSet):
 
 class SearchViewSet(ViewSetMixin, APIView):
     def list(self, request, format=None):
+        print("in search view set")
         searchterm = request.query_params.get('search')
         if not searchterm:
             return Response("search field empty", status=status.HTTP_400_BAD_REQUEST)
