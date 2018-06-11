@@ -352,7 +352,7 @@ var VRECollectionView = LazyTemplateView.extend({
         var shownCollections = this.collection.clone();
         shownCollections.remove(currentVRECollection);
         this.$el.html(this.template({models: shownCollections.toJSON()}));
-        this.$('select').select2();
+        this.$el.find('select').select2();
         return this;
     },
     setRecord: function(model) {
@@ -856,7 +856,6 @@ var RecordDetailView = LazyTemplateView.extend({
         this.vreCollectionsSelect = new VRECollectionView({collection: myCollections});
     },
     setModel: function(model) {
-        console.log("setting model");
         if (this.model) {
             if (this.model === model) return this;
             this.annotationsView.remove().off();
@@ -880,7 +879,6 @@ var RecordDetailView = LazyTemplateView.extend({
         return this;
     },
     render: function() {
-        console.log("rendering");
         this.$footer.prepend(this.vreCollectionsSelect.$el);
         this.$el.modal('show');
         return this;
@@ -984,7 +982,6 @@ var VRERouter = Backbone.Router.extend({
             $('#content').replaceWith(collectionView.$el);
             searchView.$el.appendTo($('.page-header').first());
             records = currentVRECollection.getRecords();
-            console.log(records);
             recordsList.remove();
             recordsList = new RecordListView({collection: records});
             recordsList.render().$el.insertAfter($('.page-header'));

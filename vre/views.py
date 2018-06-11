@@ -18,7 +18,6 @@ HPB_SRU_URL = "http://sru.gbv.de/hpb"
 # to do: link to detail view for the collections
 @login_required
 def index(request, database_id=None):
-    print(request)
     user_groups = list(request.user.researchgroups.all())
     user_collections = Collection.objects.filter(
          managing_group__in=user_groups
@@ -36,46 +35,6 @@ def index(request, database_id=None):
         'vre/index.html',
         response_dict
     )
-
-
-def collection_detail(request, collection_id):
-    collection = get_object_or_404(Collection, pk=collection_id)
-    url_string = HPB_SRU_URL
-    response_dict = {'collection': collection}
-    if not request.method == 'POST':
-        return render(request, 'vre/collection_detail.html', response_dict)
-    else:
-        searchterm = request.POST.get('search', None)
-        if searchterm:
-            try:
-                search_result = sru_query(url_string, searchterm)
-            except Exception as e:
-                print(e)
-            result_list = translate_sru_response_to_dict(
-                search_result.text
-            )
-            results_json = [
-                json.dumps(record) for record in result_list
-            ]
-            response_dict.update({'result_list': results_json})
-            return render(
-                request,
-                'vre/collection_detail.html',
-                response_dict
-            )
-
-
-def hpb_info(request):
-    return render(request, 'vre/hpb.html')
-
-
-def default(request, database_id):
-    return render(
-        request,
-        'vre/index.html',
-        {'id': database_id}
-    )
-
 
 def add_records_to_collections(request):
     records_and_collections = json.loads(request.body.decode())
@@ -106,7 +65,3 @@ def add_records_to_collections(request):
                 record_counter += 1
         response_dict[collection.description] = record_counter
     return JsonResponse(response_dict)
-
-
-def item_detail(request, result):
-    return render(request, 'vre/item_detail.html', {'result': result})

@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, mixins, renderers, status
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSetMixin
@@ -116,9 +117,14 @@ class RecordViewSet(CreateReadModelViewSet):
     filter_fields = ['uri', 'collection__id']
 
 
+class AnnotationViewSet(viewsets.ModelViewSet):
+    serializer_class = AnnotationSerializer
+    queryset = Annotation.objects.all()
+    filter_fields = ['record__id', 'record__uri']
+
+
 class SearchViewSet(ViewSetMixin, APIView):
     def list(self, request, format=None):
-        print("in search view set")
         searchterm = request.query_params.get('search')
         if not searchterm:
             return Response("search field empty", status=status.HTTP_400_BAD_REQUEST)
@@ -159,7 +165,36 @@ class SearchViewSet(ViewSetMixin, APIView):
         return Response(result_info)
 
 
-class AnnotationViewSet(viewsets.ModelViewSet):
-    serializer_class = AnnotationSerializer
-    queryset = Annotation.objects.all()
-    filter_fields = ['record__id', 'record__uri']
+class AddRecordsViewSet(ViewSetMixin, APIView):
+    def create(self, request, format=None):
+        print(request)
+        records_and_collections = json.loads(request.body.decode())
+        collections = records_and_collections['collections']
+        if not collections:
+            return Response("No collection selected!", status=status.HTTP_400_BAD_REQUEST)
+        records = records_and_collections['records']
+        if not records:
+            return Response("No records selected!", status=status.HTTP_400_BAD_REQUEST)
+        response_dict = {}
+        for collection_id in collections:
+            collection = get_object_or_404(Collection, pk=collection_id)
+        record_counter = 0
+        for record in records:
+            records_in_collection = [r.uri for r in collection.record_set.all()]
+            uri = record["uri"]
+            if uri not in records_in_collection:
+                existing_record = Record.objects.filter(uri=uri)
+                if existing_record:
+                    existing_record[0].collection.add(collection)
+                else:
+                    new_record = Record(
+                        uri=uri,
+                        content=record['content'],
+                    )
+                    new_record.save()
+                    new_record.collection.add(collection)
+                record_counter += 1
+        response_dict[collection.description] = record_counter
+        return Response(response_dict)
+
+
