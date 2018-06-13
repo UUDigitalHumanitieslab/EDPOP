@@ -352,7 +352,7 @@ var VRECollectionView = LazyTemplateView.extend({
         var shownCollections = this.collection.clone();
         shownCollections.remove(currentVRECollection);
         this.$el.html(this.template({models: shownCollections.toJSON()}));
-        this.$el.find('select').select2();
+        this.$('select').select2();
         return this;
     },
     setRecord: function(model) {
