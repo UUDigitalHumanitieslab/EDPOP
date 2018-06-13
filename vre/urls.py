@@ -18,7 +18,6 @@ urlpatterns = [
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^$', views.index, name='index'),
     url(r'^(?P<database_id>[a-zA-Z0-9]+)/$', views.index, name='index'),
-    #url(r'^add-selection$', views.add_records_to_collections, name='collection_add_items'),
 ]
 
 urlpatterns += staticfiles_urlpatterns()

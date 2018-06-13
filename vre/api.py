@@ -166,9 +166,8 @@ class SearchViewSet(ViewSetMixin, APIView):
 
 
 class AddRecordsViewSet(ViewSetMixin, APIView):
-    def create(self, request, format=None):
-        print(request)
-        records_and_collections = json.loads(request.body.decode())
+    def create(self, request, pk=None):
+        records_and_collections = request.data
         collections = records_and_collections['collections']
         if not collections:
             return Response("No collection selected!", status=status.HTTP_400_BAD_REQUEST)

@@ -218,7 +218,7 @@ var Record = APIModel.extend({
 });
 
 var AdditionsToCollections = Backbone.Model.extend({
-    url: '/vre/add-selection',
+    url: '/vre/api/add-selection/',
 });
 
 var Records = APICollection.extend({
@@ -1017,9 +1017,6 @@ $(function() {
         JST[$el.prop('id')] = Handlebars.compile($el.html(), {compat: true});
     });
     $('#result_detail').modal({show: false});
-    // We fetch the collections and ensure that we have them before we handle
-    // the route, because VRERouter.showCollection depends on them being
-    // available. This is something we can definitely improve upon.
     myCollections.reset(prefetchedCollections);
     allGroups.reset(prefetchedGroups);
     Backbone.history.start({
