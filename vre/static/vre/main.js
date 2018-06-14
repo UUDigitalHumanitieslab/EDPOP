@@ -400,7 +400,7 @@ var VRECollectionView = LazyTemplateView.extend({
         this.showAlert('success', feedbackString);
     },
     showError: function(response) {
-        this.showAlert('warning', response.responseJSON.error);
+        this.showAlert('warning', response.responseJSON);
     },
     showAlert: function(level, message) {
         var alert = new AlertView({level: level, message: message});
