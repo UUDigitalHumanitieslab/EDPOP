@@ -839,7 +839,6 @@ var SelectDatabaseView = LazyTemplateView.extend({
 
 var RecordDetailView = LazyTemplateView.extend({
     templateName: 'result-detail',
-    tagName: 'div',
     className: 'modal',
     attributes: {
         'role': 'dialog',
@@ -868,8 +867,7 @@ var RecordDetailView = LazyTemplateView.extend({
         this.annotationsView = new RecordAnnotationsView({
             collection: new FlatAnnotations(null, {record: model}),
         });
-        this.vreCollectionsSelect.render();
-        this.vreCollectionsSelect.setRecord(model);
+        this.vreCollectionsSelect.clear().setRecord(model);
         this.annotationsView.listenTo(this.fieldsView, 'edit', this.annotationsView.edit);
         var uriText = this.model.get('uri');
         this.$title.text(uriText);
@@ -879,7 +877,7 @@ var RecordDetailView = LazyTemplateView.extend({
         return this;
     },
     render: function() {
-        this.$footer.prepend(this.vreCollectionsSelect.$el);
+        this.$footer.prepend(this.vreCollectionsSelect.render().$el);
         this.$el.modal('show');
         return this;
     },
