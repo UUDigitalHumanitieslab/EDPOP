@@ -1,4 +1,5 @@
-var canonicalOrder = {
+
+/*var canonicalOrder = {
     'Title': 1,
     'Uniform Title': 4,
     'Varying Form of Title': 5,
@@ -14,54 +15,51 @@ var canonicalOrder = {
     'Note': 44,
     'With Note': 48,
     'Subject Headings': 52,
-};
+};*/
 
 /**
  * Insert the CSRF token header into $.ajax-compatible request options.
  * Returns a new object, does not mutate the original object.
  */
-function addCSRFToken(ajaxOptions) {
+/*function addCSRFToken(ajaxOptions) {
     return _.defaultsDeep({
         headers: {'X-CSRFToken': Cookies.get('csrftoken')},
     }, ajaxOptions);
-}
+}*/
 
-// Override Backbone.sync so it always includes the CSRF token in requests.
-(function() {
-    var id = _.identity;
-    Backbone.sync = _.overArgs(Backbone.sync, [id, id, addCSRFToken]);
-}());
 
 /**
  * Perform the following transformation:
  * (from)  {foo: 'bar', foobar: 'baz'}
  * (to)    'foo=bar&foobar=baz'
  */
-function objectAsUrlParams(object) {
+/*function objectAsUrlParams(object) {
     return _(object).entries().invokeMap('join', '=').join('&');
-}
+}*/
 
 /**
 /* Sorting in a canonical order, for FlatFields and FlatAnnotations.
 */
-function canonicalSort(key) {
-    var index = (canonicalOrder[key] || 100);
-    return index;
-}
+// function canonicalSort(key) {
+//     var index = (canonicalOrder[key] || 100);
+//     return index;
+// }
 
 /**
  * Generic subclass that appends a slash to the model URL.
  * This is required for interop with Django REST Framework.
  */
+/* 
 var APIModel = Backbone.Model.extend({
     url: function() {
         return Backbone.Model.prototype.url.call(this) + '/';
     },
 });
-
+*/
 /**
  * Generic subclass that supports filtering at the backend.
  */
+ /*
 var APICollection = Backbone.Collection.extend({
     model: APIModel,
     query: function(options) {
@@ -76,12 +74,12 @@ var APICollection = Backbone.Collection.extend({
         return this.fetch(fetchOptions);
     },
 });
-
-// A single field of a single record.
+*/
+/*// A single field of a single record.
 var Field = Backbone.Model.extend({
     idAttribute: 'key',
 });
-
+*/
 /**
  * This is an alternative, flat representation of the fields in a given
  * option.record. Its purpose is to be easier to represent and manage from
@@ -94,7 +92,7 @@ var Field = Backbone.Model.extend({
  * APICollection and that we don't set a URL. This is because we only talk
  * to the server through the underlying Record model.
  */
-var FlatFields = Backbone.Collection.extend({
+/*var FlatFields = Backbone.Collection.extend({
     model: Field,
     comparator: function(item) {
         return canonicalSort(item.attributes.key);
@@ -110,11 +108,11 @@ var FlatFields = Backbone.Collection.extend({
             return {key: key, value: value};
         });
     },
-});
+});*/
 
-var Annotations = APICollection.extend({
+/*var Annotations = APICollection.extend({
     url: '/vre/api/annotations',
-});
+});*/
 
 /**
  * This is an alternative, flat representation of the annotations for a
@@ -127,7 +125,7 @@ var Annotations = APICollection.extend({
  * normal: {id, record, managing_group, content}
  * flat alternative: [{key, value, group}]
  */
-var FlatAnnotations = Backbone.Collection.extend({
+/*var FlatAnnotations = Backbone.Collection.extend({
     // comparator: can be set to keep this sorted
     // How to uniquely identify a field annotation.
     comparator: function(item) {
@@ -202,8 +200,8 @@ var FlatAnnotations = Backbone.Collection.extend({
         flat.underlying.add(newContent, {merge: true});
         flat.markedGroups.reset();
     },
-});
-
+});*/
+/*
 var Record = APIModel.extend({
     urlRoot: '/vre/api/records',
     getAnnotations: function() {
@@ -215,82 +213,82 @@ var Record = APIModel.extend({
         }
         return this.annotations;
     },
-});
-
+});*/
+/*
 var AdditionsToCollections = Backbone.Model.extend({
     url: '/vre/add-selection',
-});
+});*/
 
-var Records = APICollection.extend({
+/*var Records = APICollection.extend({
     url: '/vre/api/records',
     model: Record,
-});
+});*/
 
-var SearchResults = Records.extend({
+/*var SearchResults = Records.extend({
     url:'/vre/api/search',
     total_results: 0,
     parse: function(response) {
         this.total_results = response.total_results;
         return response.result_list;
     }
-});
+});*/
 
 /**
  * Representation of a single VRE collection.
  */
-var VRECollection = Backbone.Model.extend({
-    getRecords: function() {
-        if (!this.records) {
-            var records = this.records = new Records();
-            records.query({
-                params: {collection__id: this.id},
-            }).then(function() {
-                records.trigger('complete');
-            });
-        }
-        return records;
-    },
-});
+// var VRECollection = Backbone.Model.extend({
+//     getRecords: function() {
+//         if (!this.records) {
+//             var records = this.records = new Records();
+//             records.query({
+//                 params: {collection__id: this.id},
+//             }).then(function() {
+//                 records.trigger('complete');
+//             });
+//         }
+//         return records;
+//     },
+// });
 
-var VRECollections = APICollection.extend({
-    url: '/vre/api/collections',
-    model: VRECollection,
-}, {
-    /**
-     * Class method for retrieving only the collections the user can manage.
-     */
-    mine: function() {
-        var myCollections = new VRECollections();
-        myCollections.fetch({url: myCollections.url + '/mine'});
-        return myCollections;
-    },
-});
+// var VRECollections = APICollection.extend({
+//     url: '/vre/api/collections',
+//     model: VRECollection,
+// }, {
+//     /**
+//      * Class method for retrieving only the collections the user can manage.
+//      */
+//     mine: function() {
+//         var myCollections = new VRECollections();
+//         myCollections.fetch({url: myCollections.url + '/mine'});
+//         return myCollections;
+//     },
+// });
 
-var ResearchGroups = APICollection.extend({
+/*var ResearchGroups = APICollection.extend({
     url: '/vre/api/researchgroups',
 }, {
-    /**
-     * Class method for retrieving only the research groups of the user.
-     */
+    //
+     // Class method for retrieving only the research groups of the user.
+     //
     mine: function() {
         var myResearchGroups = new ResearchGroups();
         myResearchGroups.fetch({url: myResearchGroups.url + '/mine'});
         return myResearchGroups;
     },
-});
+});*/
 
 /**
  * Intermediate class to enable lazy loading of templates.
  * `JST` is uninitialized at the time of extension, so postpone fetching
  * the template until it's needed.
  */
-var LazyTemplateView = Backbone.View.extend({
+/*var LazyTemplateView = Backbone.View.extend({
     template: function(context) {
         this.template = JST[this.templateName];
         return this.template(context);
     },
 });
-
+*/
 /**
  * Reusable alert view. Meant to be displayed once and then discarded.
  *
@@ -300,7 +298,7 @@ var LazyTemplateView = Backbone.View.extend({
  *  2. a string, which should be the name of a method of the alert view;
  *  3. undefined, in which case nothing is done after the animation completes.
  */
-var AlertView = LazyTemplateView.extend({
+/*var AlertView = LazyTemplateView.extend({
     ease: 500,
     delay: 2000,
     className: 'alert alert-dismissible',
@@ -340,9 +338,9 @@ var AlertView = LazyTemplateView.extend({
     wrapComplete: function(complete) {
         return this[complete] && this[complete].bind(this) || complete;
     },
-});
+});*/
 
-var VRECollectionView = LazyTemplateView.extend({
+/*var VRECollectionView = LazyTemplateView.extend({
     templateName: 'collection-selector',
     events: {
         'click button': 'submitForm',
@@ -407,9 +405,9 @@ var VRECollectionView = LazyTemplateView.extend({
         alert.render().$el.prependTo(this.el);
         alert.animate('remove');
     },
-});
+});*/
 
-var SearchView= LazyTemplateView.extend({
+/*var SearchView= LazyTemplateView.extend({
     templateName: "search-view",
     events: {
         'submit': 'firstSearch',
@@ -497,7 +495,7 @@ var AdvancedSearchView = LazyTemplateView.extend({
         fillIn = event.target.textContent.slice(0, -9);
         this.trigger('fill', fillIn);
     },
-});
+});*/
 
 /**
  * Common base for views that provide behaviour revolving around a
@@ -505,7 +503,7 @@ var AdvancedSearchView = LazyTemplateView.extend({
  * method to the right checkbox and set `this.$checkbox` in the
  * `render` method.
  */
-var SelectableView = LazyTemplateView.extend({
+/*var SelectableView = LazyTemplateView.extend({
     toggle: function(event) {
         // The assignment in the if condition is on purpose (assign + check).
         if (this.selected = event.target.checked) {
@@ -555,8 +553,8 @@ var RecordListItemView = SelectableView.extend({
         recordDetailModal.setModel(this.model).render();
     },
 });
-
-var RecordListView = LazyTemplateView.extend({
+*/
+/*var RecordListView = LazyTemplateView.extend({
     tagName: 'form',
     templateName: 'record-list',
     events: {
@@ -640,11 +638,11 @@ var RecordListView = LazyTemplateView.extend({
         return this;
     },
 });
-
+*/
 /**
  * Displays a single model from a FlatFields or FlatAnnotations collection.
  */
-var FieldView = LazyTemplateView.extend({
+/*var FieldView = LazyTemplateView.extend({
     tagName: 'tr',
     templateName: 'field-list-item',
     events: {
@@ -660,9 +658,9 @@ var FieldView = LazyTemplateView.extend({
     edit: function(event) {
         this.trigger('edit', this.model);
     },
-});
+});*/
 
-var AnnotationEditView = LazyTemplateView.extend({
+/*var AnnotationEditView = LazyTemplateView.extend({
     tagName: 'tr',
     className: 'form-inline',
     templateName: 'field-list-item-edit',
@@ -691,9 +689,9 @@ var AnnotationEditView = LazyTemplateView.extend({
         event.preventDefault();
         this.trigger('cancel', this);
     },
-});
+});*/
 
-var RecordFieldsBaseView = LazyTemplateView.extend({
+/*var RecordFieldsBaseView = LazyTemplateView.extend({
     templateName: 'field-list',
     initialize: function(options) {
         this.rows = this.collection.map(this.createRow.bind(this));
@@ -787,9 +785,9 @@ var RecordAnnotationsView = RecordFieldsBaseView.extend({
         }
         this.collection.add(model, {merge: true});
     },
-});
+});*/
 
-var SelectSourceView = LazyTemplateView.extend({
+/*var SelectSourceView = LazyTemplateView.extend({
     templateName: 'nav-dropdown',
     tagName: 'li',
     className: 'dropdown',
@@ -800,9 +798,9 @@ var SelectSourceView = LazyTemplateView.extend({
         var collections = {'collections': this.collection.toJSON()};
         this.$el.html(this.template(collections));
     },
-});
+});*/
 
-var RecordDetailView = LazyTemplateView.extend({
+/*var RecordDetailView = LazyTemplateView.extend({
     el: '#result_detail',
     templateName: 'item-fields',
     events: {
@@ -849,9 +847,9 @@ var RecordDetailView = LazyTemplateView.extend({
         this.setModel(nextModel);
         this.render();
     },
-});
+});*/
 
-var GroupMenuItemView = LazyTemplateView.extend({
+/*var GroupMenuItemView = LazyTemplateView.extend({
     tagName: 'li',
     templateName: 'group-menu-item',
     events: {
@@ -913,7 +911,9 @@ var GroupMenuView = LazyTemplateView.extend({
     render: function() {
         this.$header.html(this.template(this.model.attributes));
     },
-});
+});*/
+
+import { Records } from '//record/record.model';
 
 var VRERouter = Backbone.Router.extend({
     routes: {
@@ -966,6 +966,11 @@ var results = new SearchResults();
 var searchView  = new SearchView();
 var router = new VRERouter();
 
+// Override Backbone.sync so it always includes the CSRF token in requests.
+(function() {
+    var id = _.identity;
+    Backbone.sync = _.overArgs(Backbone.sync, [id, id, addCSRFToken]);
+}());
 
 function prepareCollectionViews() {
     recordDetailModal = new RecordDetailView();
