@@ -62,8 +62,7 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.3.3/backbone-min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
 
-        <script type="module" src="{% static "vre/record/record.model.js" %}"></script>
-        <script type="module" src="{% static "vre/main.js" %}"></script>
+        <script src="{% static "vre/bundle.js" %}"></script>
         {% endblock scripts %}
         {% block templates %}
         {% include "vre/client_templates.html" %}
