@@ -4,6 +4,10 @@
 # Virtual environment
 ENV/
 
+# node
+node_modules
+package-lock.json
+
 db*
 *__pycache*
 *-debug.log

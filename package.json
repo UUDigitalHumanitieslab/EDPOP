@@ -1,0 +1,33 @@
+{
+  "name": "edpop",
+  "version": "1.0.0",
+  "description": "Creating a virtual research environment (VRE) from CERL resources.",
+  "main": "main.js",
+  "scripts": {
+    "build": "babel src -d lib"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/UUDigitalHumanitieslab/EDPOP.git"
+  },
+  "author": "Digital Humanities Lab Utrecht",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/UUDigitalHumanitieslab/EDPOP/issues"
+  },
+  "homepage": "https://github.com/UUDigitalHumanitieslab/EDPOP#readme",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "browserify-shim": "^3.8.14"
+  },
+  "browserify": {
+    "transform": [ "browserify-shim" ]
+  }, 
+  "browserify-shim": {
+    "jquery": "global:_jquery" , 
+    "lodash": "global:_lodash", 
+    "backbone": "global:_backbone",
+    "handlebars": "global:_handlebars"
+  }
+}
