@@ -247,7 +247,7 @@ var VRECollection = Backbone.Model.extend({
                 records.trigger('complete');
             });
         }
-        return records;
+        return this.records;
     },
 });
 
