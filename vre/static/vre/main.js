@@ -141,10 +141,9 @@ var FlatAnnotations = Backbone.Collection.extend({
         this.underlying.forEach(this.toFlat.bind(this));
         this.markedGroups = new Backbone.Collection([]);
         this.listenTo(this.underlying, 'add change:content', this.toFlat);
-        this.on('add change:value', this.markGroup);
+        this.on('add change:value remove', this.markGroup);
         this.markedGroups.on('add', _.debounce(this.fromFlat), this);
         // this.listenTo(this.underlying, 'remove', TODO);
-        // this.on('remove', TODO);
     },
     // translate the official representation to the flat one
     toFlat: function(annotation) {
@@ -183,9 +182,10 @@ var FlatAnnotations = Backbone.Collection.extend({
             var groupId = allGroups.findWhere({name: groupName}).id,
                 existing = flat.underlying.findWhere({managing_group: groupId}),
                 id = existing && existing.id,
-                content = _(flatPerGroup[groupName]).map(function(model) {
+                annotations = flatPerGroup[groupName],
+                content = annotations && _(annotations).map(function(model) {
                     return [model.get('key'), model.get('value')];
-                }).fromPairs().value();
+                }).fromPairs().value() || {};
             return {
                 id: id,
                 record: recordId,
@@ -668,6 +668,7 @@ var AnnotationEditView = LazyTemplateView.extend({
     events: {
         'submit': 'submit',
         'reset': 'reset',
+        'click button[title="Delete"]': 'trash',
     },
     initialize: function(options) {
         _.assign(this, _.pick(options, ['existing']));
@@ -689,6 +690,9 @@ var AnnotationEditView = LazyTemplateView.extend({
     reset: function(event) {
         event.preventDefault();
         this.trigger('cancel', this);
+    },
+    trash: function(event) {
+        this.trigger('remove', this);
     },
 });
 
@@ -760,7 +764,7 @@ var RecordAnnotationsView = RecordFieldsBaseView.extend({
             this.rows.push(newRow);
             this.$tbody.append(newRow.render().el);
         }
-        newRow.on({cancel: this.cancel, save: this.save}, this);
+        newRow.on(_.pick(this, ['save', 'cancel', 'remove']), this);
     },
     editEmpty: function() {
         this.edit(new Backbone.Model());
@@ -785,6 +789,11 @@ var RecordAnnotationsView = RecordFieldsBaseView.extend({
             this.insertRow(model);
         }
         this.collection.add(model, {merge: true});
+    },
+    remove: function(editRow) {
+        if (editRow.existing) this.collection.remove(editRow.model);
+        this.rows.splice(_.indexOf(this.rows, editRow), 1);
+        editRow.remove();
     },
 });
 
