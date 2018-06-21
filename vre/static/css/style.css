@@ -10,6 +10,10 @@ h2 {
 	cursor: pointer;
 }
 
+#result_detail td form {
+	white-space: nowrap;
+}
+
 #more-records {
 	display: none;
 }
@@ -28,4 +32,10 @@ table#hpb-info-table td:nth-child(odd) {
 
 #search-info{
 	display: none;
+}
+
+@media (min-width: 768px) {
+	#result_detail .modal-dialog {
+		width: 636px;
+	}
 }
