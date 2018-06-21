@@ -712,7 +712,7 @@ var AnnotationEditView = LazyTemplateView.extend({
         event.preventDefault();
         $(event.target).parents('.popover').popover('destroy');
         this.trashCanceller.off();
-        this.trigger('remove', this);
+        this.trigger('trash', this);
     },
 });
 
@@ -784,7 +784,7 @@ var RecordAnnotationsView = RecordFieldsBaseView.extend({
             this.rows.push(newRow);
             this.$tbody.append(newRow.render().el);
         }
-        newRow.on(_.pick(this, ['save', 'cancel', 'remove']), this);
+        newRow.on(_.pick(this, ['save', 'cancel', 'trash']), this);
     },
     editEmpty: function() {
         this.edit(new Backbone.Model());
@@ -810,7 +810,7 @@ var RecordAnnotationsView = RecordFieldsBaseView.extend({
         }
         this.collection.add(model, {merge: true});
     },
-    remove: function(editRow) {
+    trash: function(editRow) {
         if (editRow.existing) this.collection.remove(editRow.model);
         this.rows.splice(_.indexOf(this.rows, editRow), 1);
         editRow.remove();
