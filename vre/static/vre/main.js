@@ -668,10 +668,24 @@ var AnnotationEditView = LazyTemplateView.extend({
     events: {
         'submit': 'submit',
         'reset': 'reset',
-        'click button[title="Delete"]': 'trash',
     },
     initialize: function(options) {
         _.assign(this, _.pick(options, ['existing']));
+        this.$el.popover({
+            container: 'body',
+            content: JST['annotation-confirm-deletion'](this),
+            html: true,
+            placement: 'auto top',
+            selector: 'button[aria-label="Delete"]',
+            title: 'Really delete?',
+        });
+        var confirmSelector = '#confirm-delete-' + this.cid;
+        $('body').one('submit', confirmSelector, this.reallyTrash.bind(this));
+        this.trashCanceller = $('body').on(
+            'reset',
+            confirmSelector,
+            this.cancelTrash.bind(this),
+        );
     },
     render: function() {
         this.$el.html(this.template(
@@ -691,7 +705,13 @@ var AnnotationEditView = LazyTemplateView.extend({
         event.preventDefault();
         this.trigger('cancel', this);
     },
-    trash: function(event) {
+    cancelTrash: function(event) {
+        $(event.target).parents('.popover').popover('hide');
+    },
+    reallyTrash: function(event) {
+        event.preventDefault();
+        $(event.target).parents('.popover').popover('destroy');
+        this.trashCanceller.off();
         this.trigger('remove', this);
     },
 });
