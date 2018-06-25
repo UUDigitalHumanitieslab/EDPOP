@@ -3,7 +3,7 @@ import { LazyTemplateView } from '../utils/lazy.template.view';
 /**
  * Displays a single model from a FlatFields or FlatAnnotations collection.
  */
-var FieldView = LazyTemplateView.extend({
+export var FieldView = LazyTemplateView.extend({
     tagName: 'tr',
     templateName: 'field-list-item',
     events: {

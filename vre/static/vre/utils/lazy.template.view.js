@@ -1,4 +1,4 @@
-import Backbone from 'backbone';
+import {Backbone} from 'backbone';
 
 /**
  * Intermediate class to enable lazy loading of templates.

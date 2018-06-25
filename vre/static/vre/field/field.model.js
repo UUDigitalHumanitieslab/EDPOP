@@ -1,4 +1,4 @@
-import Backbone from 'backbone';
+import {Backbone} from 'backbone';
 
 // A single field of a single record.
 export var Field = Backbone.Model.extend({
