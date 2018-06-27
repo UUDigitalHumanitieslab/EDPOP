@@ -1,7 +1,7 @@
+import { _ } from 'underscore';
+import { $ } from 'jquery';
 import { Backbone } from 'backbone';
 import { Handlebars } from 'handlebars';
-import { _ } from 'lodash';
-import { $ } from 'jquery';
 import { Records } from './record/record.model';
 import { RecordListView } from './record/record.list.view';
 import { RecordDetailView } from './record/record.detail.view';
