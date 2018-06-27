@@ -351,7 +351,10 @@ var VRECollectionView = LazyTemplateView.extend({
     render: function() {
         var shownCollections = this.collection.clone();
         shownCollections.remove(currentVRECollection);
-        this.$el.html(this.template({models: shownCollections.toJSON()}));
+        this.$el.html(this.template({
+            models: shownCollections.toJSON(),
+            cid: this.cid,
+        }));
         this.$('select').select2();
         return this;
     },
@@ -487,9 +490,9 @@ var AdvancedSearchView = LazyTemplateView.extend({
         this.$el.html(this.template());
         $('#search-info').show();
         $('#search-info').popover({
-            'html': true, 
-            'content': this.$el.html(this.template()), 
-            'container': 'body', 
+            'html': true,
+            'content': this.$el.html(this.template()),
+            'container': 'body',
             'placement': 'left'
         });
     },
