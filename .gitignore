@@ -11,3 +11,7 @@ package-lock.json
 db*
 *__pycache*
 *-debug.log
+
+# build output
+/build
+/vre/static/vre/bundle.js

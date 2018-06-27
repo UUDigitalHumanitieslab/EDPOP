@@ -1,4 +1,4 @@
-//import { Backbone } from 'backbone';
+import  Backbone from 'backbone';
 import { APIModel, APICollection } from '../utils/api.model';
 import { canonicalSort } from '../utils/generic-functions';
 
@@ -6,7 +6,7 @@ export var Annotations = APICollection.extend({
     url: '/vre/api/annotations',
 });
 
-export var FlatAnnotations = Backbone.Collection.extend({
+export var FlatAnnotations = APICollection.extend({
     // comparator: can be set to keep this sorted
     // How to uniquely identify a field annotation.
     comparator: function(item) {

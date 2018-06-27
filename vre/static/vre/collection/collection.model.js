@@ -1,10 +1,10 @@
-//import { Backbone } from 'backbone';
-import { APICollection } from '../utils/api.model'
+//import Backbone from 'backbone';
+import { APIModel, APICollection } from '../utils/api.model'
 
 /**
  * Representation of a single VRE collection.
  */
-export var VRECollection = Backbone.Model.extend({
+export var VRECollection = APIModel.extend({
     getRecords: function() {
         if (!this.records) {
             var records = this.records = new Records();

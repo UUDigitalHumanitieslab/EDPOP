@@ -1,4 +1,4 @@
-import { Backbone } from 'backbone';
+import  Backbone from 'backbone';
 
 /**
  * Generic subclass that appends a slash to the model URL.
