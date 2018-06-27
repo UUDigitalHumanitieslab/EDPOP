@@ -1,7 +1,7 @@
-import { _ } from 'lodash';
-import { $ } from 'jquery';
+import _ from 'lodash';
+import $ from 'jquery';
 import Backbone from 'backbone';
-import { Handlebars } from 'handlebars';
+import Handlebars from 'handlebars';
 import { Records } from './record/record.model';
 import { RecordListView } from './record/record.list.view';
 import { RecordDetailView } from './record/record.detail.view';
@@ -12,6 +12,8 @@ import { SearchResults } from './search/search.model';
 import { SearchView, AdvancedSearchView } from './search/search.view';
 import { SelectSourceView } from './select-source/select-source.view';
 import { addCSRFToken } from './utils/generic-functions';
+import { myCollections } from './globals/myCollections';
+import { JST } from './globals/templates';
 
 var VRERouter = Backbone.Router.extend({
     routes: {
@@ -50,11 +52,9 @@ var VRERouter = Backbone.Router.extend({
 });
 
 // Global object to hold the templates, initialized at page load below.
-var JST = {};
 var currentVRECollection;
 var records = new Records();
 var allCollections = new VRECollections();
-var myCollections = VRECollections.mine();
 var allGroups = new ResearchGroups();
 var myGroups, groupMenu;
 var recordDetailModal;
@@ -78,7 +78,7 @@ function prepareCollectionViews() {
 
 $(function() {
     $('script[type="text/x-handlebars-template"]').each(function(i, element) {
-        $el = $(element);
+        var $el = $(element);
         JST[$el.prop('id')] = Handlebars.compile($el.html(), {compat: true});
     });
     $('#result_detail').modal({show: false});

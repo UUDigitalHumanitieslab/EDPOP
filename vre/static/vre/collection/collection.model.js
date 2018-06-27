@@ -1,5 +1,6 @@
 //import Backbone from 'backbone';
 import { APIModel, APICollection } from '../utils/api.model'
+import { Records } from '../record/record.model.js';
 
 /**
  * Representation of a single VRE collection.

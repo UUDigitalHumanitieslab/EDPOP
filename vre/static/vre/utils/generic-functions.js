@@ -1,3 +1,6 @@
+import _ from 'lodash';
+import Cookies from 'jscookie';
+
 /**
  * Perform the following transformation:
  * (from)  {foo: 'bar', foobar: 'baz'}

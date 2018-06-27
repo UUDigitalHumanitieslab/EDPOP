@@ -3,6 +3,7 @@ import { FlatAnnotations } from '../annotation/annotation.model';
 import { RecordFieldsView, RecordAnnotationsView } from '../field/record.field.view';
 import { FlatFields } from '../field/field.model';
 import { VRECollectionView } from '../collection/collection.view';
+import { myCollections } from '../globals/myCollections';
 
 export var RecordDetailView = LazyTemplateView.extend({
     el: '#result_detail',

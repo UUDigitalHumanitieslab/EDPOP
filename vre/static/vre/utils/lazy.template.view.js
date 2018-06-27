@@ -1,4 +1,5 @@
 import Backbone from 'backbone';
+import { JST } from '../globals/templates';
 
 /**
  * Intermediate class to enable lazy loading of templates.
