@@ -1,5 +1,7 @@
 import { LazyTemplateView } from '../utils/lazy.template.view';
 import { AlertView } from '../alert/alert.view';
+import { JST } from '../globals/templates';
+import { GlobalVariables } from '../globals/variables';
 
 export var SearchView = LazyTemplateView.extend({
     templateName: "search-view",
@@ -22,7 +24,7 @@ export var SearchView = LazyTemplateView.extend({
         this.showPending();
         var myElement = this.el;
         var searchTerm = this.$('input').val();
-        var searchPromise = results.query(
+        var searchPromise = GlobalVariables.results.query(
             {params:{search:searchTerm, source:this.source, startRecord:startRecord},
             error: function(collection, response, options) {
                 var alert = new AlertView({
@@ -40,10 +42,10 @@ export var SearchView = LazyTemplateView.extend({
         event.preventDefault();
         this.submitSearch(1).then(_.bind(function() {
             $('#more-records').show();
-            records.reset(results.models);
-            if (!document.contains(recordsList.$el[0])) {
+            GlobalVariables.records.reset(GlobalVariables.results.models);
+            if (!document.contains(GlobalVariables.recordsList.$el[0])) {
                 // records list is initialized and rendered but not yet added to DOM
-                recordsList.$el.insertAfter($('.page-header'));
+                GlobalVariables.recordsList.$el.insertAfter($('.page-header'));
             }
             this.feedback();
         }, this));
@@ -51,19 +53,19 @@ export var SearchView = LazyTemplateView.extend({
     nextSearch: function(event) {
         event.preventDefault();
         $('#more-records').hide();
-        var startRecord = records.length+1;
+        var startRecord = GlobalVariables.records.length+1;
         this.submitSearch(startRecord).then( _.bind(function() {
-            records.add(results.models);
+            GlobalVariables.records.add(GlobalVariables.results.models);
             this.feedback();
         }, this));
     },
     feedback: function() {
-        if (records.length === results.total_results) {
-            records.trigger('complete');
+        if (GlobalVariables.records.length === GlobalVariables.results.total_results) {
+            GlobalVariables.records.trigger('complete');
         } else {
             $('#more-records').show();
         }
-        $('#search-feedback').text("Showing "+records.length+" of "+results.total_results+" results");
+        $('#search-feedback').text("Showing " + GlobalVariables.records.length + " of " + GlobalVariables.results.total_results + " results");
     },
     fill: function(fillText) {
         this.$('#query-input').val(fillText);
@@ -86,7 +88,7 @@ export var AdvancedSearchView = LazyTemplateView.extend({
     },
     fill: function(event) {
         event.preventDefault();
-        fillIn = event.target.textContent.slice(0, -9);
+        var fillIn = event.target.textContent.slice(0, -9);
         this.trigger('fill', fillIn);
     },
 });

@@ -1,6 +1,7 @@
 import { LazyTemplateView } from '../utils/lazy.template.view';
 import { AlertView } from '../alert/alert.view';
 import { AdditionsToCollections } from '../additions/additions-to-collections';
+import { GlobalVariables } from '../globals/variables';
 
 
 export var VRECollectionView = LazyTemplateView.extend({
@@ -11,8 +12,7 @@ export var VRECollectionView = LazyTemplateView.extend({
     },
     render: function() {
         var shownCollections = this.collection.clone();
-        var currentVRECollection = localStorage.getItem('currentCollection');
-        shownCollections.remove(currentVRECollection);
+        shownCollections.remove(GlobalVariables.currentVRECollection);
         this.$el.html(this.template({models: shownCollections.toJSON()}));
         this.$('select').select2();
         return this;

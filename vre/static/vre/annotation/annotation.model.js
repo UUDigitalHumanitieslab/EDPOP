@@ -1,6 +1,7 @@
 import  Backbone from 'backbone';
 import { APIModel, APICollection } from '../utils/api.model';
 import { canonicalSort } from '../utils/generic-functions';
+import { GlobalVariables } from '../globals/variables';
 
 export var Annotations = APICollection.extend({
     url: '/vre/api/annotations',
@@ -38,7 +39,7 @@ export var FlatAnnotations = APICollection.extend({
         }
         var id = annotation.id,
             groupId = annotation.get('managing_group'),
-            groupName = allGroups.get(groupId).get('name'),
+            groupName = GlobalVariables.allGroups.get(groupId).get('name'),
             content = annotation.get('content'),
             existing = _.map(this.filter({group: groupName}), 'attributes'),
             replacements = _.map(content, function(value, key) {
@@ -60,7 +61,7 @@ export var FlatAnnotations = APICollection.extend({
             recordId = record.id,
             flatPerGroup = flat.groupBy('group');
         var newContent = flat.markedGroups.map('id').map(function(groupName) {
-            var groupId = allGroups.findWhere({name: groupName}).id,
+            var groupId = GlobalVariables.allGroups.findWhere({name: groupName}).id,
                 existing = flat.underlying.findWhere({managing_group: groupId}),
                 id = existing && existing.id,
                 content = _(flatPerGroup[groupName]).map(function(model) {

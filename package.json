@@ -29,9 +29,7 @@
   "dependencies": {
     "backbone": "^1.3.3",
     "handlebars": "^4.0.11",
-    "jscookie": "^1.1.0",
-    "lodash": "^4.17.10",
-    "underscore": "^1.9.1"
+    "jscookie": "^1.1.0"
   },
   "browserify": {
     "transform": [
@@ -40,7 +38,6 @@
   },
   "browserify-shim": {
     "jquery": "global:$",
-    "lodash": "global:_",
-    "underscore": "global:_"
+    "lodash": "global:_"
   }
 }

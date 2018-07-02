@@ -1,6 +1,8 @@
+import  Backbone from 'backbone';
 import { LazyTemplateView } from '../utils/lazy.template.view';
 import { FieldView } from './field.view';
 import { AnnotationEditView } from '../annotation/annotation.edit.view';
+import { GlobalVariables } from '../globals/variables';
 
 var RecordFieldsBaseView = LazyTemplateView.extend({
     templateName: 'field-list',
@@ -51,7 +53,7 @@ export var RecordAnnotationsView = RecordFieldsBaseView.extend({
         'click table + button': 'editEmpty',
     },
     edit: function(model) {
-        var group = groupMenu.model.get('name'),
+        var group = GlobalVariables.groupMenu.model.get('name'),
             editTarget = model.clone().set('group', group),
             preExisting = this.collection.get(editTarget),
             newRow;

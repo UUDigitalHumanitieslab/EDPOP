@@ -1,4 +1,5 @@
 import Backbone from 'backbone';
+import { canonicalSort } from '../utils/generic-functions';
 
 // A single field of a single record.
 export var Field = Backbone.Model.extend({

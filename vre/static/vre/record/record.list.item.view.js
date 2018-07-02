@@ -1,4 +1,5 @@
 import { LazyTemplateView } from '../utils/lazy.template.view';
+import { GlobalVariables } from '../globals/variables';
 
 /**
  * Common base for views that provide behaviour revolving around a
@@ -53,6 +54,6 @@ export var RecordListItemView = SelectableView.extend({
         return this;
     },
     display: function(event) {
-        recordDetailModal.setModel(this.model).render();
+        GlobalVariables.recordDetailModal.setModel(this.model).render();
     },
 });

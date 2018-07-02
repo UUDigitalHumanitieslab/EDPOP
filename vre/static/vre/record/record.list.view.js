@@ -2,6 +2,7 @@ import { LazyTemplateView } from '../utils/lazy.template.view';
 import { VRECollectionView } from '../collection/collection.view';
 import { SelectAllView, RecordListItemView } from './record.list.item.view';
 import { myCollections } from '../globals/myCollections';
+import { GlobalVariables } from '../globals/variables';
 
 export var RecordListView = LazyTemplateView.extend({
     tagName: 'form',
@@ -52,7 +53,7 @@ export var RecordListView = LazyTemplateView.extend({
         return this;
     },
     loadMore: function(event) {
-        searchView.nextSearch(event);
+        GlobalVariables.searchView.nextSearch(event);
     },
     showSelectAll: function() {
         var selectAllView = this.selectAllView = new SelectAllView();

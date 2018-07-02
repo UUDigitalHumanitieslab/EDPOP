@@ -4,6 +4,7 @@ import { RecordFieldsView, RecordAnnotationsView } from '../field/record.field.v
 import { FlatFields } from '../field/field.model';
 import { VRECollectionView } from '../collection/collection.view';
 import { myCollections } from '../globals/myCollections';
+import { GlobalVariables } from '../globals/variables';
 
 export var RecordDetailView = LazyTemplateView.extend({
     el: '#result_detail',
@@ -46,9 +47,9 @@ export var RecordDetailView = LazyTemplateView.extend({
         return this;
     },
     load: function(event) {
-        var currentIndex = recordsList.collection.findIndex(this.model);
+        var currentIndex = GlobalVariables.recordsList.collection.findIndex(this.model);
         var nextIndex = event.target.id==='load_next'? currentIndex+1 : currentIndex-1;
-        var nextModel = recordsList.collection.at(nextIndex);
+        var nextModel = GlobalVariables.recordsList.collection.at(nextIndex);
         this.setModel(nextModel);
         this.render();
     },
