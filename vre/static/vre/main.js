@@ -41,7 +41,8 @@ var VRERouter = Backbone.Router.extend({
             // We are not on the HPB search page, so display the
             // records in the current collection.
             $('#HPB-info').hide();
-            currentVRECollection = myCollections.get(id);
+            var currentVRECollection = myCollections.get(id);
+            localStorage.setItem('currentCollection', currentVRECollection);
             records = currentVRECollection.getRecords();
             recordsList.remove();
             recordsList = new RecordListView({collection: records});
@@ -52,7 +53,6 @@ var VRERouter = Backbone.Router.extend({
 });
 
 // Global object to hold the templates, initialized at page load below.
-var currentVRECollection;
 var records = new Records();
 var allCollections = new VRECollections();
 var allGroups = new ResearchGroups();
