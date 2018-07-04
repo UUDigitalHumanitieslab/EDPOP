@@ -53,6 +53,7 @@ var VRERouter = Backbone.Router.extend({
             // records in the current collection.
             $('#HPB-info').hide();
             GlobalVariables.currentVRECollection = GlobalVariables.myCollections.get(id);
+            console.log(GlobalVariables.currentVRECollection);
             var collectionView = new CollectionView({model:GlobalVariables.currentVRECollection});
             $('#content').replaceWith(collectionView.$el);
             GlobalVariables.searchView.$el.appendTo($('.page-header').first());
@@ -83,7 +84,7 @@ $(function() {
         root: '/vre/',
     });
     var myGroups = ResearchGroups.mine();
-     GlobalVariables.groupMenu = new GroupMenuView({collection: myGroups});
+    GlobalVariables.groupMenu = new GroupMenuView({collection: myGroups});
     prepareCollectionViews();
     var router = new VRERouter();
 });
