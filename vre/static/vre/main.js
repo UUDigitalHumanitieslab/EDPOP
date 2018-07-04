@@ -23,6 +23,7 @@ GlobalVariables.recordsList = new RecordListView({collection: GlobalVariables.re
 GlobalVariables.allGroups = new ResearchGroups();
 GlobalVariables.results = new SearchResults();
 GlobalVariables.searchView  = new SearchView();
+GlobalVariables.myCollections = new VRECollections();
 
 
 // Override Backbone.sync so it always includes the CSRF token in requests.

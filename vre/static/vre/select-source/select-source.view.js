@@ -1,7 +1,7 @@
 import { LazyTemplateView } from '../utils/lazy.template.view';
 
 export var SelectSourceView = LazyTemplateView.extend({
-    templateName: 'nav-dropdown',
+    templateName: 'database-menu',
     tagName: 'li',
     className: 'dropdown',
     initialize: function() {
