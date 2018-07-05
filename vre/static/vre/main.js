@@ -6,12 +6,12 @@ import { Records } from './record/record.model';
 import { RecordListView } from './record/record.list.view';
 import { RecordDetailView } from './record/record.detail.view';
 import { VRECollections } from './collection/collection.model';
+import { CollectionView } from './collection/collection.view';
 import { ResearchGroups } from './group/group.model';
 import { GroupMenuView } from './group/group.menu.view';
 import { SearchResults } from './search/search.model';
 import { SearchView, AdvancedSearchView } from './search/search.view';
-import { SelectSourceView } from './select-source/select-source.view';
-import { VRECollectionView } from './collection/collection.view';
+import { SelectDatabaseView } from './select-db/select-db.view';
 import { addCSRFToken } from './utils/generic-functions';
 import { JST } from './globals/templates';
 import { GlobalVariables } from './globals/variables';
@@ -53,13 +53,14 @@ var VRERouter = Backbone.Router.extend({
             // records in the current collection.
             $('#HPB-info').hide();
             GlobalVariables.currentVRECollection = GlobalVariables.myCollections.get(id);
-            var collectionView = new VRECollectionView({model:GlobalVariables.currentVRECollection});
+            var collectionView = new CollectionView({model:GlobalVariables.currentVRECollection});
             $('#content').replaceWith(collectionView.$el);
             GlobalVariables.searchView.$el.appendTo($('.page-header').first());
             GlobalVariables.records = GlobalVariables.currentVRECollection.getRecords();
-            console.log(GlobalVariables.currentVRECollection, GlobalVariables.records);
             GlobalVariables.recordsList.remove();
+            
             GlobalVariables.recordsList = new RecordListView({collection: GlobalVariables.records});
+            console.log(GlobalVariables.records);
             GlobalVariables.recordsList.render().$el.insertAfter($('.page-header'));
         }
     },
@@ -67,7 +68,7 @@ var VRERouter = Backbone.Router.extend({
 
 function prepareCollectionViews() {
     GlobalVariables.recordDetailModal = new RecordDetailView();
-    GlobalVariables.dropDown = new SelectSourceView({collection: GlobalVariables.myCollections});
+    GlobalVariables.dropDown = new SelectDatabaseView({collection: GlobalVariables.myCollections});
     GlobalVariables.dropDown.$el.appendTo($('.nav').first());
 }
 

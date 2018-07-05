@@ -42,7 +42,7 @@ export var VRECollectionView = LazyTemplateView.extend({
             selected_records.push(this.model.toJSON());
         }
         else {
-            selected_records = _(recordsList.items).filter({selected: true}).invokeMap('model.toJSON').value();
+            selected_records = _(GlobalVariables.recordsList.items).filter({selected: true}).invokeMap('model.toJSON').value();
         }
         var selected_collections = this.$('select').val();
         var records_and_collections = new AdditionsToCollections({
@@ -68,5 +68,17 @@ export var VRECollectionView = LazyTemplateView.extend({
         var alert = new AlertView({level: level, message: message});
         alert.render().$el.prependTo(this.el);
         alert.animate('remove');
+    },
+});
+
+export var CollectionView = LazyTemplateView.extend({
+    templateName:"collection-view",
+    id:"content",
+    initialize: function() {
+        this.render();
+    },
+    render: function() {
+        this.$el.html(this.template(this.model.attributes));
+        return this;
     },
 });
