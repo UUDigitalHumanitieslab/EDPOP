@@ -11,8 +11,8 @@ import { GroupMenuView } from './group/group.menu.view';
 import { SearchResults } from './search/search.model';
 import { SearchView, AdvancedSearchView } from './search/search.view';
 import { SelectSourceView } from './select-source/select-source.view';
+import { VRECollectionView } from './collection/collection.view';
 import { addCSRFToken } from './utils/generic-functions';
-//import { myCollections } from './globals/myCollections';
 import { JST } from './globals/templates';
 import { GlobalVariables } from './globals/variables';
 
@@ -53,11 +53,11 @@ var VRERouter = Backbone.Router.extend({
             // records in the current collection.
             $('#HPB-info').hide();
             GlobalVariables.currentVRECollection = GlobalVariables.myCollections.get(id);
-            console.log(GlobalVariables.currentVRECollection);
-            var collectionView = new CollectionView({model:GlobalVariables.currentVRECollection});
+            var collectionView = new VRECollectionView({model:GlobalVariables.currentVRECollection});
             $('#content').replaceWith(collectionView.$el);
             GlobalVariables.searchView.$el.appendTo($('.page-header').first());
             GlobalVariables.records = GlobalVariables.currentVRECollection.getRecords();
+            console.log(GlobalVariables.currentVRECollection, GlobalVariables.records);
             GlobalVariables.recordsList.remove();
             GlobalVariables.recordsList = new RecordListView({collection: GlobalVariables.records});
             GlobalVariables.recordsList.render().$el.insertAfter($('.page-header'));

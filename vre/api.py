@@ -195,5 +195,3 @@ class AddRecordsViewSet(ViewSetMixin, APIView):
                 record_counter += 1
         response_dict[collection.description] = record_counter
         return Response(response_dict)
-
-
