@@ -6,12 +6,12 @@ import { Records } from './record/record.model';
 import { RecordListView } from './record/record.list.view';
 import { RecordDetailView } from './record/record.detail.view';
 import { VRECollections } from './collection/collection.model';
-import { CollectionView } from './collection/collection.view';
+import { CollectionView, HPBView } from './database/database.view';
 import { ResearchGroups } from './group/group.model';
 import { GroupMenuView } from './group/group.menu.view';
 import { SearchResults } from './search/search.model';
 import { SearchView, AdvancedSearchView } from './search/search.view';
-import { SelectDatabaseView } from './select-db/select-db.view';
+import { SelectDatabaseView } from './database/select-db.view';
 import { addCSRFToken } from './utils/generic-functions';
 import { JST } from './globals/templates';
 import { GlobalVariables } from './globals/variables';
@@ -46,7 +46,7 @@ var VRERouter = Backbone.Router.extend({
             GlobalVariables.searchView.$el.appendTo($('.page-header').first());
             var advancedSearchView = new AdvancedSearchView();
             advancedSearchView.render();
-            GlobalVariables.searchView.listenTo(advancedSearchView, 'fill', searchView.fill);
+            GlobalVariables.searchView.listenTo(advancedSearchView, 'fill', GlobalVariables.searchView.fill);
         }
         else {
             // We are not on the HPB search page, so display the
@@ -57,11 +57,9 @@ var VRERouter = Backbone.Router.extend({
             $('#content').replaceWith(collectionView.$el);
             GlobalVariables.searchView.$el.appendTo($('.page-header').first());
             GlobalVariables.records = GlobalVariables.currentVRECollection.getRecords();
-            GlobalVariables.recordsList.remove();
-            
+ 			GlobalVariables.recordsList.remove();
             GlobalVariables.recordsList = new RecordListView({collection: GlobalVariables.records});
-            console.log(GlobalVariables.records);
-            GlobalVariables.recordsList.render().$el.insertAfter($('.page-header'));
+    		GlobalVariables.recordsList.render().$el.insertAfter($('.page-header'));
         }
     },
 });
@@ -77,7 +75,7 @@ $(function() {
         var $el = $(element);
         JST[$el.prop('id')] = Handlebars.compile($el.html(), {compat: true});
     });
-    $('#result_detail').modal({show: false});
+    $('#result-detail').modal({show: false});
     GlobalVariables.myCollections.reset(prefetchedCollections);
     GlobalVariables.allGroups.reset(prefetchedGroups);
     Backbone.history.start({

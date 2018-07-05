@@ -1,7 +1,6 @@
 import { LazyTemplateView } from '../utils/lazy.template.view';
 import { VRECollectionView } from '../collection/collection.view';
 import { SelectAllView, RecordListItemView } from './record.list.item.view';
-import { myCollections } from '../globals/myCollections';
 import { GlobalVariables } from '../globals/variables';
 
 export var RecordListView = LazyTemplateView.extend({
@@ -21,7 +20,7 @@ export var RecordListView = LazyTemplateView.extend({
             reset: this.render,
             complete: this.showSelectAll,
         });
-        this.vreCollectionsSelect = new VRECollectionView({collection: myCollections});
+        this.vreCollectionsSelect = new VRECollectionView({collection: GlobalVariables.myCollections});
     },
     render: function() {
         this.$el.html(this.template({}));

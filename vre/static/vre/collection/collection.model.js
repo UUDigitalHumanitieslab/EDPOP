@@ -15,6 +15,9 @@ export var VRECollection = APIModel.extend({
                 records.trigger('complete');
             });
         }
+        else {
+        	var records = this.records;
+        }
         return records;
     },
 });

@@ -3,21 +3,24 @@ import { FlatAnnotations } from '../annotation/annotation.model';
 import { RecordFieldsView, RecordAnnotationsView } from '../field/record.field.view';
 import { FlatFields } from '../field/field.model';
 import { VRECollectionView } from '../collection/collection.view';
-import { myCollections } from '../globals/myCollections';
 import { GlobalVariables } from '../globals/variables';
 
 export var RecordDetailView = LazyTemplateView.extend({
-    el: '#result_detail',
-    templateName: 'item-fields',
+    templateName: 'record-detail',
+    className: 'modal',
+    attributes: {
+        'role': 'dialog',
+    },
     events: {
         'click #load_next': 'load',
         'click #load_previous': 'load',
     },
     initialize: function(options) {
+        this.$el.html(this.template(this.model));
         this.$title = this.$('.modal-title');
         this.$body = this.$('.modal-body');
         this.$footer = this.$('.modal-footer');
-        this.vreCollectionsSelect = new VRECollectionView({collection: myCollections});
+        this.vreCollectionsSelect = new VRECollectionView({collection: GlobalVariables.myCollections});
     },
     setModel: function(model) {
         if (this.model) {
@@ -36,7 +39,7 @@ export var RecordDetailView = LazyTemplateView.extend({
         this.annotationsView.listenTo(this.fieldsView, 'edit', this.annotationsView.edit);
         var uriText = this.model.get('uri');
         this.$title.text(uriText);
-        document.getElementById("uri-link").href = uriText;
+        this.$("#uri-link").attr("href", uriText);
         this.fieldsView.render().$el.appendTo(this.$body);
         this.annotationsView.render().$el.appendTo(this.$body);
         return this;
@@ -50,7 +53,6 @@ export var RecordDetailView = LazyTemplateView.extend({
         var currentIndex = GlobalVariables.recordsList.collection.findIndex(this.model);
         var nextIndex = event.target.id==='load_next'? currentIndex+1 : currentIndex-1;
         var nextModel = GlobalVariables.recordsList.collection.at(nextIndex);
-        this.setModel(nextModel);
-        this.render();
+        this.setModel(nextModel).render();
     },
 });

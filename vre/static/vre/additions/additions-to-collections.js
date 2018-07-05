@@ -1,5 +1,5 @@
 import Backbone from 'backbone';
 
 export var AdditionsToCollections = Backbone.Model.extend({
-    url: '/vre/add-selection',
+    url: '/vre/api/add-selection/',
 });

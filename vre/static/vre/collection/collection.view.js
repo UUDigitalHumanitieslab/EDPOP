@@ -13,7 +13,10 @@ export var VRECollectionView = LazyTemplateView.extend({
     render: function() {
         var shownCollections = this.collection.clone();
         shownCollections.remove(GlobalVariables.currentVRECollection);
-        this.$el.html(this.template({models: shownCollections.toJSON()}));
+        this.$el.html(this.template({
+            models: shownCollections.toJSON(),
+            cid: this.cid,
+        }));
         this.$('select').select2();
         return this;
     },
@@ -68,17 +71,5 @@ export var VRECollectionView = LazyTemplateView.extend({
         var alert = new AlertView({level: level, message: message});
         alert.render().$el.prependTo(this.el);
         alert.animate('remove');
-    },
-});
-
-export var CollectionView = LazyTemplateView.extend({
-    templateName:"collection-view",
-    id:"content",
-    initialize: function() {
-        this.render();
-    },
-    render: function() {
-        this.$el.html(this.template(this.model.attributes));
-        return this;
     },
 });
