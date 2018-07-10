@@ -128,11 +128,10 @@ var Annotations = APICollection.extend({
  * flat alternative: [{key, value, group}]
  */
 var FlatAnnotations = Backbone.Collection.extend({
-    // comparator: can be set to keep this sorted
-    // How to uniquely identify a field annotation.
     comparator: function(item) {
         return canonicalSort(item.attributes.key);
     },
+    // How to uniquely identify a field annotation.
     modelId: function(attributes) {
         return attributes.key + ':' + attributes.group;
     },
@@ -142,10 +141,9 @@ var FlatAnnotations = Backbone.Collection.extend({
         this.underlying.forEach(this.toFlat.bind(this));
         this.markedGroups = new Backbone.Collection([]);
         this.listenTo(this.underlying, 'add change:content', this.toFlat);
-        this.on('add change:value', this.markGroup);
+        this.on('add change:value remove', this.markGroup);
         this.markedGroups.on('add', _.debounce(this.fromFlat), this);
         // this.listenTo(this.underlying, 'remove', TODO);
-        // this.on('remove', TODO);
     },
     // translate the official representation to the flat one
     toFlat: function(annotation) {
@@ -184,9 +182,10 @@ var FlatAnnotations = Backbone.Collection.extend({
             var groupId = allGroups.findWhere({name: groupName}).id,
                 existing = flat.underlying.findWhere({managing_group: groupId}),
                 id = existing && existing.id,
-                content = _(flatPerGroup[groupName]).map(function(model) {
+                annotations = flatPerGroup[groupName],
+                content = annotations && _(annotations).map(function(model) {
                     return [model.get('key'), model.get('value')];
-                }).fromPairs().value();
+                }).fromPairs().value() || {};
             return {
                 id: id,
                 record: recordId,
@@ -240,9 +239,10 @@ var SearchResults = Records.extend({
  */
 var VRECollection = Backbone.Model.extend({
     getRecords: function() {
-        if (!records) {
-            var records = new Records();
+        if (!this.records) {
+            this.records = new Records();
         }
+        var records = this.records;
         records.query({
             params: {collection__id: this.id},
         }).then(function() {
@@ -700,6 +700,21 @@ var AnnotationEditView = LazyTemplateView.extend({
     },
     initialize: function(options) {
         _.assign(this, _.pick(options, ['existing']));
+        this.$el.popover({
+            container: 'body',
+            content: JST['annotation-confirm-deletion'](this),
+            html: true,
+            placement: 'auto top',
+            selector: 'button[aria-label="Delete"]',
+            title: 'Really delete?',
+        });
+        var confirmSelector = '#confirm-delete-' + this.cid;
+        $('body').one('submit', confirmSelector, this.reallyTrash.bind(this));
+        this.trashCanceller = $('body').on(
+            'reset',
+            confirmSelector,
+            this.cancelTrash.bind(this),
+        );
     },
     render: function() {
         this.$el.html(this.template(
@@ -718,6 +733,15 @@ var AnnotationEditView = LazyTemplateView.extend({
     reset: function(event) {
         event.preventDefault();
         this.trigger('cancel', this);
+    },
+    cancelTrash: function(event) {
+        $(event.target).parents('.popover').popover('hide');
+    },
+    reallyTrash: function(event) {
+        event.preventDefault();
+        $(event.target).parents('.popover').popover('destroy');
+        this.trashCanceller.off();
+        this.trigger('trash', this);
     },
 });
 
@@ -789,7 +813,7 @@ var RecordAnnotationsView = RecordFieldsBaseView.extend({
             this.rows.push(newRow);
             this.$tbody.append(newRow.render().el);
         }
-        newRow.on({cancel: this.cancel, save: this.save}, this);
+        newRow.on(_.pick(this, ['save', 'cancel', 'trash']), this);
     },
     editEmpty: function() {
         this.edit(new Backbone.Model());
@@ -814,6 +838,11 @@ var RecordAnnotationsView = RecordFieldsBaseView.extend({
             this.insertRow(model);
         }
         this.collection.add(model, {merge: true});
+    },
+    trash: function(editRow) {
+        if (editRow.existing) this.collection.remove(editRow.model);
+        this.rows.splice(_.indexOf(this.rows, editRow), 1);
+        editRow.remove();
     },
 });
 
@@ -842,6 +871,7 @@ var SelectDatabaseView = LazyTemplateView.extend({
 
 var RecordDetailView = LazyTemplateView.extend({
     templateName: 'result-detail',
+    id: 'result_detail',
     className: 'modal',
     attributes: {
         'role': 'dialog',
