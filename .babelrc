@@ -1,4 +1,3 @@
 {
-  "presets": ["env"],
-  "ignore": ['vre/static/vre/bundle.js']
+  "presets": ["env"]
 }

@@ -20,13 +20,13 @@ export var RecordListView = LazyTemplateView.extend({
             reset: this.render,
             complete: this.showSelectAll,
         });
-        this.vreCollectionsSelect = new VRECollectionView({collection: GlobalVariables.myCollections});
     },
     render: function() {
         this.$el.html(this.template({}));
         this.$tbody = this.$('tbody');
         this.renderItems();
         $('#HPB-info').hide();
+        this.vreCollectionsSelect = new VRECollectionView({collection: GlobalVariables.myCollections});
         this.vreCollectionsSelect.render();
         this.$el.prepend(this.vreCollectionsSelect.$el);
         return this;

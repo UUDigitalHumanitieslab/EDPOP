@@ -6,7 +6,6 @@ var browserify = require("browserify");
 var source = require("vinyl-source-stream");
 var buffer = require('vinyl-buffer');
 var uglify = require('gulp-uglify');
-//var transform = require('vinyl-transform');
 var babelify = require('babelify');
 var watchify = require('watchify');
 
@@ -40,12 +39,12 @@ gulp.task('browserify', function() {
    	}, 'browserify-shim');
 
     return b.bundle()
-   		.pipe(source('../vre/static/vre/main.js'))
-	        //.pipe(buffer())
-	        //.pipe(sourcemaps.init({loadMaps: true}))
+   		.pipe(source('bundle.js'))
+	    .pipe(buffer())
+	        .pipe(sourcemaps.init({loadMaps: true}))
 	       	// Add transformation tasks to the pipeline here.
 	       	//.pipe(uglify())
-	        .pipe(gulp.dest('./build'));
+	    .pipe(gulp.dest('vre/static/vre/'));
 });
 
 function bundle_es6(input) {
