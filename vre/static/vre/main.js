@@ -47,8 +47,8 @@ var VRERouter = Backbone.Router.extend({
         if (id=="hpb") {
             //$('#content').empty();
             var hpbView = new HPBView();
+            GlobalVariables.searchView.$el.appendTo(hpbView.$('.page-header'));
             $('#content').replaceWith(hpbView.$el);
-            GlobalVariables.searchView.$el.appendTo($('.page-header').first());
             var advancedSearchView = new AdvancedSearchView();
             advancedSearchView.render();
             GlobalVariables.searchView.listenTo(advancedSearchView, 'fill', GlobalVariables.searchView.fill);
@@ -59,8 +59,8 @@ var VRERouter = Backbone.Router.extend({
             $('#HPB-info').hide();
             GlobalVariables.currentVRECollection = GlobalVariables.myCollections.get(id);
             var collectionView = new CollectionView({model:GlobalVariables.currentVRECollection});
+            GlobalVariables.searchView.$el.appendTo(collectionView.$('.page-header'));
             $('#content').replaceWith(collectionView.$el);
-            GlobalVariables.searchView.$el.appendTo($('.page-header').first());
             GlobalVariables.records = GlobalVariables.currentVRECollection.getRecords();
  			GlobalVariables.recordsList.remove();
             GlobalVariables.recordsList = new RecordListView({collection: GlobalVariables.records});
