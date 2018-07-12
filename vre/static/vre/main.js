@@ -22,9 +22,14 @@ GlobalVariables.records = new Records();
 GlobalVariables.recordsList = new RecordListView({collection: GlobalVariables.records});
 GlobalVariables.allGroups = new ResearchGroups();
 GlobalVariables.results = new SearchResults();
-GlobalVariables.searchView  = new SearchView();
+GlobalVariables.searchView  = new SearchView({model: GlobalVariables.results});
 GlobalVariables.myCollections = new VRECollections();
 
+
+$(document).on("submit", "form", function(e) {
+            e.preventDefault();
+            return false;
+        });
 
 // Override Backbone.sync so it always includes the CSRF token in requests.
 (function() {
@@ -37,10 +42,10 @@ var VRERouter = Backbone.Router.extend({
         ':id/': 'showDatabase',
     },
     showDatabase: function(id) {
-        GlobalVariables.searchView.render();
         GlobalVariables.searchView.source = id;
+        GlobalVariables.searchView.render();
         if (id=="hpb") {
-            $('#content').empty();
+            //$('#content').empty();
             var hpbView = new HPBView();
             $('#content').replaceWith(hpbView.$el);
             GlobalVariables.searchView.$el.appendTo($('.page-header').first());
@@ -69,6 +74,7 @@ function prepareCollectionViews() {
     GlobalVariables.dropDown = new SelectDatabaseView({collection: GlobalVariables.myCollections});
     GlobalVariables.dropDown.$el.appendTo($('.nav').first());
 }
+
 
 $(function() {
     $('script[type="text/x-handlebars-template"]').each(function(i, element) {

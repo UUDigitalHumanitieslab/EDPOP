@@ -9,6 +9,7 @@ var uglify = require('gulp-uglify');
 var babelify = require('babelify');
 var watchify = require('watchify');
 
+// this task on its own works
 gulp.task('babel', function () {
   return gulp.src("vre/static/vre/**/*.js")
     .pipe(sourcemaps.init())
@@ -16,15 +17,8 @@ gulp.task('babel', function () {
     .pipe(gulp.dest("build"));
 });
 
-gulp.task('watchify', function() {
-	//var args = merge(watchify.args, { debug: true });
-	var input = watchify(b);
-	return bundle_es6(input);
-	input.on('update', function () {
-    	return bundle_es6(input);
-  	});
-});
-
+// this task should do babelify, browserify ad watchify in one, but isn't functional yet
+// sourcemaps don't work yet either
 gulp.task('browserify', function() {
 	var b = browserify({
     	entries: 'vre/static/vre/main.js',
@@ -46,13 +40,3 @@ gulp.task('browserify', function() {
 	       	//.pipe(uglify())
 	    .pipe(gulp.dest('vre/static/vre/'));
 });
-
-function bundle_es6(input) {
-	return input.bundle()
-        .pipe(source('../vre/static/vre/bundle.js'))
-        .pipe(buffer())
-        .pipe(sourcemaps.init({loadMaps: true}))
-        	// Add transformation tasks to the pipeline here.
-        	//.pipe(uglify())
-        .pipe(gulp.dest('./build/'));
-}

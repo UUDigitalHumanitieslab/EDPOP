@@ -50,6 +50,7 @@ export var RecordDetailView = LazyTemplateView.extend({
         return this;
     },
     load: function(event) {
+        event.preventDefault();
         var currentIndex = GlobalVariables.recordsList.collection.findIndex(this.model);
         var nextIndex = event.target.id==='load_next'? currentIndex+1 : currentIndex-1;
         var nextModel = GlobalVariables.recordsList.collection.at(nextIndex);

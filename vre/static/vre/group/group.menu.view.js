@@ -11,6 +11,7 @@ export var GroupMenuItemView = LazyTemplateView.extend({
         return this;
     },
     select: function(event) {
+        event.preventDefault();
         this.trigger('select', this.model);
     },
     activate: function(model) {

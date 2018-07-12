@@ -4,7 +4,7 @@ import { JST } from '../globals/templates';
 import { GlobalVariables } from '../globals/variables';
 
 export var SearchView = LazyTemplateView.extend({
-    templateName: "search-view",
+    templateName: 'search-view',
     events: {
         'submit': 'firstSearch',
     },

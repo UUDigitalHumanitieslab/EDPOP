@@ -8,6 +8,7 @@ export var RecordListView = LazyTemplateView.extend({
     templateName: 'record-list',
     events: {
         'submit': function(event) {
+        	event.preventDefault();
             this.vreCollectionsSelect.submitForm(event);
         },
         'click #more-records': 'loadMore',

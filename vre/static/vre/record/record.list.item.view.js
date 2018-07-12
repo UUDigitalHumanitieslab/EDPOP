@@ -10,6 +10,7 @@ import { GlobalVariables } from '../globals/variables';
 export var SelectableView = LazyTemplateView.extend({
     toggle: function(event) {
         // The assignment in the if condition is on purpose (assign + check).
+        event.preventDefault();
         if (this.selected = event.target.checked) {
             this.trigger('check');
         } else {
@@ -54,6 +55,7 @@ export var RecordListItemView = SelectableView.extend({
         return this;
     },
     display: function(event) {
+        event.preventDefault();
         GlobalVariables.recordDetailModal.setModel(this.model).render();
     },
 });
