@@ -38,9 +38,19 @@
         required
     ></td>
     <td><form id=form-{{cid}}>
-        <button type=reset class="btn btn-default">Cancel</button>
         <button type=submit class="btn btn-primary">Save</button>
+        <button type=reset class="btn btn-default">Cancel</button>
+        <button type=button class="btn btn-danger" aria-label=Delete>
+            <span class="glyphicon glyphicon-trash" aria-hidden=true></span>
+        </button>
     </form></td>
+</script>
+
+<script type="text/x-handlebars-template" id="annotation-confirm-deletion">
+    <form id=confirm-delete-{{cid}}>
+        <button type=reset class="btn btn-default">No, cancel</button>
+        <button type=submit class="btn btn-danger">Yes, I&rsquo;m sure</button>
+    </form>
 </script>
 
 <script type="text/x-handlebars-template" id="select-all-view">
