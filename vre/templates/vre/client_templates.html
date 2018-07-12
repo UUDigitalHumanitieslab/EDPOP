@@ -108,7 +108,7 @@
         <div class="input-group">
             <input type="text" class="form-control" name="search" id="query-input" placeholder="Query">
             <div class="input-group-btn">
-                <button type="submit" class="btn btn-primary">Search</button>
+                <button type="submit" id="query-submit" class="btn btn-primary">Search</button>
                 <button
                     type="button"
                     class="btn btn-default"
@@ -144,7 +144,7 @@
     {{{message}}}
 </script>
 
-<script type="text/x-handlebars-template" id="result-detail">
+<script type="text/x-handlebars-template" id="record-detail">
     <div class="modal-dialog" role=document>
         <div class="modal-content">
             <div class="modal-header">
@@ -160,7 +160,7 @@
                     data-dismiss="modal"
                     aria-label="Close"
                 ><span aria-hidden="true">&times;</span></button>
-                <a id="uri-link" target="blank"><h4 class="modal-title"></h4></a>
+                <a id="uri-link" target="blank" href=""><h4 class="modal-title"></h4></a>
             </div>
             <div class="modal-body"></div>
             <div class="modal-footer">
