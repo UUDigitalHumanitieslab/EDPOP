@@ -5,6 +5,7 @@ import Handlebars from 'handlebars';
 import { Records } from './record/record.model';
 import { RecordListView } from './record/record.list.view';
 import { RecordDetailView } from './record/record.detail.view';
+import { BlankRecordButtonView } from './record/blank.record.button.view';
 import { VRECollections } from './collection/collection.model';
 import { CollectionView, HPBView } from './database/database.view';
 import { ResearchGroups } from './group/group.model';
@@ -24,6 +25,7 @@ GlobalVariables.allGroups = new ResearchGroups();
 GlobalVariables.results = new SearchResults();
 GlobalVariables.searchView  = new SearchView({model: GlobalVariables.results});
 GlobalVariables.myCollections = new VRECollections();
+GlobalVariables.blankRecordButton = new BlankRecordButtonView();
 
 // Override Backbone.sync so it always includes the CSRF token in requests.
 (function() {
@@ -66,7 +68,10 @@ var VRERouter = Backbone.Router.extend({
 function prepareCollectionViews() {
     GlobalVariables.recordDetailModal = new RecordDetailView();
     GlobalVariables.dropDown = new SelectDatabaseView({collection: GlobalVariables.myCollections});
-    GlobalVariables.dropDown.$el.appendTo($('.nav').first());
+    $('.nav').first().append(
+        GlobalVariables.dropDown.el,
+        GlobalVariables.blankRecordButton.el,
+    );
 }
 
 
