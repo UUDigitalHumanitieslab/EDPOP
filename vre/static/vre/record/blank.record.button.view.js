@@ -15,6 +15,8 @@ export var BlankRecordButtonView = Backbone.View.extend({
         return this;
     },
     launchBlank: function() {
-        GlobalVariables.recordDetailModal.setModel(new Record).render();
+        GlobalVariables.recordDetailModal.setModel(new Record({
+            content: {},
+        })).render();
     },
 });
