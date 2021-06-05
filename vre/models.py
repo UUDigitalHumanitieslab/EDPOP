@@ -43,7 +43,7 @@ class Record(models.Model):
     """ an item in one or several collections in the
     Virtual Research Environment.
     """
-    uri = models.CharField(max_length=200)
+    uri = models.CharField(max_length=200, blank=True)
     collection = models.ManyToManyField(Collection)
     content = JSONField(default='VRE Record')
 
