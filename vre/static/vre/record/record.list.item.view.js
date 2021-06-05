@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { LazyTemplateView } from '../utils/lazy.template.view';
 import { GlobalVariables } from '../globals/variables';
 
@@ -49,8 +50,18 @@ export var RecordListItemView = SelectableView.extend({
         'change input': 'toggle',
         'click a': 'display',
     },
+    initialize: function() {
+        if (!this.model.get('content').Title) {
+            this.model.getAnnotations().once('sync', this.render, this);
+        }
+    },
     render: function() {
-        this.$el.html(this.template(this.model.attributes));
+        var data = this.model.toJSON();
+        if (!data.content.Title && this.model.annotations) {
+            var annoContent = this.model.annotations.map('content');
+            data.content = _.defaults.apply(null, [{}, data.content].concat(annoContent));
+        }
+        this.$el.html(this.template(data));
         this.$checkbox = this.$('input');
         return this;
     },
