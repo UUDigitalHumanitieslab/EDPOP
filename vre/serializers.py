@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.reverse import reverse
 
 from .models import ResearchGroup, Collection, Record, Annotation
 
@@ -29,6 +30,14 @@ class RecordSerializer(serializers.ModelSerializer):
     class Meta:
         model = Record
         fields = ('id', 'uri', 'collection', 'content')
+
+    def create(self, validated_data):
+        created = super().create(validated_data)
+        pk = created.pk
+        request = self.context['request']
+        created.uri = reverse('record-detail', args=[pk], request=request)
+        created.save()
+        return created
 
 
 class AnnotationSerializer(serializers.ModelSerializer):
