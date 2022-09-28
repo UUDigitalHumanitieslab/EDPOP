@@ -4,6 +4,13 @@ import { FieldView } from './field.view';
 import { AnnotationEditView } from '../annotation/annotation.edit.view';
 import { GlobalVariables } from '../globals/variables';
 
+// Allow prototype property access in the Handlebars runtime (needed as of 4.6).
+// This setting should be safe because it doesn't allow `.constructor`.
+// See also https://mahmoudsec.blogspot.com/2019/04/handlebars-template-injection-and-rce.html.
+var templateOptions = {
+    allowProtoPropertiesByDefault: true,
+};
+
 var RecordFieldsBaseView = LazyTemplateView.extend({
     templateName: 'field-list',
     initialize: function(options) {
@@ -29,7 +36,7 @@ var RecordFieldsBaseView = LazyTemplateView.extend({
         }
     },
     render: function() {
-        this.$el.html(this.template(this));
+        this.$el.html(this.template(this, templateOptions));
         this.$tbody = this.$('tbody');
         this.$tbody.append(_(this.rows).invokeMap('render').map('el').value());
         return this;
