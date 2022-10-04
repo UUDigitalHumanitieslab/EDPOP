@@ -7,6 +7,12 @@ The project uses PostgreSQL, to make use of JSON fields (the format in which res
 A guide for setting up PostgreSQL in Django can be found here:
 [][https://www.digitalocean.com/community/tutorials/how-to-use-postgresql-with-your-django-application-on-ubuntu-14-04]
 
+For testing in local development (**only!**), the database user needs to have the `CREATEDB` privilege:
+
+```sql
+ALTER USER edpopuser CREATEDB;
+```
+
 ## Installing
 Switch to a virtual environment with Python 3.8 installed, then:
 
@@ -24,6 +30,8 @@ python manage.py runserver
 ```
 
 The Django server will run on `localhost:8000`, and the admin should be available with the credentials provided during installation.
+
+Run the backend tests by invoking `pytest`.
 
 ## Frontend
 Install the dependencies of the frontend via npm install.
