@@ -7,7 +7,6 @@ ENV/
 
 # node
 node_modules
-package-lock.json
 
 db*
 *__pycache*
