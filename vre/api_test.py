@@ -66,3 +66,29 @@ def test_add_single_record_preexisting(auth_client, records, collections):
     assert response.status_code is 200
     assert response.json() == {collection.description: 1}
     assert record.collection.get(pk=collection.pk)
+
+
+def test_add_multi_record_multi_collection(auth_client, records, collections):
+    # We're going to add two records to two collections:
+    # one pre-existing record,
+    record1 = records.first()
+    # and one to be created on the fly.
+    record2 = {'uri': 'http://testing.test/3', 'content': {}}
+    payload = {
+        'records': [{'uri': record1.uri, 'content': record1.content}, record2],
+        'collections': [collection.pk for collection in collections.all()]
+    }
+    response = auth_client.post('/vre/api/add-selection/',
+        data=json.dumps(payload),
+        content_type='application/json',
+    )
+    assert response.status_code is 200
+    assert response.json() == {
+        collection.description: 2
+        for collection in collections.all()
+    }
+    record2_saved = records.get(uri='http://testing.test/3')
+    assert record2_saved
+    for collection in collections.all():
+        assert record1.collection.get(pk=collection.pk)
+        assert record2_saved.collection.get(pk=collection.pk)
