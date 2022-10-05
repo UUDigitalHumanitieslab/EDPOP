@@ -81,9 +81,9 @@ export var AdvancedSearchView = LazyTemplateView.extend({
     render: function() {
         $('#search-info').show();
         $('#search-info').popover({
-            'html': true, 
-            'content': this.$el.html(this.template()), 
-            'container': 'body', 
+            'html': true,
+            'content': this.$el.html(this.template()),
+            'container': 'body',
             'placement': 'left'
         });
     },

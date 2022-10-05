@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import  Backbone from 'backbone';
 import { LazyTemplateView } from '../utils/lazy.template.view';
 import { FieldView } from './field.view';
@@ -79,7 +80,7 @@ export var RecordAnnotationsView = RecordFieldsBaseView.extend({
             this.rows.push(newRow);
             this.$tbody.append(newRow.render().el);
         }
-        newRow.on({cancel: this.cancel, save: this.save}, this);
+        newRow.on(_.pick(this, ['save', 'cancel', 'trash']), this);
     },
     editEmpty: function() {
         this.edit(new Backbone.Model());
@@ -104,5 +105,10 @@ export var RecordAnnotationsView = RecordFieldsBaseView.extend({
             this.insertRow(model);
         }
         this.collection.add(model, {merge: true});
+    },
+    trash: function(editRow) {
+        if (editRow.existing) this.collection.remove(editRow.model);
+        this.rows.splice(_.indexOf(this.rows, editRow), 1);
+        editRow.remove();
     },
 });

@@ -1,4 +1,5 @@
 import { LazyTemplateView } from '../utils/lazy.template.view';
+import { JST } from '../globals/templates';
 
 export var AnnotationEditView = LazyTemplateView.extend({
     tagName: 'tr',
@@ -10,6 +11,21 @@ export var AnnotationEditView = LazyTemplateView.extend({
     },
     initialize: function(options) {
         _.assign(this, _.pick(options, ['existing']));
+        this.$el.popover({
+             container: 'body',
+             content: JST['annotation-confirm-deletion'](this),
+             html: true,
+             placement: 'auto top',
+             selector: 'button[aria-label="Delete"]',
+             title: 'Really delete?',
+         });
+         var confirmSelector = '#confirm-delete-' + this.cid;
+         $('body').one('submit', confirmSelector, this.reallyTrash.bind(this));
+         this.trashCanceller = $('body').on(
+             'reset',
+             confirmSelector,
+             this.cancelTrash.bind(this),
+         );
     },
     render: function() {
         this.$el.html(this.template(
@@ -28,5 +44,14 @@ export var AnnotationEditView = LazyTemplateView.extend({
     reset: function(event) {
         event.preventDefault();
         this.trigger('cancel', this);
+    },
+    cancelTrash: function(event) {
+         $(event.target).parents('.popover').popover('hide');
+    },
+    reallyTrash: function(event) {
+        event.preventDefault();
+        $(event.target).parents('.popover').popover('destroy');
+        this.trashCanceller.off();
+        this.trigger('trash', this);
     },
 });

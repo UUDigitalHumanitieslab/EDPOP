@@ -8,11 +8,10 @@ export var Annotations = APICollection.extend({
 });
 
 export var FlatAnnotations = APICollection.extend({
-    // comparator: can be set to keep this sorted
-    // How to uniquely identify a field annotation.
     comparator: function(item) {
         return canonicalSort(item.attributes.key);
     },
+    // How to uniquely identify a field annotation.
     modelId: function(attributes) {
         return attributes.key + ':' + attributes.group;
     },
@@ -22,10 +21,9 @@ export var FlatAnnotations = APICollection.extend({
         this.underlying.forEach(this.toFlat.bind(this));
         this.markedGroups = new Backbone.Collection([]);
         this.listenTo(this.underlying, 'add change:content', this.toFlat);
-        this.on('add change:value', this.markGroup);
+        this.on('add change:value remove', this.markGroup);
         this.markedGroups.on('add', _.debounce(this.fromFlat), this);
         // this.listenTo(this.underlying, 'remove', TODO);
-        // this.on('remove', TODO);
     },
     // translate the official representation to the flat one
     toFlat: function(annotation) {
@@ -64,9 +62,10 @@ export var FlatAnnotations = APICollection.extend({
             var groupId = GlobalVariables.allGroups.findWhere({name: groupName}).id,
                 existing = flat.underlying.findWhere({managing_group: groupId}),
                 id = existing && existing.id,
-                content = _(flatPerGroup[groupName]).map(function(model) {
+                annotations = flatPerGroup[groupName],
+                content = annotations && _(annotations).map(function(model) {
                     return [model.get('key'), model.get('value')];
-                }).fromPairs().value();
+                }).fromPairs().value() || {};
             return {
                 id: id,
                 record: recordId,
