@@ -7,6 +7,8 @@ The project uses PostgreSQL, to make use of JSON fields (the format in which res
 A guide for setting up PostgreSQL in Django can be found here:
 [][https://www.digitalocean.com/community/tutorials/how-to-use-postgresql-with-your-django-application-on-ubuntu-14-04]
 
+For local development, you need to create a database and database user with the names and password mentioned in `edpop/settings.py`. See the `NAME`, `USER` and `PASSWORD` entries of the `DATABASES['default']`.
+
 For testing in local development (**only!**), the database user needs to have the `CREATEDB` privilege:
 
 ```sql
