@@ -7,8 +7,8 @@ import { JST } from '../globals/templates';
  * the template until it's needed.
  */
 export var LazyTemplateView = Backbone.View.extend({
-    template: function(context) {
+    template: function(context, options) {
         this.template = JST[this.templateName];
-        return this.template(context);
+        return this.template(context, options);
     },
 });

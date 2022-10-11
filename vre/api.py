@@ -177,21 +177,23 @@ class AddRecordsViewSet(ViewSetMixin, APIView):
         response_dict = {}
         for collection_id in collections:
             collection = get_object_or_404(Collection, pk=collection_id)
-        record_counter = 0
-        for record in records:
-            records_in_collection = [r.uri for r in collection.record_set.all()]
-            uri = record["uri"]
-            if uri not in records_in_collection:
-                existing_record = Record.objects.filter(uri=uri)
-                if existing_record:
-                    existing_record[0].collection.add(collection)
-                else:
-                    new_record = Record(
-                        uri=uri,
-                        content=record['content'],
-                    )
-                    new_record.save()
-                    new_record.collection.add(collection)
-                record_counter += 1
-        response_dict[collection.description] = record_counter
+            record_counter = 0
+            for record in records:
+                records_in_collection = [
+                    r.uri for r in collection.record_set.all()
+                ]
+                uri = record["uri"]
+                if uri not in records_in_collection:
+                    existing_record = Record.objects.filter(uri=uri)
+                    if existing_record:
+                        existing_record[0].collection.add(collection)
+                    else:
+                        new_record = Record(
+                            uri=uri,
+                            content=record['content'],
+                        )
+                        new_record.save()
+                        new_record.collection.add(collection)
+                    record_counter += 1
+            response_dict[collection.description] = record_counter
         return Response(response_dict)
