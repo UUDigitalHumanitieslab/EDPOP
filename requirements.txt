@@ -12,8 +12,6 @@ chardet==3.0.4
     # via requests
 django==1.11.29
     # via -r requirements.in
-django-contrib-postgres==0.0.1
-    # via -r requirements.in
 django-filter==1.1.0
     # via -r requirements.in
 django-json-widget==0.1.1

@@ -66,8 +66,8 @@ class Annotation(models.Model):
     One record can have multiple annotations.
     An annotation is also linked to exactly one research group,
     but multiple groups can add annotations."""
-    record = models.ForeignKey(Record)
-    managing_group = models.ForeignKey(ResearchGroup)
+    record = models.ForeignKey(Record, on_delete=models.CASCADE)
+    managing_group = models.ForeignKey(ResearchGroup, on_delete=models.CASCADE)
     content = JSONField(default='VRE Annotation')
 
     def __str__(self):
