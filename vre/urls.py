@@ -11,11 +11,14 @@ api_router.register(r'collections', api.CollectionViewSet)
 api_router.register(r'records', api.RecordViewSet)
 api_router.register(r'annotations', api.AnnotationViewSet)
 api_router.register(r'search', api.SearchViewSet, basename='search')
-api_router.register(r'add-selection', api.AddRecordsViewSet, basename='add-selection')
+api_router.register(r'add-selection',
+                    api.AddRecordsViewSet,
+                    basename='add-selection')
 
 urlpatterns = [
     url(r'^api/', include(api_router.urls)),
-    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^api-auth/',
+        include('rest_framework.urls', namespace='rest_framework')),
     url(r'^$', views.index, name='index'),
     url(r'^(?P<database_id>[a-zA-Z0-9]+)/$', views.index, name='index'),
 ]
