@@ -3,7 +3,7 @@ from rest_framework import viewsets, mixins, renderers, status
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSetMixin
 from rest_framework.response import Response
-from rest_framework.decorators import list_route
+from rest_framework.decorators import action
 from rest_framework.renderers import JSONRenderer
 
 
@@ -48,7 +48,7 @@ class ListMineMixin(object):
     that belong to a research group of the current user.
     """
 
-    @list_route()
+    @action(detail=True)
     def mine(self, request):
         # get_queryset takes care of the reduced queryset
         return self.list(request)
