@@ -45,7 +45,7 @@ class Record(models.Model):
     """
     uri = models.CharField(max_length=200, blank=True)
     collection = models.ManyToManyField(Collection)
-    content = JSONField(default='VRE Record')
+    content = JSONField(dict)
 
     def __str__(self):
         return self.uri
@@ -60,7 +60,7 @@ class Annotation(models.Model):
     but multiple groups can add annotations."""
     record = models.ForeignKey(Record, on_delete=models.CASCADE)
     managing_group = models.ForeignKey(ResearchGroup, on_delete=models.CASCADE)
-    content = JSONField(default='VRE Annotation')
+    content = JSONField(dict)
 
     def __str__(self):
         return '{} ({})'.format(self.record.uri, self.managing_group.name)
