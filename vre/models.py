@@ -1,8 +1,5 @@
 from django.db import models
-from django.contrib import admin
-from django.contrib.auth.models import Group, User
-from django.contrib.auth.decorators import user_passes_test
-from django.contrib.postgres.fields import JSONField
+from django.contrib.auth.models import User
 
 
 class ResearchGroup(models.Model):
@@ -45,7 +42,7 @@ class Record(models.Model):
     """
     uri = models.CharField(max_length=200, blank=True)
     collection = models.ManyToManyField(Collection)
-    content = JSONField(dict)
+    content = models.JSONField(dict)
 
     def __str__(self):
         return self.uri
@@ -60,7 +57,7 @@ class Annotation(models.Model):
     but multiple groups can add annotations."""
     record = models.ForeignKey(Record, on_delete=models.CASCADE)
     managing_group = models.ForeignKey(ResearchGroup, on_delete=models.CASCADE)
-    content = JSONField(dict)
+    content = models.JSONField(dict)
 
     def __str__(self):
         return '{} ({})'.format(self.record.uri, self.managing_group.name)
