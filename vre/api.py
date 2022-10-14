@@ -48,7 +48,7 @@ class ListMineMixin(object):
     that belong to a research group of the current user.
     """
 
-    @action(detail=True)
+    @action(detail=False)
     def mine(self, request):
         # get_queryset takes care of the reduced queryset
         return self.list(request)
