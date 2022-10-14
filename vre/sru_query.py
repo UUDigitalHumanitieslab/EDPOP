@@ -1,5 +1,4 @@
 import requests
-import os
 import csv
 
 from bs4 import BeautifulSoup
@@ -7,11 +6,8 @@ from bs4 import BeautifulSoup
 from django.conf import settings
 
 HPB_URI = 'http://hpb.cerl.org/record/{}'
-READABLE_FIELDS_FILE = os.path.join(
-    settings.BASE_DIR,
-    "vre",
-    "M21_readable_fields.csv",
-)
+READABLE_FIELDS_FILE = settings.BASE_DIR / 'vre' \
+    / "M21_readable_fields.csv"
 
 
 def sru_explain(url_string):
