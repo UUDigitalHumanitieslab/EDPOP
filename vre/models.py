@@ -51,17 +51,9 @@ class Record(models.Model):
         return self.uri
 
 
-'''
-class AnnotationAdmin(admin.modelAdmin):
-    """ set permissions to edit annotations """
-    # each group sharing the same record has their own annotation
-    # they can see, but not edit other groups' annotations
-    pass
-'''
-
 class Annotation(models.Model):
-    """ Import the fields of a given record, and stores annotations to its fields,
-    as well as extra information.
+    """ Import the fields of a given record, and stores annotations to its
+    fields, as well as extra information.
     An annotation is related to exactly one record.
     One record can have multiple annotations.
     An annotation is also linked to exactly one research group,
