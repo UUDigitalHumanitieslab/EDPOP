@@ -14,7 +14,7 @@ django==2.0.13
     # via -r requirements.in
 django-filter==2.2.0
     # via -r requirements.in
-django-json-widget==0.1.1
+django-json-widget==1.1.1
     # via -r requirements.in
 djangorestframework==3.11.2
     # via -r requirements.in
