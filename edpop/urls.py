@@ -18,9 +18,9 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 
 urlpatterns = [
-    url(r'^$', auth_views.LoginView, name='login'),
+    url(r'^$', auth_views.LoginView.as_view(), name='login'),
     url(r'^vre/', include('vre.urls')),
     url(r'^admin/', admin.site.urls),
-    url(r'^login/$', auth_views.LoginView, name='login'),
-    url(r'^logout/$', auth_views.LogoutView, name='logout'),
+    url(r'^login/$', auth_views.LoginView.as_view(), name='login'),
+    url(r'^logout/$', auth_views.LogoutView.as_view(), name='logout'),
 ]
