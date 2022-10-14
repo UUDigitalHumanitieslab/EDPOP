@@ -10,7 +10,7 @@ certifi==2017.11.5
     # via requests
 chardet==3.0.4
     # via requests
-django==3.2.16
+django==4.0.8
     # via -r requirements.in
 django-filter==22.1
     # via -r requirements.in
