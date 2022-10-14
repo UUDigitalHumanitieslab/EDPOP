@@ -2,7 +2,7 @@ django
 django-json-widget
 django-filter
 djangorestframework
-psycopg2>=2.8,<2.9
+psycopg2
 requests
 lxml
 beautifulsoup4
