@@ -20,9 +20,9 @@ def index(request, database_id=None):
     prefetched_groups = ResearchGroupSerializer(all_groups, many=True)
     response_dict = {
         'prefetched_collections':
-            JSONRenderer().render(prefetched_collections.data),
+            JSONRenderer().render(prefetched_collections.data).decode(),
         'prefetched_groups':
-            JSONRenderer().render(prefetched_groups.data)
+            JSONRenderer().render(prefetched_groups.data).decode()
     }
     if database_id:
         response_dict['id'] = database_id
