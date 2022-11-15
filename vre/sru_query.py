@@ -59,7 +59,7 @@ def translate_sru_response_to_dict(response_content):
             if datafield:
                 subfields = datafield.find_all('subfield')
                 if len(subfields)>1:
-                    datafields[description] = " ; ".join([sub.string for sub in subfields])
+                    datafields[description] = " ; ".join(filter(None, [sub.string for sub in subfields]))
                 else:
                     datafields[description] = datafield.subfield.string
         result['uri'] = uri
