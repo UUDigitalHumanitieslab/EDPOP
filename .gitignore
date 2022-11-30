@@ -1,1 +1,17 @@
+# PyCharm folders
+.idea/
+
+# Virtual environment
+ENV/
+
+# node
+node_modules
+package-lock.json
+
 db*
+*__pycache*
+*-debug.log
+
+# build output
+/build
+/vre/static/vre/bundle.js

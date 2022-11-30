@@ -25,19 +25,31 @@ SECRET_KEY = '(0vb2e%m!)ol05+c)l$u99d)5cw!_d89$45bvz$ynu1(uh404f'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# Dummy caching for development mode so we don't need to empty our
+# cache every time.
+# https://docs.djangoproject.com/en/1.11/topics/cache/#dummy-caching-for-development
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+    }
+}
+
 ALLOWED_HOSTS = []
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    'vre.apps.VreConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_json_widget',
+    'django_filters',
+    'rest_framework',
+    'vre.apps.VreConfig',
 ]
 
 MIDDLEWARE = [
@@ -55,7 +67,7 @@ ROOT_URLCONF = 'edpop.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [],#['./vre/templates/vre', './vre/templates/login'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -76,8 +88,12 @@ WSGI_APPLICATION = 'edpop.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'edpop',
+        'USER': 'edpopuser',
+        'PASSWORD': 'edpop',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
@@ -100,6 +116,17 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+LOGIN_REDIRECT_URL = '/vre'
+
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': (
+        'django_filters.rest_framework.DjangoFilterBackend',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+}
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
@@ -117,5 +144,7 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
-
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, "static"),
+)
 STATIC_URL = '/static/'
