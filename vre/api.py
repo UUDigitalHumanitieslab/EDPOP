@@ -11,7 +11,7 @@ from .serializers import *
 from .models import *
 from .sru_query import sru_query, translate_sru_response_to_dict
 
-HPB_SRU_URL = "http://sru.gbv.de/hpb"
+HPB_SRU_URL = "http://sru.k10plus.de/hpb"
 ERROR_MESSAGE_500 = (
     'The server doesn\'t feel too well right now. '
     'If the problem persists, please contact the maintainer.'
