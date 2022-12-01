@@ -41,7 +41,10 @@ def sru_query(url_string, query_string, startRecord=1):
         'startRecord': startRecord
     }
     payload['query'] = query_string
-    response = requests.get(url_string, params=payload)
+    try:
+        response = requests.get(url_string, params=payload, timeout=2)
+    except requests.ReadTimeout:
+        raise SRUError('SRU server timeout')
     logger.info('Performed SRU query {}'.format(response.request.url))
     # the requests library guesses 'ISO-8859-1' but it really is 'UTF-8'
     response.encoding = 'UTF-8'
