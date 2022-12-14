@@ -2,6 +2,7 @@ import requests
 import os
 import csv
 import logging
+import re
 
 from bs4 import BeautifulSoup
 
@@ -42,7 +43,7 @@ def sru_query(url_string, query_string, startRecord=1):
     }
     payload['query'] = query_string
     try:
-        response = requests.get(url_string, params=payload, timeout=2)
+        response = requests.get(url_string, params=payload, timeout=3)
     except (requests.ReadTimeout, requests.ConnectTimeout):
         raise SRUError('SRU server timeout')
     logger.info('Performed SRU query {}'.format(response.request.url))
@@ -63,10 +64,12 @@ def translate_sru_response_to_dict(response_content):
         raise SRUError(diagnostic.string)
     records = soup.find_all('record')
     try:
-        total_results = int(soup.find('zs:numberofrecords').string)
+        total_results = int(soup.find(
+            re.compile('^[a-z]+:numberofrecords$')
+        ).string)
     except AttributeError:
         # zs:numberofrecords tag not found; an error has occurred
-        raise SRUError('Response does not contain zs:numberofrecords tag')
+        raise SRUError('Response does not contain numberofrecords tag')
     record_list = []
     for record in records:
         result = {}
