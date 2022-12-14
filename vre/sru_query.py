@@ -50,6 +50,7 @@ def sru_query(url_string, query_string, startRecord=1, sru_version='1.1'):
 
 def translate_sru_response_to_dict(response_content):
     logger.info('Translating SRU response to dict')
+    logger.info('SRU response:\n{}'.format(str(response_content)))
     translationDictionary = load_translation_dictionary()
     soup = BeautifulSoup(response_content, 'lxml')
     diagnostic = soup.find('diag:message')
