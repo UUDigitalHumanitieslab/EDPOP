@@ -28,7 +28,7 @@ def sru_explain(url_string):
     return response
 
 
-def sru_query(url_string, query_string, startRecord=1):
+def sru_query(url_string, query_string, startRecord=1, sru_version='1.1'):
     ''' given the url of a resource to query, and the query string,
     return a requests object with the server's response.
     '''
@@ -37,7 +37,7 @@ def sru_query(url_string, query_string, startRecord=1):
     payload = {
         'recordPacking': 'xml',
         'operation': 'searchRetrieve',
-        'version': '1.1',
+        'version': sru_version,
         'maximumRecords': 15,
         'startRecord': startRecord
     }
