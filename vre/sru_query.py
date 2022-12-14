@@ -53,6 +53,7 @@ def sru_query(url_string, query_string, startRecord=1, sru_version='1.1'):
 
 
 def translate_sru_response_to_dict(response_content):
+    logger.info('Translating SRU response to dict')
     translationDictionary = load_translation_dictionary()
     soup = BeautifulSoup(response_content, 'lxml')
     diagnostic = soup.find('diag:message')
@@ -91,6 +92,7 @@ def translate_sru_response_to_dict(response_content):
         result['content'] = datafields
         record_list.append(result)
     result_info = {'total_results': total_results, 'result_list': record_list}
+    logger.info('Done translating SRU response to dict')
     return result_info
 
 
