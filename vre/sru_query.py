@@ -57,7 +57,9 @@ def translate_sru_response_to_dict(response_content):
     logger.info('SRU response type: ' + str(type(response_content)))
     logger.info('SRU response:\n{}'.format(response_content[:500]))
     translationDictionary = load_translation_dictionary()
+    logger.info('Creating BeautifulSoup object')
     soup = BeautifulSoup(response_content, 'lxml')
+    logger.info('Done creating BeautifulSoup object')
     diagnostic = soup.find('diag:message')
     if diagnostic is not None:
         logger.debug(
@@ -65,7 +67,9 @@ def translate_sru_response_to_dict(response_content):
             .format(response_content)
         )
         raise SRUError(diagnostic.string)
+    logger.info('Finding all records')
     records = soup.find_all('record')
+    logger.info('Done finding all records')
     try:
         total_results = int(soup.find(
             re.compile('^[a-z]+:numberofrecords$')
@@ -74,7 +78,9 @@ def translate_sru_response_to_dict(response_content):
         # zs:numberofrecords tag not found; an error has occurred
         raise SRUError('Response does not contain numberofrecords tag')
     record_list = []
+    logger.info('Going through all records')
     for record in records:
+        logger.info('Going through a record')
         result = {}
         ids = record.find_all('datafield', tag='035')
         # for multiple fields with tag "035", select one which does not start with a bracket
