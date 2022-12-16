@@ -9,32 +9,7 @@ from rest_framework.renderers import JSONRenderer
 
 from .serializers import *
 from .models import *
-from .sru_query import sru_query, translate_sru_response_to_dict, SRUError
-
-# See for information about k10plus APIs:
-# https://wiki.k10plus.de/display/K10PLUS/Datenbanken
-SRU_INFO = {
-    'hpb': {
-        'url': 'http://sru.k10plus.de/hpb',
-        'transformer': (lambda x: x)
-    },
-    'vd16': {
-        'url': 'http://bvbr.bib-bvb.de:5661/bvb01sru',
-        'transformer': (lambda x: 'VD16 and ({})'.format(x))
-    },
-    'vd17': {
-        'url': 'http://sru.k10plus.de/vd17',
-        'transformer': (lambda x: x)
-    },
-    'vd18': {
-        'url': 'http://sru.k10plus.de/vd18',
-        'transformer': (lambda x: x)
-    },
-    'gallica': {
-        'url': 'https://gallica.bnf.fr/SRU',
-        'transformer': (lambda x: 'gallica all ' + x)
-    }
-}
+from .sru_query import SRUError, sru_fetch, SRU_INFO
 
 ERROR_MESSAGE_500 = (
     'The server doesn\'t feel too well right now. '
@@ -158,17 +133,11 @@ class SearchViewSet(ViewSetMixin, APIView):
             startRecord = 1
         search_source = request.query_params.get('source')
         if search_source in SRU_INFO:
-            url_string = SRU_INFO[search_source]['url']
-            transformer = SRU_INFO[search_source]['transformer']
-            searchterm_transformed = transformer(searchterm)
             try:
-                search_result = sru_query(
-                    url_string,
-                    searchterm_transformed,
-                    startRecord=startRecord
-                )
-                result_info = translate_sru_response_to_dict(
-                    search_result.text
+                result_info = sru_fetch(
+                    search_source,
+                    searchterm,
+                    start_record=startRecord
                 )
             except SRUError as err:
                 return Response(
