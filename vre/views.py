@@ -7,7 +7,6 @@ from django.shortcuts import get_object_or_404, render, render_to_response
 from django.core import serializers
 from rest_framework.renderers import JSONRenderer
 
-from .sru_query import sru_query, translate_sru_response_to_dict
 from .models import Record, ResearchGroup, Collection
 from .serializers import CollectionSerializer, ResearchGroupSerializer
 
