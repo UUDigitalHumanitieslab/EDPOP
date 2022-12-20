@@ -169,7 +169,7 @@ def sru_fetch(database: str, query_string: str, start_record: int) -> dict:
             maximum_records=RECORDS_PER_PAGE,
             sru_version=SRU_INFO[database]['version']
         )
-    except sruthi.errors.SruError as err:
+    except (sruthi.errors.SruError, sruthi.errors.SruthiError) as err:
         raise SRUError(str(err))
     except TypeError as err:
         # This seems to be a bug in sruthi
