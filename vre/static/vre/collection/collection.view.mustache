@@ -1,0 +1,7 @@
+<label for="collection-select">
+    Choose collections:
+    <select name="collections" multiple="multiple" style="width: 100%;" id="collection-select-{{cid}}">
+        {{#models}}<option value={{id}}>{{description}}</option>{{/models}}
+    </select>
+</label>
+<button class="btn btn-primary disabled" type="submit">Add</button>
