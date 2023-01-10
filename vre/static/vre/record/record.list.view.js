@@ -1,6 +1,7 @@
 import { LazyTemplateView } from '../utils/lazy.template.view';
 import { VRECollectionView } from '../collection/collection.view';
-import { SelectAllView, RecordListItemView } from './record.list.item.view';
+import { SelectAllView } from './select-all.view';
+import { RecordListItemView } from './record.list.item.view';
 import { GlobalVariables } from '../globals/variables';
 
 export var RecordListView = LazyTemplateView.extend({
