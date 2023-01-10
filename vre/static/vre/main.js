@@ -1,7 +1,6 @@
 import _ from 'lodash';
 import $ from 'jquery';
 import Backbone from 'backbone';
-import Handlebars from 'handlebars';
 import { Records } from './record/record.model';
 import { RecordListView } from './record/record.list.view';
 import { RecordDetailView } from './record/record.detail.view';
@@ -16,7 +15,6 @@ import { SearchView } from './search/search.view';
 import { AdvancedSearchView } from './search/advanced.search.view';
 import { SelectDatabaseView } from './database/select-db.view';
 import { addCSRFToken } from './utils/generic-functions';
-import { JST } from './globals/templates';
 import { GlobalVariables } from './globals/variables';
 
 
@@ -80,10 +78,6 @@ function prepareCollectionViews() {
 
 
 $(function() {
-    $('script[type="text/x-handlebars-template"]').each(function(i, element) {
-        var $el = $(element);
-        JST[$el.prop('id')] = Handlebars.compile($el.html(), {compat: true});
-    });
     $('#result-detail').modal({show: false});
     GlobalVariables.myCollections.reset(prefetchedCollections);
     GlobalVariables.allGroups.reset(prefetchedGroups);
