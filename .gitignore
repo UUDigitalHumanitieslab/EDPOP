@@ -15,3 +15,4 @@ db*
 # build output
 /build
 /vre/static/vre/bundle.js
+/vre/static/vre/bundle.js.map
