@@ -32,7 +32,9 @@ module.exports = function(config) {
     },
 
     browserify: {
-        transform: [['babelify', {
+        transform: [['hbsfy', {
+            extensions: 'mustache'
+        }], ['babelify', {
             presets: 'power-assert'
         }], ['browserify-shim', {
             jquery: 'global:$',
