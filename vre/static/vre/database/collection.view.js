@@ -1,8 +1,9 @@
-import { LazyTemplateView } from '../utils/lazy.template.view';
+import { View } from 'backbone';
+import collectionTemplate from './collection.view.mustache';
 
-export var CollectionView = LazyTemplateView.extend({
-    templateName:"collection-view",
-    id:"content",
+export var CollectionView = View.extend({
+    template: collectionTemplate,
+    id: 'content',
     initialize: function() {
         this.render();
     },

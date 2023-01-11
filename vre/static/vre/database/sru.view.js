@@ -1,7 +1,8 @@
-import { LazyTemplateView } from '../utils/lazy.template.view';
+import { View } from 'backbone';
+import sruTemplate from './sru.view.mustache';
 
-export var SRUView = LazyTemplateView.extend({
-    templateName:"sru-view",
+export var SRUView = View.extend({
+    template: sruTemplate,
     id: "content",
     initialize: function() {
         this.render();

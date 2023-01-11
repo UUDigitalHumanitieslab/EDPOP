@@ -1,12 +1,13 @@
-import { LazyTemplateView } from '../utils/lazy.template.view';
+import { View } from 'backbone';
 import { VRECollectionView } from '../collection/collection.view';
 import { SelectAllView } from './select-all.view';
 import { RecordListItemView } from './record.list.item.view';
 import { GlobalVariables } from '../globals/variables';
+import recordListTemplate from './record.list.view.mustache';
 
-export var RecordListView = LazyTemplateView.extend({
+export var RecordListView = View.extend({
     tagName: 'form',
-    templateName: 'record-list',
+    template: recordListTemplate,
     events: {
         'submit': function(event) {
         	event.preventDefault();

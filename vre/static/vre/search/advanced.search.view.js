@@ -1,7 +1,8 @@
-import { LazyTemplateView } from '../utils/lazy.template.view';
+import { View } from 'backbone';
+import advancedSearchTemplate from './advanced.search.view.mustache';
 
-export var AdvancedSearchView = LazyTemplateView.extend({
-    templateName: 'hpb-search-info',
+export var AdvancedSearchView = View.extend({
+    template: advancedSearchTemplate,
     events: {
         'click a': 'fill',
     },

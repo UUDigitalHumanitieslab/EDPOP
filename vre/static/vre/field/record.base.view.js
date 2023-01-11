@@ -1,6 +1,7 @@
 import _ from 'lodash';
-import { LazyTemplateView } from '../utils/lazy.template.view';
+import Backbone from 'backbone';
 import { FieldView } from './field.view';
+import fieldListTemplate from './record.base.view.mustache';
 
 // Allow prototype property access in the Handlebars runtime (needed as of 4.6).
 // This setting should be safe because it doesn't allow `.constructor`.
@@ -9,8 +10,8 @@ var templateOptions = {
     allowProtoPropertiesByDefault: true,
 };
 
-export var RecordFieldsBaseView = LazyTemplateView.extend({
-    templateName: 'field-list',
+export var RecordFieldsBaseView = Backbone.View.extend({
+    template: fieldListTemplate,
     initialize: function(options) {
         this.rows = this.collection.map(this.createRow.bind(this));
         this.listenTo(this.collection, 'add', this.insertRow);

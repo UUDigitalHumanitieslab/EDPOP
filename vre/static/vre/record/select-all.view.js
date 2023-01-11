@@ -1,8 +1,9 @@
 import { SelectableView } from '../utils/selectable.view';
+import selectAllTemplate from './select-all.view.mustache';
 
 export var SelectAllView = SelectableView.extend({
     className: 'checkbox',
-    templateName: 'select-all-view',
+    template: selectAllTemplate,
     events: {
         'change input': 'toggle',
     },

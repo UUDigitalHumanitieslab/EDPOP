@@ -1,11 +1,12 @@
-import { LazyTemplateView } from '../utils/lazy.template.view';
+import { View } from 'backbone';
+import fieldTemplate from './field.view.mustache';
 
 /**
  * Displays a single model from a FlatFields or FlatAnnotations collection.
  */
-export var FieldView = LazyTemplateView.extend({
+export var FieldView = View.extend({
     tagName: 'tr',
-    templateName: 'field-list-item',
+    template: fieldTemplate,
     events: {
         'click': 'edit',
     },

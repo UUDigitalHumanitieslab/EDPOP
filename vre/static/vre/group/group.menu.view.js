@@ -1,10 +1,11 @@
-import { LazyTemplateView } from '../utils/lazy.template.view';
+import { View } from 'backbone';
 
 import { GroupMenuItemView } from './group.menu.item.view';
+import groupMenuTemplate from './group.menu.view.mustache';
 
-export var GroupMenuView = LazyTemplateView.extend({
+export var GroupMenuView = View.extend({
     el: '#vre-group-menu',
-    templateName: 'group-menu-header',
+    template: groupMenuTemplate,
     initialize: function(options) {
         this.$header = this.$('.dropdown-toggle');
         this.$list = this.$('.dropdown-menu');

@@ -1,4 +1,4 @@
-import { LazyTemplateView } from '../utils/lazy.template.view';
+import Backbone from 'backbone';
 
 /**
  * Common base for views that provide behaviour revolving around a
@@ -6,7 +6,7 @@ import { LazyTemplateView } from '../utils/lazy.template.view';
  * method to the right checkbox and set `this.$checkbox` in the
  * `render` method.
  */
-export var SelectableView = LazyTemplateView.extend({
+export var SelectableView = Backbone.View.extend({
     toggle: function(event) {
         // The assignment in the if condition is on purpose (assign + check).
         event.preventDefault();

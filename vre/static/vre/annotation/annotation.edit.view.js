@@ -1,10 +1,11 @@
-import { LazyTemplateView } from '../utils/lazy.template.view';
-import { JST } from '../globals/templates';
+import { View } from 'backbone';
+import annotationEditTemplate from './annotation.edit.view.mustache';
+import confirmDeletionTemplate from './annotation.confirm.deletion.mustache';
 
-export var AnnotationEditView = LazyTemplateView.extend({
+export var AnnotationEditView = View.extend({
     tagName: 'tr',
     className: 'form-inline',
-    templateName: 'field-list-item-edit',
+    template: annotationEditTemplate,
     events: {
         'submit': 'submit',
         'reset': 'reset',
@@ -13,7 +14,7 @@ export var AnnotationEditView = LazyTemplateView.extend({
         _.assign(this, _.pick(options, ['existing']));
         this.$el.popover({
              container: 'body',
-             content: JST['annotation-confirm-deletion'](this),
+             content: confirmDeletionTemplate(this),
              html: true,
              placement: 'auto top',
              selector: 'button[aria-label="Delete"]',

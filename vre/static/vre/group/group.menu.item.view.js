@@ -1,8 +1,9 @@
-import { LazyTemplateView } from '../utils/lazy.template.view'
+import { View } from 'backbone';
+import groupMenuItemTemplate from './group.menu.item.view.mustache';
 
-export var GroupMenuItemView = LazyTemplateView.extend({
+export var GroupMenuItemView = View.extend({
     tagName: 'li',
-    templateName: 'group-menu-item',
+    template: groupMenuItemTemplate,
     events: {
         'click': 'select',
     },

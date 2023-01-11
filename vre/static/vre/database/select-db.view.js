@@ -1,8 +1,8 @@
 import Backbone from 'backbone';
-import { LazyTemplateView } from '../utils/lazy.template.view';
+import selectDBTemplate from './select-db.view.mustache';
 
-export var SelectDatabaseView = LazyTemplateView.extend({
-    templateName: 'database-menu',
+export var SelectDatabaseView = Backbone.View.extend({
+    template: selectDBTemplate,
     tagName: 'li',
     className: 'dropdown',
     events: {

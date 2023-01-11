@@ -1,10 +1,11 @@
 import _ from 'lodash';
 import { GlobalVariables } from '../globals/variables';
 import { SelectableView } from '../utils/selectable.view';
+import recordListItemTemplate from './record.list.item.view.mustache';
 
 export var RecordListItemView = SelectableView.extend({
     tagName: 'tr',
-    templateName: 'record-list-item',
+    template: recordListItemTemplate,
     events: {
         'change input': 'toggle',
         'click a': 'display',

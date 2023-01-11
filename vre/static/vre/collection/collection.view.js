@@ -1,11 +1,11 @@
-import { LazyTemplateView } from '../utils/lazy.template.view';
+import { View } from 'backbone';
 import { AlertView } from '../alert/alert.view';
 import { AdditionsToCollections } from '../additions/additions-to-collections';
 import { GlobalVariables } from '../globals/variables';
+import collectionTemplate from './collection.view.mustache';
 
-
-export var VRECollectionView = LazyTemplateView.extend({
-    templateName: 'collection-selector',
+export var VRECollectionView = View.extend({
+    template: collectionTemplate,
     events: {
         'click button': 'submitForm',
         'change select': 'activateButton',
