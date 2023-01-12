@@ -18,6 +18,7 @@ module.exports = function(config) {
         'node_modules/popper.js/dist/umd/popper.js',
         'node_modules/bootstrap/dist/js/bootstrap.js',
         'node_modules/select2/dist/js/select2.js',
+        'node_modules/backbone/backbone.js',
         'vre/static/vre/**/*.test.js'
     ],
 
@@ -32,13 +33,16 @@ module.exports = function(config) {
     },
 
     browserify: {
-        transform: [['hbsfy', {
-            extensions: 'mustache'
-        }], ['babelify', {
+        transform: [['babelify', {
             presets: 'power-assert'
-        }], ['browserify-shim', {
-            jquery: 'global:$',
-            lodash: 'global:_'
+        }], ['exposify', {
+            expose: {
+                jquery: 'jQuery',
+                lodash: '_',
+                backbone: 'Backbone'
+            }
+        }], ['hbsfy', {
+            extensions: 'mustache'
         }]]
     },
 
