@@ -16,6 +16,7 @@ export var AnnotationEditView = View.extend({
              container: 'body',
              content: confirmDeletionTemplate(this),
              html: true,
+             sanitize: false,
              placement: 'auto top',
              selector: 'button[aria-label="Delete"]',
              title: 'Really delete?',
