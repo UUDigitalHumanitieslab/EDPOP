@@ -11,7 +11,7 @@ export var FieldView = View.extend({
         'click': 'edit',
     },
     initialize: function(options) {
-        this.listenTo(this.model, 'change:value', this.render);
+        this.render().listenTo(this.model, 'change:value', this.render);
     },
     render: function() {
         this.$el.html(this.template(this.model.attributes));

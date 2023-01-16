@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import { map } from 'lodash';
 import Backbone from 'backbone';
 import { FieldView } from './field.view';
 import fieldListTemplate from './record.base.view.mustache';
@@ -24,7 +24,7 @@ export var RecordFieldsBaseView = Backbone.View.extend({
     insertRow: function(model) {
         var row = this.createRow(model),
             rows = this.rows,
-            el = row.render().el,
+            el = row.el,
             index = this.collection.indexOf(model);
         if (index >= rows.length) {
             rows.push(row);
@@ -37,7 +37,7 @@ export var RecordFieldsBaseView = Backbone.View.extend({
     render: function() {
         this.$el.html(this.template(this, templateOptions));
         this.$tbody = this.$('tbody');
-        this.$tbody.append(_(this.rows).invokeMap('render').map('el').value());
+        this.$tbody.append(map(this.rows, 'el'));
         return this;
     },
 });

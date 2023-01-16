@@ -11,7 +11,7 @@ describe('FieldView', function() {
             value: 'green',
             group: 'me, myself and I',
         });
-        this.view = new FieldView({model: this.model}).render();
+        this.view = new FieldView({model: this.model});
     });
 
     afterEach(function() {
