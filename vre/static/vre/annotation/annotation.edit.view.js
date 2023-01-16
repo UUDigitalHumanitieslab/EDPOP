@@ -13,25 +13,25 @@ export var AnnotationEditView = View.extend({
     initialize: function(options) {
         _.assign(this, _.pick(options, ['existing']));
         this.$el.popover({
-             container: 'body',
-             content: confirmDeletionTemplate(this),
-             html: true,
-             sanitize: false,
-             placement: 'auto top',
-             selector: 'button[aria-label="Delete"]',
-             title: 'Really delete?',
-         });
-         var confirmSelector = '#confirm-delete-' + this.cid;
-         this.trashConfirmer = $('body').one(
-             'submit',
-             confirmSelector,
-             this.reallyTrash.bind(this)
-         );
-         this.trashCanceller = $('body').on(
-             'reset',
-             confirmSelector,
-             this.cancelTrash.bind(this),
-         );
+            container: 'body',
+            content: confirmDeletionTemplate(this),
+            html: true,
+            sanitize: false,
+            placement: 'auto top',
+            selector: 'button[aria-label="Delete"]',
+            title: 'Really delete?',
+        });
+        var confirmSelector = '#confirm-delete-' + this.cid;
+        this.trashConfirmer = $('body').one(
+            'submit',
+            confirmSelector,
+            this.reallyTrash.bind(this)
+        );
+        this.trashCanceller = $('body').on(
+            'reset',
+            confirmSelector,
+            this.cancelTrash.bind(this),
+        );
     },
     render: function() {
         this.$el.html(this.template(
@@ -58,7 +58,7 @@ export var AnnotationEditView = View.extend({
         this.trigger('cancel', this);
     },
     cancelTrash: function(event) {
-         $(event.target).parents('.popover').popover('hide');
+        $(event.target).parents('.popover').popover('hide');
     },
     reallyTrash: function(event) {
         event.preventDefault();
