@@ -33,6 +33,7 @@ module.exports = function(config) {
     },
 
     browserify: {
+        debug: true,
         transform: [['babelify', {
             presets: 'power-assert'
         }], ['exposify', {
