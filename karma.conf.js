@@ -43,7 +43,10 @@ module.exports = function(config) {
                 backbone: 'Backbone'
             }
         }], ['hbsfy', {
-            extensions: 'mustache'
+            extensions: 'mustache',
+            precompilerOptions: {
+                compat: true
+            }
         }]]
     },
 
