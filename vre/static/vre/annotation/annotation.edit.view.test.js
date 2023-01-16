@@ -12,7 +12,7 @@ describe('AnnotationEditView', function() {
     });
 
     afterEach(function() {
-        this.view.remove().$el.popover('destroy');
+        this.view.remove();
     });
 
     it('renders with two inputs and some buttons', function() {

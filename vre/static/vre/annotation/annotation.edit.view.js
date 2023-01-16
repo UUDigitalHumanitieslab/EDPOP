@@ -22,7 +22,11 @@ export var AnnotationEditView = View.extend({
              title: 'Really delete?',
          });
          var confirmSelector = '#confirm-delete-' + this.cid;
-         $('body').one('submit', confirmSelector, this.reallyTrash.bind(this));
+         this.trashConfirmer = $('body').one(
+             'submit',
+             confirmSelector,
+             this.reallyTrash.bind(this)
+         );
          this.trashCanceller = $('body').on(
              'reset',
              confirmSelector,
@@ -34,6 +38,12 @@ export var AnnotationEditView = View.extend({
             _.extend({cid: this.cid}, this.model.attributes)
         ));
         return this;
+    },
+    remove: function() {
+        this.$el.popover('destroy');
+        this.trashConfirmer.off();
+        this.trashCanceller.off();
+        return View.prototype.remove.call(this);
     },
     submit: function(event) {
         event.preventDefault();
@@ -52,8 +62,7 @@ export var AnnotationEditView = View.extend({
     },
     reallyTrash: function(event) {
         event.preventDefault();
-        $(event.target).parents('.popover').popover('destroy');
-        this.trashCanceller.off();
+        $(event.target).parents('.popover').popover('hide');
         this.trigger('trash', this);
     },
 });
