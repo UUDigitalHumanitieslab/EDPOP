@@ -9,7 +9,7 @@ module.exports = function(config) {
 
     // frameworks to use
     // available frameworks: https://www.npmjs.com/search?q=keywords:karma-adapter
-    frameworks: ['browserify', 'mocha', 'power-assert'],
+    frameworks: ['mocha', 'power-assert'],
 
     // list of files / patterns to load in the browser
     files: [
@@ -19,7 +19,7 @@ module.exports = function(config) {
         'node_modules/bootstrap/dist/js/bootstrap.js',
         'node_modules/select2/dist/js/select2.js',
         'node_modules/backbone/backbone.js',
-        'vre/static/vre/**/*.test.js'
+        'vre/static/vre/test-index.js'
     ],
 
     // list of files / patterns to exclude
@@ -29,25 +29,45 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://www.npmjs.com/search?q=keywords:karma-preprocessor
     preprocessors: {
-        'vre/static/vre/**/*.test.js': ['browserify']
+        'vre/static/vre/test-index.js': ['rollup']
     },
 
-    browserify: {
-        debug: true,
-        transform: [['babelify', {
-            presets: 'power-assert'
-        }], ['exposify', {
-            expose: {
+    rollupPreprocessor: {
+        external: [
+            'jquery',
+            'lodash',
+            'underscore',
+            'popper.js',
+            'bootstrap',
+            'select2',
+            'backbone',
+        ],
+        plugins: [
+            require('rollup-plugin-node-polyfills')(),
+            require('rollup-plugin-wontache')({precompile: true}),
+            require('rollup-plugin-glob-import')({format: 'import'}),
+            require('@rollup/plugin-json')(),
+            require('@rollup/plugin-node-resolve').default({
+                preferBuiltins: true,
+            }),
+            require('@rollup/plugin-commonjs')(),
+            require('@rollup/plugin-babel').default({
+                presets: ['power-assert'],
+                babelHelpers: 'bundled',
+            }),
+        ],
+        output: {
+            file: 'vre/static/vre/test-bundle.js',
+            name: 'test',
+            format: 'iife',
+            globals: {
                 jquery: 'jQuery',
                 lodash: '_',
-                backbone: 'Backbone'
-            }
-        }], ['hbsfy', {
-            extensions: 'mustache',
-            precompilerOptions: {
-                compat: true
-            }
-        }]]
+                underscore: '_',
+                backbone: 'Backbone',
+            },
+            sourcemap: 'inline',
+        },
     },
 
     // test results reporter to use

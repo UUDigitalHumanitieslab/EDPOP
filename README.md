@@ -41,12 +41,13 @@ Install the dependencies of the frontend via npm install.
 npm install
 ```
 
-Then, use browserify to package the modules into a bundle, and convert from ES6 to ES5 JavaScript with babelify. Watchify will watch for any changes and reconvert if needed, and the `debug` flag creates a source map.
+Then, use Rollup to package the modules into a bundle. Add the `-w` flag to watch for any changes and reconvert if needed.
+
 ```bash
-npx watchify vre/static/vre/main.js -o vre/static/vre/bundle.js -t babelify -t '[' exposify --expose '[' --jquery jQuery --lodash _ --backbone Backbone ']' ']' -t '[' hbsfy -e mustache --precompilerOptions '[' --compat ']' ']' --debug
+npx rollup -c
 ```
 
-It is necessary to reload the browser every time.
+It is necessary to refresh the browser every time.
 
 For deployment, copy the stable bundle.js in the vre/static/vre directory.
 
