@@ -3,13 +3,6 @@ import Backbone from 'backbone';
 import { FieldView } from './field.view';
 import fieldListTemplate from './record.base.view.mustache';
 
-// Allow prototype property access in the Handlebars runtime (needed as of 4.6).
-// This setting should be safe because it doesn't allow `.constructor`.
-// See also https://mahmoudsec.blogspot.com/2019/04/handlebars-template-injection-and-rce.html.
-var templateOptions = {
-    allowProtoPropertiesByDefault: true,
-};
-
 export var RecordFieldsBaseView = Backbone.View.extend({
     template: fieldListTemplate,
     initialize: function(options) {
@@ -35,7 +28,7 @@ export var RecordFieldsBaseView = Backbone.View.extend({
         }
     },
     render: function() {
-        this.$el.html(this.template(this, templateOptions));
+        this.$el.html(this.template(this));
         this.$tbody = this.$('tbody');
         this.$tbody.append(map(this.rows, 'el'));
         return this;
