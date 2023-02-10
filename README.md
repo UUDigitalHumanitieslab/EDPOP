@@ -50,7 +50,3 @@ npx rollup -c
 It is necessary to refresh the browser every time.
 
 For deployment, copy the stable bundle.js in the vre/static/vre directory.
-
-## Gulpfile
-This is work in progress and doesn't work yet. Therefore the dependencies in this file have been removed from package.json for now. Eventually, the gulpfile might run more tasks, such as uglify and source maps, livereload and starting up python.
-
