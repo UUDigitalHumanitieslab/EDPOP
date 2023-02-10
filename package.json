@@ -4,8 +4,9 @@
   "description": "Creating a virtual research environment (VRE) from CERL resources.",
   "main": "main.js",
   "scripts": {
-    "build": "babel vre/static/vre -d build",
-    "watch": "babel vre/static/vre -w -d build"
+    "build": "rollup -c",
+    "watch": "rollup -cw",
+    "test": "karma start"
   },
   "repository": {
     "type": "git",

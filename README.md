@@ -41,12 +41,17 @@ Install the dependencies of the frontend via npm install.
 npm install
 ```
 
-Then, use Rollup to package the modules into a bundle. Add the `-w` flag to watch for any changes and reconvert if needed.
+Then, use Rollup to package the modules into a bundle.
 
 ```bash
-npx rollup -c
+# bundle once
+npm run build
+# OR bundle again on every change
+npm run watch
 ```
 
 It is necessary to refresh the browser every time.
 
 For deployment, copy the stable bundle.js in the vre/static/vre directory.
+
+Run the frontend tests by invoking `npm run test` and opening http://localhost:9876/ in a browser.
