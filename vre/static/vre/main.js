@@ -24,7 +24,6 @@ GlobalVariables.recordsList = new RecordListView({collection: GlobalVariables.re
 GlobalVariables.allGroups = new ResearchGroups();
 GlobalVariables.results = new SearchResults();
 GlobalVariables.searchView  = new SearchView({model: GlobalVariables.results});
-GlobalVariables.myCollections = new VRECollections();
 GlobalVariables.blankRecordButton = new BlankRecordButtonView();
 
 const SRUIDS = ['hpb', 'vd16', 'vd17', 'vd18', 'gallica', 'cerl-thesaurus'];
@@ -76,17 +75,22 @@ function prepareCollectionViews() {
     );
 }
 
+function startRouting() {
+    prepareCollectionViews();
+    Backbone.history.start({
+        pushState: true,
+        root: '/vre/',
+    });
+}
 
 $(function() {
     $('#result-detail').modal({show: false});
-    GlobalVariables.myCollections.reset(prefetchedCollections);
-    GlobalVariables.allGroups.reset(prefetchedGroups);
-    Backbone.history.start({
-        pushState: true,  // this enables matching the path of the URL hashchange
-        root: '/vre/',
-    });
+    GlobalVariables.myCollections = VRECollections.mine();
+    GlobalVariables.allGroups.fetch();
     var myGroups = ResearchGroups.mine();
     GlobalVariables.groupMenu = new GroupMenuView({collection: myGroups});
-    prepareCollectionViews();
-    var router = new VRERouter();
+    GlobalVariables.router = new VRERouter();
+    var finish = _.after(2, startRouting);
+    GlobalVariables.myCollections.on('update', finish);
+    GlobalVariables.allGroups.on('update', finish);
 });
