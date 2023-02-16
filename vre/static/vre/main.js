@@ -1,6 +1,8 @@
 import _ from 'lodash';
 import $ from 'jquery';
 import Backbone from 'backbone';
+import Cookies from 'jscookie';
+
 import { Records } from './record/record.model';
 import { RecordListView } from './record/record.list.view';
 import { RecordDetailView } from './record/record.detail.view';
@@ -66,31 +68,46 @@ var VRERouter = Backbone.Router.extend({
     },
 });
 
-function prepareCollectionViews() {
-    GlobalVariables.recordDetailModal = new RecordDetailView();
-    GlobalVariables.dropDown = new SelectDatabaseView({collection: GlobalVariables.myCollections});
-    $('.nav').first().append(
-        GlobalVariables.dropDown.el,
-        GlobalVariables.blankRecordButton.el,
-    );
-}
-
-function startRouting() {
-    prepareCollectionViews();
-    Backbone.history.start({
-        pushState: true,
-        root: '/vre/',
-    });
-}
-
-$(function() {
+// We want this code to run after two conditions are met:
+// 1. The DOM has fully loaded;
+// 2. the CSRF cookie has been obtained.
+function prepareCollections() {
     $('#result-detail').modal({show: false});
     GlobalVariables.myCollections = VRECollections.mine();
     GlobalVariables.allGroups.fetch();
     var myGroups = ResearchGroups.mine();
     GlobalVariables.groupMenu = new GroupMenuView({collection: myGroups});
     GlobalVariables.router = new VRERouter();
-    var finish = _.after(2, startRouting);
     GlobalVariables.myCollections.on('update', finish);
     GlobalVariables.allGroups.on('update', finish);
-});
+}
+
+// We want this code to run after prepareCollections has run and both
+// GlobalVariables.myCollections and GlobalVariables.allGroups have fully
+// loaded.
+function startRouting() {
+    GlobalVariables.recordDetailModal = new RecordDetailView();
+    GlobalVariables.dropDown = new SelectDatabaseView({collection: GlobalVariables.myCollections});
+    $('.nav').first().append(
+        GlobalVariables.dropDown.el,
+        GlobalVariables.blankRecordButton.el,
+    );
+    Backbone.history.start({
+        pushState: true,
+        root: '/vre/',
+    });
+}
+
+// _.after ensures that a function runs only after a given number of calls.
+var kickoff = _.after(2, prepareCollections);
+var finish = _.after(2, startRouting);
+
+// Ensure we have a CSRF cookie.
+if (Cookies.get('csrftoken')) {
+    kickoff();
+} else {
+    $.ajax({url: '/'}).then(kickoff);
+}
+
+// Ensure the DOM has fully loaded.
+$(kickoff);
