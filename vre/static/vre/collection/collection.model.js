@@ -23,7 +23,7 @@ export var VRECollection = APIModel.extend({
 });
 
 export var VRECollections = APICollection.extend({
-    url: '/vre/api/collections',
+    url: '/api/collections',
     model: VRECollection,
 }, {
     /**

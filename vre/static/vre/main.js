@@ -94,7 +94,7 @@ function startRouting() {
     );
     Backbone.history.start({
         pushState: true,
-        root: '/vre/',
+        root: '/',
     });
 }
 
@@ -106,7 +106,7 @@ var finish = _.after(2, startRouting);
 if (Cookies.get('csrftoken')) {
     kickoff();
 } else {
-    $.ajax({url: '/'}).then(kickoff);
+    $.ajax({url: '/login/'}).then(kickoff);
 }
 
 // Ensure the DOM has fully loaded.

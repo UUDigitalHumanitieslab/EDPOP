@@ -59,7 +59,7 @@ def test_add_single_record_preexisting(auth_client, records, collections):
         'records': [{'uri': record.uri, 'content': record.content}],
         'collections': [collection.pk]
     }
-    response = auth_client.post('/vre/api/add-selection/',
+    response = auth_client.post('/api/add-selection/',
         data=json.dumps(payload),
         content_type='application/json',
     )
@@ -78,7 +78,7 @@ def test_add_multi_record_multi_collection(auth_client, records, collections):
         'records': [{'uri': record1.uri, 'content': record1.content}, record2],
         'collections': [collection.pk for collection in collections.all()]
     }
-    response = auth_client.post('/vre/api/add-selection/',
+    response = auth_client.post('/api/add-selection/',
         data=json.dumps(payload),
         content_type='application/json',
     )

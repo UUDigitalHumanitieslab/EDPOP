@@ -2,7 +2,7 @@ import { APIModel, APICollection } from '../utils/api.model';
 import{ Annotations } from '../annotation/annotation.model';
 
 export var Record = APIModel.extend({
-    urlRoot: '/vre/api/records',
+    urlRoot: '/api/records',
     getAnnotations: function() {
         if (!this.annotations) {
             this.annotations = new Annotations();
@@ -15,6 +15,6 @@ export var Record = APIModel.extend({
 });
 
 export var Records = APICollection.extend({
-    url: '/vre/api/records',
+    url: '/api/records',
     model: Record,
 });

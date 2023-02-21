@@ -1,7 +1,7 @@
 import { APICollection } from '../utils/api.model';
 
 export var ResearchGroups = APICollection.extend({
-    url: '/vre/api/researchgroups',
+    url: '/api/researchgroups',
 }, {
     /**
      * Class method for retrieving only the research groups of the user.

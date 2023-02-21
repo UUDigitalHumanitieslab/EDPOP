@@ -4,7 +4,7 @@ import { canonicalSort } from '../utils/generic-functions';
 import { GlobalVariables } from '../globals/variables';
 
 export var Annotations = APICollection.extend({
-    url: '/vre/api/annotations',
+    url: '/api/annotations',
 });
 
 export var FlatAnnotations = APICollection.extend({
