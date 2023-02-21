@@ -8,7 +8,7 @@ var underscorePattern = /node_modules\/underscore($|\/)/;
 var extension = /.js$/;
 
 export default {
-    input: 'vre/static/vre/main.js',
+    input: 'vre/main.js',
     external: ['jquery', 'lodash', underscorePattern, 'backbone'],
     plugins: [
         wontache(),
@@ -16,7 +16,7 @@ export default {
         commonjs(),
     ],
     output: {
-        file: 'vre/static/vre/bundle.js',
+        file: 'vre/bundle.js',
         format: 'iife',
         globals(id) {
             switch (id) {

@@ -19,7 +19,7 @@ module.exports = function(config) {
         'node_modules/bootstrap/dist/js/bootstrap.js',
         'node_modules/select2/dist/js/select2.js',
         'node_modules/backbone/backbone.js',
-        'vre/static/vre/test-index.js'
+        'vre/test-index.js'
     ],
 
     // list of files / patterns to exclude
@@ -29,7 +29,7 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://www.npmjs.com/search?q=keywords:karma-preprocessor
     preprocessors: {
-        'vre/static/vre/test-index.js': ['rollup']
+        'vre/test-index.js': ['rollup']
     },
 
     rollupPreprocessor: {
@@ -57,7 +57,7 @@ module.exports = function(config) {
             }),
         ],
         output: {
-            file: 'vre/static/vre/test-bundle.js',
+            file: 'vre/test-bundle.js',
             name: 'test',
             format: 'iife',
             globals: {

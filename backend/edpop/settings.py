@@ -175,6 +175,6 @@ LOGGING = {
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 STATICFILES_DIRS = (
-    BASE_DIR / 'vre' / 'static',
+    BASE_DIR / '..' / 'frontend' / 'vre',
 )
 STATIC_URL = '/static/'

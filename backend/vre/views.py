@@ -8,5 +8,5 @@ HPB_SRU_URL = "http://sru.gbv.de/hpb"
 
 @login_required
 def index(request, database_id=None):
-    with open(finders.find('vre/index.html')) as index_file:
+    with open(finders.find('index.html')) as index_file:
         return HttpResponse(content=index_file)
