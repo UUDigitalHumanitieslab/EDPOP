@@ -29,6 +29,10 @@ export var AlertView = View.extend({
         this.$el.addClass(this.getLevelClass()).html(this.template(this));
         return this;
     },
+    remove: function() {
+        AlertView.__super__.remove.call(this);
+        this.trigger('removed', this);
+    },
     // Show and hide automatically, then execute `complete`.
     animate: function(complete) {
         var followUp = _.bind(this.animateOut, this, complete);
