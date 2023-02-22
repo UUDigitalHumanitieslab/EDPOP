@@ -44,7 +44,7 @@ export var SearchView = CompositeView.extend({
         this.alert = new AlertView({
             level: 'warning',
             message: failedSearchTemplate(response),
-        }).render().once('removed', this.deleteAlert, this);
+        }).once('removed', this.deleteAlert, this);
         this.placeSubviews();
         this.alert.animateIn();
     },

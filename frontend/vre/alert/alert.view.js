@@ -24,6 +24,7 @@ export var AlertView = View.extend({
     },
     initialize: function(options) {
         _.assign(this, _.pick(options, ['level', 'message', 'ease', 'delay']));
+        this.render();
     },
     render: function() {
         this.$el.addClass(this.getLevelClass()).html(this.template(this));
