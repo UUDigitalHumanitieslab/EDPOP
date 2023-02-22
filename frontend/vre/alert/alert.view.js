@@ -19,6 +19,9 @@ export var AlertView = View.extend({
     attributes: {
         role: 'alert',
     },
+    events: {
+        'click button': function() { this.animateOut('remove'); }
+    },
     initialize: function(options) {
         _.assign(this, _.pick(options, ['level', 'message', 'ease', 'delay']));
     },
