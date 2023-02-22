@@ -61,9 +61,9 @@ var VRERouter = Backbone.Router.extend({
             GlobalVariables.searchView.$el.appendTo(collectionView.$('.page-header'));
             $('#content').replaceWith(collectionView.$el);
             GlobalVariables.records = GlobalVariables.currentVRECollection.getRecords();
- 			      GlobalVariables.recordsList.remove();
+            GlobalVariables.recordsList.remove();
             GlobalVariables.recordsList = new RecordListView({collection: GlobalVariables.records});
-    		GlobalVariables.recordsList.render().$el.insertAfter($('.page-header'));
+            GlobalVariables.recordsList.render().$el.insertAfter($('.page-header'));
         }
     },
 });
