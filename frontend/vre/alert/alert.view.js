@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { View } from 'backbone';
 import alertTemplate from './alert.view.mustache';
 
