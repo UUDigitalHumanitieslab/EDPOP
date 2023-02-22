@@ -10,7 +10,7 @@ export var RecordListView = View.extend({
     template: recordListTemplate,
     events: {
         'submit': function(event) {
-        	event.preventDefault();
+            event.preventDefault();
             this.vreCollectionsSelect.submitForm(event);
         },
         'click #more-records': 'loadMore',
