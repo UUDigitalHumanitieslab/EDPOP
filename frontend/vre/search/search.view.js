@@ -1,15 +1,20 @@
-import Backbone from 'backbone';
+import { CompositeView } from 'backbone-fractal';
 import { AlertView } from '../alert/alert.view';
 import { GlobalVariables } from '../globals/variables';
 import searchViewTemplate from './search.view.mustache';
 import failedSearchTemplate from './failed.search.message.mustache';
 
-export var SearchView = Backbone.View.extend({
+export var SearchView = CompositeView.extend({
     template: searchViewTemplate,
     events: {
         'submit': 'firstSearch',
     },
-    render: function() {
+    subviews: [{
+        view: 'alert',
+        selector: '.page-header',
+        method: 'after',
+    }],
+    renderContainer: function() {
         this.$el.html(this.template());
         return this;
     },
@@ -23,23 +28,27 @@ export var SearchView = Backbone.View.extend({
     },
     submitSearch: function(startRecord) {
         this.showPending();
-        var myElement = this.el;
         var searchTerm = this.$('input').val();
-        var searchPromise = GlobalVariables.results.query(
-            {params:{search:searchTerm, source:this.source, startRecord:startRecord},
-            error: function(collection, response, options) {
-                console.log(response);
-                var alert = new AlertView({
-                    level: 'warning',
-                    message: failedSearchTemplate(response),
-                });
-                alert.render().$el.insertAfter('.page-header');
-                alert.animateIn();
+        var searchPromise = GlobalVariables.results.query({
+            params: {
+                search: searchTerm,
+                source: this.source,
+                startRecord: startRecord,
             },
+            error: _.bind(this.alertError, this),
         });
         searchPromise.always(this.showIdle.bind(this));
         return searchPromise;
     },
+    alertError: function(collection, response, options) {
+        this.alert = new AlertView({
+            level: 'warning',
+            message: failedSearchTemplate(response),
+        }).render().once('removed', this.deleteAlert, this);
+        this.placeSubviews();
+        this.alert.animateIn();
+    },
+    deleteAlert: function() { delete this.alert; },
     firstSearch: function(event){
         event.preventDefault();
         this.submitSearch(1).then(_.bind(function() {
