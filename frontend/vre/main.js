@@ -4,7 +4,7 @@ import Backbone from 'backbone';
 import Cookies from 'jscookie';
 
 import { Records } from './record/record.model';
-import { RecordListView } from './record/record.list.view';
+import { RecordListManagingView } from './record/record.list.managing.view';
 import { RecordDetailView } from './record/record.detail.view';
 import { BlankRecordButtonView } from './record/blank.record.button.view';
 import { VRECollections } from './collection/collection.model';
@@ -22,7 +22,6 @@ import { GlobalVariables } from './globals/variables';
 
 // Global variables
 GlobalVariables.records = new Records();
-GlobalVariables.recordsList = new RecordListView({collection: GlobalVariables.records});
 GlobalVariables.allGroups = new ResearchGroups();
 GlobalVariables.results = new SearchResults();
 GlobalVariables.searchView  = new SearchView({model: GlobalVariables.results});
@@ -62,7 +61,9 @@ var VRERouter = Backbone.Router.extend({
             $('#content').replaceWith(collectionView.$el);
             GlobalVariables.records = GlobalVariables.currentVRECollection.getRecords();
             GlobalVariables.recordsList.remove();
-            GlobalVariables.recordsList = new RecordListView({collection: GlobalVariables.records});
+            GlobalVariables.recordsList = new RecordListManagingView({
+                collection: GlobalVariables.records,
+            });
             GlobalVariables.recordsList.render().$el.insertAfter($('.page-header'));
         }
     },
@@ -74,6 +75,9 @@ var VRERouter = Backbone.Router.extend({
 function prepareCollections() {
     $('#result-detail').modal({show: false});
     GlobalVariables.myCollections = VRECollections.mine();
+    GlobalVariables.recordsList = new RecordListManagingView({
+        collection: GlobalVariables.records,
+    });
     GlobalVariables.allGroups.fetch();
     var myGroups = ResearchGroups.mine();
     GlobalVariables.groupMenu = new GroupMenuView({collection: myGroups});
