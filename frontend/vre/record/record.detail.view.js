@@ -30,7 +30,7 @@ export var RecordDetailView = View.extend({
         this.vreCollectionsSelect = new VRECollectionView({
             collection: GlobalVariables.myCollections,
             model: model,
-        }).setRecord(model).render();
+        });
         this.render();
     },
     render: function() {

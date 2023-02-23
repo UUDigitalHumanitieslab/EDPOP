@@ -10,15 +10,23 @@ export var VRECollectionView = View.extend({
         'click button': 'submitForm',
         'change select': 'activateButton',
     },
+    initialize: function() {
+        this.render();
+    },
     render: function() {
         var shownCollections = this.collection.clone();
         shownCollections.remove(GlobalVariables.currentVRECollection);
+        this.$('select').select2('destroy');
         this.$el.html(this.template({
             models: shownCollections.toJSON(),
             cid: this.cid,
         }));
         this.$('select').select2();
         return this;
+    },
+    remove: function() {
+        this.$('select').select2('destroy');
+        return VRECollectionView.__super__.remove.call(this);
     },
     setRecord: function(model) {
         this.model = model;
