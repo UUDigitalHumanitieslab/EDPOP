@@ -15,8 +15,8 @@ export var RecordDetailView = View.extend({
         'role': 'dialog',
     },
     events: {
-        'click #load_next': 'load',
-        'click #load_previous': 'load',
+        'click #load_next': 'next',
+        'click #load_previous': 'previous',
     },
     initialize: function(options) {
         var model = this.model;
@@ -61,11 +61,12 @@ export var RecordDetailView = View.extend({
         this.$el.modal('show');
         return this;
     },
-    load: function(event) {
+    next: function(event) {
         event.preventDefault();
-        var currentIndex = GlobalVariables.recordsList.collection.findIndex(this.model);
-        var nextIndex = event.target.id==='load_next'? currentIndex+1 : currentIndex-1;
-        var nextModel = GlobalVariables.recordsList.collection.at(nextIndex);
-        vreChannel.trigger('displayRecord', nextModel);
+        vreChannel.trigger('displayNextRecord');
+    },
+    previous: function(event) {
+        event.preventDefault();
+        vreChannel.trigger('displayPreviousRecord');
     },
 });

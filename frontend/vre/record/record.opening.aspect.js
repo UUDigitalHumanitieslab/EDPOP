@@ -16,4 +16,19 @@ function displayRecord(model) {
     currentModal.display();
 }
 
-vreChannel.on('displayRecord', displayRecord);
+function shift(direction) {
+    return function() {
+        if (!currentModal) return;
+        var model = currentModal.model;
+        var collection = model.collection;
+        var oldIndex = collection.indexOf(model);
+        var newIndex = oldIndex + direction;
+        displayRecord(collection.at(newIndex));
+    }
+}
+
+vreChannel.on({
+    displayRecord: displayRecord,
+    displayNextRecord: shift(+1),
+    displayPreviousRecord: shift(-1),
+});
