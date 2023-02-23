@@ -14,6 +14,7 @@ export var RecordListItemView = SelectableView.extend({
         if (!this.model.get('content').Title) {
             this.model.getAnnotations().once('sync', this.render, this);
         }
+        this.render();
     },
     render: function() {
         var data = this.model.toJSON();
