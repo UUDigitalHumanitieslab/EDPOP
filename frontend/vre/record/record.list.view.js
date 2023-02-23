@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { CollectionView } from 'backbone-fractal';
 import { RecordListItemView } from './record.list.item.view';
 import recordListTemplate from './record.list.view.mustache';
