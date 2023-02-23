@@ -7,6 +7,9 @@ export var SelectAllView = SelectableView.extend({
     events: {
         'change input': 'toggle',
     },
+    initialize: function() {
+        this.render();
+    },
     render: function() {
         this.$el.html(this.template({}));
         this.$checkbox = this.$('input');
