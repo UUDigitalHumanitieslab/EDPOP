@@ -28,7 +28,8 @@ export var RecordListManagingView = CompositeView.extend({
             collection: GlobalVariables.myCollections
         }).render();
         this.recordListView = new RecordListView({collection: this.collection});
-        this.render().listenTo(this.collection, {complete: this.showSelectAll});
+        this.selectAllView = new SelectAllView();
+        this.render().bindSelectAll();
     },
 
     renderContainer: function() {
@@ -40,8 +41,8 @@ export var RecordListManagingView = CompositeView.extend({
         GlobalVariables.searchView.nextSearch(event);
     },
 
-    showSelectAll: function() {
-        var selectAllView = this.selectAllView = new SelectAllView();
+    bindSelectAll: function() {
+        var selectAllView = this.selectAllView;
         var recordListView = this.recordListView;
         selectAllView.on({
             check: recordListView.checkAll,
@@ -51,6 +52,5 @@ export var RecordListManagingView = CompositeView.extend({
             allChecked: selectAllView.check,
             notAllChecked: selectAllView.uncheck,
         }, selectAllView);
-        this.placeSubviews();
     },
 });
