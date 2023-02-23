@@ -3,9 +3,9 @@ import $ from 'jquery';
 import Backbone from 'backbone';
 import Cookies from 'jscookie';
 
+import './record/record.opening.aspect';
 import { Records } from './record/record.model';
 import { RecordListManagingView } from './record/record.list.managing.view';
-import { RecordDetailView } from './record/record.detail.view';
 import { BlankRecordButtonView } from './record/blank.record.button.view';
 import { VRECollections } from './collection/collection.model';
 import { SRUView } from './database/sru.view';
@@ -90,7 +90,6 @@ function prepareCollections() {
 // GlobalVariables.myCollections and GlobalVariables.allGroups have fully
 // loaded.
 function startRouting() {
-    GlobalVariables.recordDetailModal = new RecordDetailView();
     GlobalVariables.dropDown = new SelectDatabaseView({collection: GlobalVariables.myCollections});
     $('.nav').first().append(
         GlobalVariables.dropDown.el,

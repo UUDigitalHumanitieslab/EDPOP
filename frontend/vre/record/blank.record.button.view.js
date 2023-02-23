@@ -1,5 +1,5 @@
 import Backbone from 'backbone';
-import { GlobalVariables } from '../globals/variables';
+import { vreChannel } from '../radio';
 import { Record } from './record.model';
 
 export var BlankRecordButtonView = Backbone.View.extend({
@@ -15,8 +15,8 @@ export var BlankRecordButtonView = Backbone.View.extend({
         return this;
     },
     launchBlank: function() {
-        GlobalVariables.recordDetailModal.setModel(new Record({
+        vreChannel.trigger('displayRecord', new Record({
             content: {},
-        })).render();
+        }));
     },
 });

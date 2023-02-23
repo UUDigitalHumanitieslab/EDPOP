@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { GlobalVariables } from '../globals/variables';
+import { vreChannel } from '../radio';
 import { SelectableView } from '../utils/selectable.view';
 import recordListItemTemplate from './record.list.item.view.mustache';
 
@@ -28,6 +28,6 @@ export var RecordListItemView = SelectableView.extend({
     },
     display: function(event) {
         event.preventDefault();
-        GlobalVariables.recordDetailModal.setModel(this.model).render();
+        vreChannel.trigger('displayRecord', this.model);
     },
 });

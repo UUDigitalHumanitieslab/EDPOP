@@ -1,4 +1,5 @@
 import { View } from 'backbone';
+import { vreChannel } from '../radio';
 import { FlatAnnotations } from '../annotation/annotation.model';
 import { RecordFieldsView } from '../field/record.fields.view';
 import { RecordAnnotationsView } from '../field/record.annotations.view';
@@ -18,36 +19,45 @@ export var RecordDetailView = View.extend({
         'click #load_previous': 'load',
     },
     initialize: function(options) {
+        var model = this.model;
+        this.fieldsView = new RecordFieldsView({
+            collection: new FlatFields(null, {record: model}),
+        }).render();
+        this.annotationsView = new RecordAnnotationsView({
+            collection: new FlatAnnotations(null, {record: model}),
+        }).render();
+        this.annotationsView.listenTo(this.fieldsView, 'edit', this.annotationsView.edit);
+        this.vreCollectionsSelect = new VRECollectionView({
+            collection: GlobalVariables.myCollections,
+            model: model,
+        }).setRecord(model).render();
+        this.render();
+    },
+    render: function() {
+        this.fieldsView.$el.detach();
+        this.annotationsView.$el.detach();
+        this.vreCollectionsSelect.$el.detach();
         this.$el.html(this.template(this.model));
         this.$title = this.$('.modal-title');
         this.$body = this.$('.modal-body');
         this.$footer = this.$('.modal-footer');
-        this.vreCollectionsSelect = new VRECollectionView({collection: GlobalVariables.myCollections});
-    },
-    setModel: function(model) {
-        if (this.model) {
-            if (this.model === model) return this;
-            this.annotationsView.remove().off();
-            this.fieldsView.remove().off();
-        }
-        this.model = model;
-        this.fieldsView = new RecordFieldsView({
-            collection: new FlatFields(null, {record: model}),
-        });
-        this.annotationsView = new RecordAnnotationsView({
-            collection: new FlatAnnotations(null, {record: model}),
-        });
-        this.vreCollectionsSelect.clear().setRecord(model);
-        this.annotationsView.listenTo(this.fieldsView, 'edit', this.annotationsView.edit);
         var uriText = this.model.get('uri') || '';
         this.$title.text(uriText);
         this.$("#uri-link").attr("href", uriText);
-        this.fieldsView.render().$el.appendTo(this.$body);
-        this.annotationsView.render().$el.appendTo(this.$body);
+        this.fieldsView.$el.appendTo(this.$body);
+        this.annotationsView.$el.appendTo(this.$body);
+        this.vreCollectionsSelect.$el.prependTo(this.$footer);
         return this;
     },
-    render: function() {
-        this.$footer.prepend(this.vreCollectionsSelect.render().$el);
+    remove: function() {
+        this.$el.modal('hide');
+        this.fieldsView.remove();
+        this.annotationsView.remove();
+        this.vreCollectionsSelect.remove();
+        RecordDetailView.__super__.remove.call(this);
+        return this.trigger('remove');
+    },
+    display: function() {
         this.$el.modal('show');
         return this;
     },
@@ -56,6 +66,6 @@ export var RecordDetailView = View.extend({
         var currentIndex = GlobalVariables.recordsList.collection.findIndex(this.model);
         var nextIndex = event.target.id==='load_next'? currentIndex+1 : currentIndex-1;
         var nextModel = GlobalVariables.recordsList.collection.at(nextIndex);
-        this.setModel(nextModel).render();
+        vreChannel.trigger('displayRecord', nextModel);
     },
 });
