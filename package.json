@@ -32,6 +32,7 @@
     "karma-power-assert": "^1.0.0",
     "karma-rollup-preprocessor": "^7.0.8",
     "mocha": "^10.0.0",
+    "power-assert": "^1.6.1",
     "rollup": "^2.79.1",
     "rollup-plugin-glob-import": "^0.5.0",
     "rollup-plugin-node-polyfills": "^0.2.1",
