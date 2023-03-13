@@ -24,7 +24,7 @@ describe('AnnotationEditView', function() {
         assert(buttons.length === 3);
         assert(buttons[0].textContent === 'Save');
         assert(buttons[1].textContent === 'Cancel');
-        assert(buttons[2].ariaLabel === 'Delete');
+        assert(buttons[2].getAttribute('aria-label') === 'Delete');
     });
 
     it('has a popover which is initially hidden', function() {
