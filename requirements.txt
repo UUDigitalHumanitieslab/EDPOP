@@ -43,5 +43,4 @@ sqlparse==0.4.3
     # via django
 urllib3==1.26.12
     # via requests
--e git+https://github.com/UUDigitalHumanitieslab/sruthi@backport-python34#egg=sruthi
-
+sruthi==1.0.0
