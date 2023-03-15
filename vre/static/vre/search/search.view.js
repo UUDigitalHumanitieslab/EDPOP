@@ -27,6 +27,7 @@ export var SearchView = LazyTemplateView.extend({
         var searchPromise = GlobalVariables.results.query(
             {params:{search:searchTerm, source:this.source, startRecord:startRecord},
             error: function(collection, response, options) {
+                console.log(response);
                 var alert = new AlertView({
                     level: 'warning',
                     message: JST['failed-search-message'](response),

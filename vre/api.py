@@ -9,9 +9,33 @@ from rest_framework.renderers import JSONRenderer
 
 from .serializers import *
 from .models import *
-from .sru_query import sru_query, translate_sru_response_to_dict
+from .sru_query import sru_query, translate_sru_response_to_dict, SRUError
 
-HPB_SRU_URL = "http://sru.k10plus.de/hpb"
+# See for information about k10plus APIs:
+# https://wiki.k10plus.de/display/K10PLUS/Datenbanken
+SRU_INFO = {
+    'hpb': {
+        'url': 'http://sru.k10plus.de/hpb',
+        'transformer': (lambda x: x)
+    },
+    'vd16': {
+        'url': 'http://bvbr.bib-bvb.de:5661/bvb01sru',
+        'transformer': (lambda x: 'VD16 and ({})'.format(x))
+    },
+    'vd17': {
+        'url': 'http://sru.k10plus.de/vd17',
+        'transformer': (lambda x: x)
+    },
+    'vd18': {
+        'url': 'http://sru.k10plus.de/vd18',
+        'transformer': (lambda x: x)
+    },
+    'gallica': {
+        'url': 'https://gallica.bnf.fr/SRU',
+        'transformer': (lambda x: 'gallica all ' + x)
+    }
+}
+
 ERROR_MESSAGE_500 = (
     'The server doesn\'t feel too well right now. '
     'If the problem persists, please contact the maintainer.'
@@ -133,18 +157,25 @@ class SearchViewSet(ViewSetMixin, APIView):
         else:
             startRecord = 1
         search_source = request.query_params.get('source')
-        if search_source == "hpb":
-            url_string = HPB_SRU_URL
+        if search_source in SRU_INFO:
+            url_string = SRU_INFO[search_source]['url']
+            transformer = SRU_INFO[search_source]['transformer']
+            searchterm_transformed = transformer(searchterm)
             try:
-                search_result = sru_query(url_string, searchterm, startRecord=startRecord)
-            except:
+                search_result = sru_query(
+                    url_string,
+                    searchterm_transformed,
+                    startRecord=startRecord
+                )
+                result_info = translate_sru_response_to_dict(
+                    search_result.text
+                )
+            except SRUError as err:
                 return Response(
-                    ERROR_MESSAGE_500,
+                    'Error searching using {} API: {}'
+                    .format(search_source, str(err)),
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 )
-            result_info = translate_sru_response_to_dict(
-                search_result.text
-            )
         else:
             # searching records in collection: do they contain the search term anywhere in content?
             records = Record.objects.filter(collection__id=search_source)

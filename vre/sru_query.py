@@ -1,10 +1,13 @@
 import requests
 import os
 import csv
+import logging
 
 from bs4 import BeautifulSoup
 
 from django.conf import settings
+
+logger = logging.getLogger(__name__)
 
 HPB_URI = 'http://hpb.cerl.org/record/{}'
 READABLE_FIELDS_FILE = os.path.join(
@@ -12,6 +15,10 @@ READABLE_FIELDS_FILE = os.path.join(
     "vre",
     "M21_readable_fields.csv",
 )
+
+
+class SRUError(RuntimeError):
+    pass
 
 
 def sru_explain(url_string):
@@ -35,6 +42,7 @@ def sru_query(url_string, query_string, startRecord=1):
     }
     payload['query'] = query_string
     response = requests.get(url_string, params=payload)
+    logger.info('Performed SRU query {}'.format(response.request.url))
     # the requests library guesses 'ISO-8859-1' but it really is 'UTF-8'
     response.encoding = 'UTF-8'
     return response
@@ -43,8 +51,19 @@ def sru_query(url_string, query_string, startRecord=1):
 def translate_sru_response_to_dict(response_content):
     translationDictionary = load_translation_dictionary()
     soup = BeautifulSoup(response_content, 'lxml')
+    diagnostic = soup.find('diag:message')
+    if diagnostic is not None:
+        logger.debug(
+            'API error message has been reported to user. Full response:\n{}'
+            .format(response_content)
+        )
+        raise SRUError(diagnostic.string)
     records = soup.find_all('record')
-    total_results = int(soup.find('zs:numberofrecords').string)
+    try:
+        total_results = int(soup.find('zs:numberofrecords').string)
+    except AttributeError:
+        # zs:numberofrecords tag not found; an error has occurred
+        raise SRUError('Response does not contain zs:numberofrecords tag')
     record_list = []
     for record in records:
         result = {}
@@ -59,7 +78,7 @@ def translate_sru_response_to_dict(response_content):
             if datafield:
                 subfields = datafield.find_all('subfield')
                 if len(subfields)>1:
-                    datafields[description] = " ; ".join(filter(None, [sub.string for sub in subfields]))
+                    datafields[description] = " ; ".join([sub.string for sub in subfields])
                 else:
                     datafields[description] = datafield.subfield.string
         result['uri'] = uri
