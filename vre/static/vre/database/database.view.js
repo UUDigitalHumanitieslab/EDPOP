@@ -12,6 +12,18 @@ export var HPBView = LazyTemplateView.extend({
     },
 });
 
+export var SRUView = LazyTemplateView.extend({
+    templateName:"sru-view",
+    id: "content",
+    initialize: function() {
+        this.render();
+    },
+    render: function() {
+        this.$el.html(this.template());
+        return this;
+    },
+});
+
 export var CollectionView = LazyTemplateView.extend({
     templateName:"collection-view",
     id:"content",
