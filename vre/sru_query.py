@@ -1,5 +1,4 @@
 import requests
-import os
 import csv
 import logging
 
@@ -15,11 +14,8 @@ HPB_URI = 'http://hpb.cerl.org/record/{}'
 VD16_URI = 'http://gateway-bayern.de/{}'  # Spaces should be replaced by +
 VD17_URI = 'https://kxp.k10plus.de/DB=1.28/CMD?ACT=SRCHA&IKT=8079&TRM=%27{}%27'
 VD18_URI = 'https://kxp.k10plus.de/DB=1.65/SET=1/TTL=1/CMD?ACT=SRCHA&IKT=1016&SRT=YOP&TRM={}&ADI_MAT=B&MATCFILTER=Y&MATCSET=Y&ADI_MAT=T&REC=*'
-READABLE_FIELDS_FILE = os.path.join(
-    settings.BASE_DIR,
-    "vre",
-    "M21_readable_fields.csv",
-)
+READABLE_FIELDS_FILE = settings.BASE_DIR / 'vre' \
+    / "M21_readable_fields.csv"
 
 RECORDS_PER_PAGE = 15
 

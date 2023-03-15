@@ -1,8 +1,5 @@
 from django.db import models
-from django.contrib import admin
-from django.contrib.auth.models import Group, User
-from django.contrib.auth.decorators import user_passes_test
-from django.contrib.postgres.fields import JSONField
+from django.contrib.auth.models import User
 
 
 class ResearchGroup(models.Model):
@@ -45,30 +42,22 @@ class Record(models.Model):
     """
     uri = models.CharField(max_length=200, blank=True)
     collection = models.ManyToManyField(Collection)
-    content = JSONField(default='VRE Record')
+    content = models.JSONField(dict)
 
     def __str__(self):
         return self.uri
 
 
-'''
-class AnnotationAdmin(admin.modelAdmin):
-    """ set permissions to edit annotations """
-    # each group sharing the same record has their own annotation
-    # they can see, but not edit other groups' annotations
-    pass
-'''
-
 class Annotation(models.Model):
-    """ Import the fields of a given record, and stores annotations to its fields,
-    as well as extra information.
+    """ Import the fields of a given record, and stores annotations to its
+    fields, as well as extra information.
     An annotation is related to exactly one record.
     One record can have multiple annotations.
     An annotation is also linked to exactly one research group,
     but multiple groups can add annotations."""
-    record = models.ForeignKey(Record)
-    managing_group = models.ForeignKey(ResearchGroup)
-    content = JSONField(default='VRE Annotation')
+    record = models.ForeignKey(Record, on_delete=models.CASCADE)
+    managing_group = models.ForeignKey(ResearchGroup, on_delete=models.CASCADE)
+    content = models.JSONField(dict)
 
     def __str__(self):
         return '{} ({})'.format(self.record.uri, self.managing_group.name)
