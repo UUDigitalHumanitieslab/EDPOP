@@ -27,7 +27,7 @@ GlobalVariables.searchView  = new SearchView({model: GlobalVariables.results});
 GlobalVariables.myCollections = new VRECollections();
 GlobalVariables.blankRecordButton = new BlankRecordButtonView();
 
-const SRUIDS = ['hpb', 'vd16', 'vd17', 'vd18', 'gallica'];
+const SRUIDS = ['hpb', 'vd16', 'vd17', 'vd18', 'gallica', 'cerl-thesaurus'];
 
 // Override Backbone.sync so it always includes the CSRF token in requests.
 (function() {
