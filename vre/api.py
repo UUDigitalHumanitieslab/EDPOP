@@ -16,24 +16,34 @@ from .sru_query import sru_query, translate_sru_response_to_dict, SRUError
 SRU_INFO = {
     'hpb': {
         'url': 'http://sru.k10plus.de/hpb',
-        'transformer': (lambda x: x)
+        'transformer': (lambda x: x),
+        'version': '1.1'
     },
     'vd16': {
         'url': 'http://bvbr.bib-bvb.de:5661/bvb01sru',
-        'transformer': (lambda x: 'VD16 and ({})'.format(x))
+        'transformer': (lambda x: 'VD16 and ({})'.format(x)),
+        'version': '1.1'
     },
     'vd17': {
         'url': 'http://sru.k10plus.de/vd17',
-        'transformer': (lambda x: x)
+        'transformer': (lambda x: x),
+        'version': '1.1'
     },
     'vd18': {
         'url': 'http://sru.k10plus.de/vd18',
-        'transformer': (lambda x: x)
+        'transformer': (lambda x: x),
+        'version': '1.1'
     },
     'gallica': {
         'url': 'https://gallica.bnf.fr/SRU',
-        'transformer': (lambda x: 'gallica all ' + x)
-    }
+        'transformer': (lambda x: 'gallica all ' + x),
+        'version': '1.2'
+    },
+    'cerl-thesaurus': {
+        'url': 'https://data.cerl.org/thesaurus/_sru',
+        'transformer': (lambda x: x),
+        'version': '1.2'
+    },
 }
 
 ERROR_MESSAGE_500 = (
@@ -165,7 +175,8 @@ class SearchViewSet(ViewSetMixin, APIView):
                 search_result = sru_query(
                     url_string,
                     searchterm_transformed,
-                    startRecord=startRecord
+                    startRecord=startRecord,
+                    sru_version=SRU_INFO[search_source]['version']
                 )
                 result_info = translate_sru_response_to_dict(
                     search_result.text
