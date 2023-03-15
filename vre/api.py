@@ -9,9 +9,8 @@ from rest_framework.renderers import JSONRenderer
 
 from .serializers import *
 from .models import *
-from .sru_query import sru_query, translate_sru_response_to_dict
+from .sru_query import SRUError, sru_fetch, SRU_INFO
 
-HPB_SRU_URL = "http://sru.gbv.de/hpb"
 ERROR_MESSAGE_500 = (
     'The server doesn\'t feel too well right now. '
     'If the problem persists, please contact the maintainer.'
@@ -133,18 +132,19 @@ class SearchViewSet(ViewSetMixin, APIView):
         else:
             startRecord = 1
         search_source = request.query_params.get('source')
-        if search_source == "hpb":
-            url_string = HPB_SRU_URL
+        if search_source in SRU_INFO:
             try:
-                search_result = sru_query(url_string, searchterm, startRecord=startRecord)
-            except:
+                result_info = sru_fetch(
+                    search_source,
+                    searchterm,
+                    start_record=startRecord
+                )
+            except SRUError as err:
                 return Response(
-                    ERROR_MESSAGE_500,
+                    'Error searching using {} API: {}'
+                    .format(search_source, str(err)),
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 )
-            result_info = translate_sru_response_to_dict(
-                search_result.text
-            )
         else:
             # searching records in collection: do they contain the search term anywhere in content?
             records = Record.objects.filter(collection__id=search_source)

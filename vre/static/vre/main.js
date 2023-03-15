@@ -7,7 +7,7 @@ import { RecordListView } from './record/record.list.view';
 import { RecordDetailView } from './record/record.detail.view';
 import { BlankRecordButtonView } from './record/blank.record.button.view';
 import { VRECollections } from './collection/collection.model';
-import { CollectionView, HPBView } from './database/database.view';
+import { CollectionView, SRUView } from './database/database.view';
 import { ResearchGroups } from './group/group.model';
 import { GroupMenuView } from './group/group.menu.view';
 import { SearchResults } from './search/search.model';
@@ -27,6 +27,8 @@ GlobalVariables.searchView  = new SearchView({model: GlobalVariables.results});
 GlobalVariables.myCollections = new VRECollections();
 GlobalVariables.blankRecordButton = new BlankRecordButtonView();
 
+const SRUIDS = ['hpb', 'vd16', 'vd17', 'vd18', 'gallica', 'cerl-thesaurus'];
+
 // Override Backbone.sync so it always includes the CSRF token in requests.
 (function() {
     var id = _.identity;
@@ -40,11 +42,11 @@ var VRERouter = Backbone.Router.extend({
     showDatabase: function(id) {
         GlobalVariables.searchView.source = id;
         GlobalVariables.searchView.render();
-        if (id=="hpb") {
+        if (SRUIDS.includes(id)) {
             //$('#content').empty();
-            var hpbView = new HPBView();
-            GlobalVariables.searchView.$el.appendTo(hpbView.$('.page-header'));
-            $('#content').replaceWith(hpbView.$el);
+            var sruView = new SRUView();
+            GlobalVariables.searchView.$el.appendTo(sruView.$('.page-header'));
+            $('#content').replaceWith(sruView.$el);
             var advancedSearchView = new AdvancedSearchView();
             advancedSearchView.render();
             GlobalVariables.searchView.listenTo(advancedSearchView, 'fill', GlobalVariables.searchView.fill);
