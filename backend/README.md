@@ -26,6 +26,8 @@ python manage.py migrate # create the database
 python manage.py createsuperuser # ask to specify a new admin name, email and password
 ```
 
+If you need to update the requirements, edit the `requirements.in` (for application dependencies) or `requirements-test.in` (for test dependencies), then run `pip-compile requirements.in` and/or `pip-compile requirements-test.in` in order to update the corresponding `requirements{,-test}.txt`. This ensures that all pinned dependencies are compatible and that no dependencies linger around when they are no longer required.
+
 ## Running
 
 ```bash
