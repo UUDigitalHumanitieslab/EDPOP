@@ -1,0 +1,10 @@
+<a href="" class="dropdown-toggle" data-toggle="dropdown"
+    id="database-menu-title" aria-haspopup="true" aria-expanded="false"> <b>Database:</b> {{selected-db}} <span class="caret"></span>
+</a>
+<ul class="dropdown-menu">
+    <li><a href="hpb/" id="hpb">HPB</a></li>
+    <li role="separator" class="divider"></li>
+    {{#collections}}
+        <li> <a href="{{id}}/" id="{{id}}">{{description}}</a></li>
+    {{/collections}}
+</ul>

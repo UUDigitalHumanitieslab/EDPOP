@@ -16,9 +16,9 @@ export var VRECollection = APIModel.extend({
             });
         }
         else {
-        	var records = this.records;
+            var records = this.records;
         }
-        return records;
+        return this.records;
     },
 });
 

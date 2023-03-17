@@ -46,26 +46,22 @@
         {% block content %}{% endblock content %}
         {% block scripts %}
         <script
-          src="https://code.jquery.com/jquery-3.3.1.min.js"
-          integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+          src="https://code.jquery.com/jquery-3.6.1.min.js"
           crossorigin="anonymous"></script>
 
-        <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.5/lodash.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
         <script
-            src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
-            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+            src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"
             crossorigin="anonymous"
         ></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/backbone@1.4.1/backbone-min.js"></script>
         <script>
             var prefetchedCollections = JSON.parse('{{ prefetched_collections | escapejs }}');
             var prefetchedGroups = JSON.parse('{{ prefetched_groups | escapejs }}');
         </script>
         <script src="{% static "vre/bundle.js" %}"></script>
         {% endblock scripts %}
-        {% block templates %}
-        {% include "vre/client_templates.html" %}
-        {% endblock templates %}
     </body>
 </html>

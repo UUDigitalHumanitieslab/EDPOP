@@ -1,31 +1,11 @@
-import { LazyTemplateView } from '../utils/lazy.template.view'
+import { View } from 'backbone';
 
-export var GroupMenuItemView = LazyTemplateView.extend({
-    tagName: 'li',
-    templateName: 'group-menu-item',
-    events: {
-        'click': 'select',
-    },
-    render: function() {
-        this.$el.html(this.template(this.model.attributes));
-        return this;
-    },
-    select: function(event) {
-        event.preventDefault();
-        this.trigger('select', this.model);
-    },
-    activate: function(model) {
-        if (model === this.model) {
-            this.$el.addClass('active');
-        } else {
-            this.$el.removeClass('active');
-        }
-    },
-});
+import { GroupMenuItemView } from './group.menu.item.view';
+import groupMenuTemplate from './group.menu.view.mustache';
 
-export var GroupMenuView = LazyTemplateView.extend({
+export var GroupMenuView = View.extend({
     el: '#vre-group-menu',
-    templateName: 'group-menu-header',
+    template: groupMenuTemplate,
     initialize: function(options) {
         this.$header = this.$('.dropdown-toggle');
         this.$list = this.$('.dropdown-menu');

@@ -1,4 +1,5 @@
-import { LazyTemplateView } from '../utils/lazy.template.view';
+import { View } from 'backbone';
+import alertTemplate from './alert.view.mustache';
 
 /**
  * Reusable alert view. Meant to be displayed once and then discarded.
@@ -9,11 +10,11 @@ import { LazyTemplateView } from '../utils/lazy.template.view';
  *  2. a string, which should be the name of a method of the alert view;
  *  3. undefined, in which case nothing is done after the animation completes.
  */
-export var AlertView = LazyTemplateView.extend({
+export var AlertView = View.extend({
     ease: 500,
     delay: 2000,
     className: 'alert alert-dismissible',
-    templateName: 'alert-view',
+    template: alertTemplate,
     attributes: {
         role: 'alert',
     },

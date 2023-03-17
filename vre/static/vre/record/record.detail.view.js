@@ -1,12 +1,14 @@
-import { LazyTemplateView } from '../utils/lazy.template.view';
+import { View } from 'backbone';
 import { FlatAnnotations } from '../annotation/annotation.model';
-import { RecordFieldsView, RecordAnnotationsView } from '../field/record.field.view';
+import { RecordFieldsView } from '../field/record.fields.view';
+import { RecordAnnotationsView } from '../field/record.annotations.view';
 import { FlatFields } from '../field/field.model';
 import { VRECollectionView } from '../collection/collection.view';
 import { GlobalVariables } from '../globals/variables';
+import recordDetailTemplate from './record.detail.view.mustache';
 
-export var RecordDetailView = LazyTemplateView.extend({
-    templateName: 'record-detail',
+export var RecordDetailView = View.extend({
+    template: recordDetailTemplate,
     className: 'modal',
     attributes: {
         'role': 'dialog',

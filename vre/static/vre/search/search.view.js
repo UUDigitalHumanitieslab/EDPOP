@@ -1,10 +1,11 @@
-import { LazyTemplateView } from '../utils/lazy.template.view';
+import Backbone from 'backbone';
 import { AlertView } from '../alert/alert.view';
-import { JST } from '../globals/templates';
 import { GlobalVariables } from '../globals/variables';
+import searchViewTemplate from './search.view.mustache';
+import failedSearchTemplate from './failed.search.message.mustache';
 
-export var SearchView = LazyTemplateView.extend({
-    templateName: 'search-view',
+export var SearchView = Backbone.View.extend({
+    template: searchViewTemplate,
     events: {
         'submit': 'firstSearch',
     },
@@ -30,7 +31,7 @@ export var SearchView = LazyTemplateView.extend({
                 console.log(response);
                 var alert = new AlertView({
                     level: 'warning',
-                    message: JST['failed-search-message'](response),
+                    message: failedSearchTemplate(response),
                 });
                 alert.render().$el.insertAfter('.page-header');
                 alert.animateIn();
@@ -70,26 +71,5 @@ export var SearchView = LazyTemplateView.extend({
     },
     fill: function(fillText) {
         this.$('#query-input').val(fillText);
-    },
-});
-
-export var AdvancedSearchView = LazyTemplateView.extend({
-    templateName: 'hpb-search-info',
-    events: {
-        'click a': 'fill',
-    },
-    render: function() {
-        $('#search-info').show();
-        $('#search-info').popover({
-            'html': true, 
-            'content': this.$el.html(this.template()), 
-            'container': 'body', 
-            'placement': 'left'
-        });
-    },
-    fill: function(event) {
-        event.preventDefault();
-        var fillIn = event.target.textContent.slice(0, -9);
-        this.trigger('fill', fillIn);
     },
 });

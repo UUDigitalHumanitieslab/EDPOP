@@ -41,15 +41,17 @@ Install the dependencies of the frontend via npm install.
 npm install
 ```
 
-Then, use browserify to package the modules into a bundle, and convert from ES6 to ES5 JavaScript with babelify. Watchify will watch for any changes and reconvert if needed, and the `debug` flag creates a source map.
+Then, use Rollup to package the modules into a bundle.
+
 ```bash
-npx watchify vre/static/vre/main.js -o vre/static/vre/bundle.js -t babelify -t [browserify-shim --global] --debug
+# bundle once
+npm run build
+# OR bundle again on every change
+npm run watch
 ```
 
-It is necessary to reload the browser every time.
+It is necessary to refresh the browser every time.
 
 For deployment, copy the stable bundle.js in the vre/static/vre directory.
 
-## Gulpfile
-This is work in progress and doesn't work yet. Therefore the dependencies in this file have been removed from package.json for now. Eventually, the gulpfile might run more tasks, such as uglify and source maps, livereload and starting up python.
-
+Run the frontend tests by invoking `npm run test` and opening http://localhost:9876/ in a browser.
