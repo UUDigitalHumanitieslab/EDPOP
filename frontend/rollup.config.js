@@ -29,7 +29,7 @@ export default {
             if (lastPart === 'underscore') return '_';
             return '_.' + lastPart;
         },
-        plugins: [terser()],
+        // plugins: [terser()],
         sourcemap: true,
     },
 };
