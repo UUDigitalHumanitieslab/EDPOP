@@ -12,7 +12,7 @@ export var AnnotationEditView = View.extend({
     },
     initialize: function(options) {
         _.assign(this, _.pick(options, ['existing']));
-        this.$el.popover({
+        this.render().$el.popover({
             container: 'body',
             content: confirmDeletionTemplate(this),
             html: true,
