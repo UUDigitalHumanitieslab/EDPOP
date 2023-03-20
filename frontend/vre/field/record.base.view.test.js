@@ -19,7 +19,7 @@ var testFields = [{
 }];
 
 function assertRows() {
-    var rows = this.view.rows;
+    var rows = this.view.items;
     var trs = this.view.$('tr');
     assert(rows.length === this.collection.length);
     assert(trs.length === this.collection.length);
