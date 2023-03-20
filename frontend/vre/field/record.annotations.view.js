@@ -43,13 +43,13 @@ export var RecordAnnotationsView = RecordFieldsBaseView.extend({
     },
 
     cancel: function(editRow) {
-        var staticRow, index = _.indexOf(this.items, editRow);
-        if (editRow.existing) {
-            staticRow = this.makeItem(editRow.model);
-        }
-        this.items.splice(index, 1, staticRow);
+        var index = _.indexOf(this.items, editRow);
         editRow.remove();
-        editRow.existing && this.placeItems();
+        this.items.splice(index, 1);
+        if (editRow.existing) {
+            this.items.splice(index, 0, this.makeItem(editRow.model));
+            this.placeItems();
+        }
     },
 
     save: function(editRow) {
