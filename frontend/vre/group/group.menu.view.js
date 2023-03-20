@@ -15,7 +15,8 @@ export var GroupMenuView = CollectionView.extend({
     },
 
     renderContainer: function() {
-        this.$header.html(this.template(this.model.attributes));
+        var attributes = this.model ? this.model.toJSON() : {};
+        this.$header.html(this.template(attributes));
         return this;
     },
 
