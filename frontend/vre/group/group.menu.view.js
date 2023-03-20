@@ -21,7 +21,7 @@ export var GroupMenuView = View.extend({
             item.listenTo(this, 'select', item.activate);
             return item;
         }, this));
-        this.$list.append(_(this.items).invokeMap('render').map('el').value());
+        this.$list.append(_(this.items).map('el').value());
         if (!this.model || !this.collection.includes(this.model)) {
             var savedId = localStorage.getItem('researchGroup');
             if (savedId) {
