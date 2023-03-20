@@ -19,6 +19,7 @@ module.exports = function(config) {
         'node_modules/bootstrap/dist/js/bootstrap.js',
         'node_modules/select2/dist/js/select2.js',
         'node_modules/backbone/backbone.js',
+        'node_modules/backbone-fractal/backbone-fractal.js',
         'vre/test-index.js'
     ],
 
@@ -41,6 +42,7 @@ module.exports = function(config) {
             'bootstrap',
             'select2',
             'backbone',
+            'backbone-fractal',
         ],
         plugins: [
             require('rollup-plugin-node-polyfills')(),
@@ -65,6 +67,7 @@ module.exports = function(config) {
                 lodash: '_',
                 underscore: '_',
                 backbone: 'Backbone',
+                'backbone-fractal': 'BackboneFractal',
             },
             sourcemap: 'inline',
         },
