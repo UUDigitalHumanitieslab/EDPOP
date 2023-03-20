@@ -1,4 +1,4 @@
-import { View } from 'backbone';
+import { CompositeView } from 'backbone-fractal';
 import { vreChannel } from '../radio';
 import { FlatAnnotations } from '../annotation/annotation.model';
 import { RecordFieldsView } from '../field/record.fields.view';
@@ -8,16 +8,30 @@ import { VRECollectionView } from '../collection/collection.view';
 import { GlobalVariables } from '../globals/variables';
 import recordDetailTemplate from './record.detail.view.mustache';
 
-export var RecordDetailView = View.extend({
+export var RecordDetailView = CompositeView.extend({
     template: recordDetailTemplate,
     className: 'modal',
     attributes: {
         'role': 'dialog',
     },
+
+    subviews: [{
+        view: 'fieldsView',
+        selector: '.modal-body'
+    },{
+        view: 'annotationsView',
+        selector: '.modal-body'
+    },{
+        view: 'vreCollectionsSelect',
+        selector: '.modal-footer',
+        method: 'prepend'
+    }],
+
     events: {
         'click #load_next': 'next',
         'click #load_previous': 'previous',
     },
+
     initialize: function(options) {
         var model = this.model;
         this.fieldsView = new RecordFieldsView({
@@ -33,38 +47,28 @@ export var RecordDetailView = View.extend({
         });
         this.render();
     },
-    render: function() {
-        this.fieldsView.$el.detach();
-        this.annotationsView.$el.detach();
-        this.vreCollectionsSelect.$el.detach();
-        this.$el.html(this.template(this.model));
-        this.$title = this.$('.modal-title');
-        this.$body = this.$('.modal-body');
-        this.$footer = this.$('.modal-footer');
-        var uriText = this.model.get('uri') || '';
-        this.$title.text(uriText);
-        this.$("#uri-link").attr("href", uriText);
-        this.fieldsView.$el.appendTo(this.$body);
-        this.annotationsView.$el.appendTo(this.$body);
-        this.vreCollectionsSelect.$el.prependTo(this.$footer);
+
+    renderContainer: function() {
+        this.$el.html(this.template(this.model.toJSON()));
         return this;
     },
+
     remove: function() {
         this.$el.modal('hide');
-        this.fieldsView.remove();
-        this.annotationsView.remove();
-        this.vreCollectionsSelect.remove();
         RecordDetailView.__super__.remove.call(this);
         return this.trigger('remove');
     },
+
     display: function() {
         this.$el.modal('show');
         return this;
     },
+
     next: function(event) {
         event.preventDefault();
         vreChannel.trigger('displayNextRecord');
     },
+
     previous: function(event) {
         event.preventDefault();
         vreChannel.trigger('displayPreviousRecord');
