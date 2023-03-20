@@ -1,27 +1,32 @@
-import { View } from 'backbone';
+import { CollectionView } from 'backbone-fractal';
 
 import { GroupMenuItemView } from './group.menu.item.view';
 import groupMenuTemplate from './group.menu.view.mustache';
 
-export var GroupMenuView = View.extend({
+export var GroupMenuView = CollectionView.extend({
     el: '#vre-group-menu',
     template: groupMenuTemplate,
+    container: '.dropdown-menu',
+
     initialize: function(options) {
         this.$header = this.$('.dropdown-toggle');
-        this.$list = this.$('.dropdown-menu');
-        this.items = [];
-        this.resetItems(this.collection);
-        this.listenTo(this.collection, 'update reset', this.resetItems);
+        this.initItems().restoreSelection().render().initCollectionEvents()
+        .listenTo(this.collection, 'update reset', this.restoreSelection);
     },
-    resetItems: function(collection) {
-        _.invokeMap(this.items, 'remove');
-        this.items = this.collection.map(_.bind(function(group) {
-            var item = new GroupMenuItemView({model: group});
-            item.on('select', this.select, this);
-            item.listenTo(this, 'select', item.activate);
-            return item;
-        }, this));
-        this.$list.append(_(this.items).map('el').value());
+
+    renderContainer: function() {
+        this.$header.html(this.template(this.model.attributes));
+        return this;
+    },
+
+    makeItem: function(group) {
+        var item = new GroupMenuItemView({model: group});
+        item.on('select', this.select, this);
+        item.listenTo(this, 'select', item.activate);
+        return item;
+    },
+
+    restoreSelection: function(collection) {
         if (!this.model || !this.collection.includes(this.model)) {
             var savedId = localStorage.getItem('researchGroup');
             if (savedId) {
@@ -32,15 +37,14 @@ export var GroupMenuView = View.extend({
                 this.select(this.collection.first());
             }
         }
+        return this;
     },
+
     select: function(model) {
         if (model === this.model) return;
         this.model = model;
-        this.render();
+        this.renderContainer();
         this.trigger('select', model);
         localStorage.setItem('researchGroup', model.attributes.id);
-    },
-    render: function() {
-        this.$header.html(this.template(this.model.attributes));
     },
 });
