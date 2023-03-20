@@ -10,7 +10,10 @@ export var GroupMenuItemView = View.extend({
     },
 
     initialize: function() {
-        this.render();
+        this.render().listenTo(this.model, {
+            select: this.activate,
+            deselect: this.deactivate,
+        });
     },
 
     render: function() {
@@ -20,14 +23,14 @@ export var GroupMenuItemView = View.extend({
 
     select: function(event) {
         event.preventDefault();
-        this.trigger('select', this.model);
+        this.model.trigger('select', this.model);
     },
 
     activate: function(model) {
-        if (model === this.model) {
-            this.$el.addClass('active');
-        } else {
-            this.$el.removeClass('active');
-        }
+        this.$el.addClass('active');
+    },
+
+    deactivate: function(model) {
+        this.$el.removeClass('active');
     },
 });
