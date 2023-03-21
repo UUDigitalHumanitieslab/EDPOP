@@ -14,4 +14,4 @@ db*
 
 # build output
 /build
-/vre/static/vre/*bundle*.js*
+/frontend/vre/*bundle*.js*

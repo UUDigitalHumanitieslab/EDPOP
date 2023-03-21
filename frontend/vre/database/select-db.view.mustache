@@ -1,0 +1,15 @@
+<a href="" class="dropdown-toggle" data-toggle="dropdown"
+    id="database-menu-title" aria-haspopup="true" aria-expanded="false"> <b>Database:</b> {{selected-db}} <span class="caret"></span>
+</a>
+<ul class="dropdown-menu">
+    <li><a href="hpb/" id="hpb">HPB</a></li>
+    <li><a href="vd16/" id="vd16">VD16</a></li>
+    <li><a href="vd17/" id="vd17">VD17</a></li>
+    <li><a href="vd18/" id="vd18">VD18</a></li>
+    <li><a href="gallica/" id="gallica">Gallica</a></li>
+    <li><a href="cerl-thesaurus/" id="cerl-thesaurus">CERL Thesaurus</a></li>
+    <li role="separator" class="divider"></li>
+    {{#collections}}
+        <li> <a href="{{id}}/" id="{{id}}">{{description}}</a></li>
+    {{/collections}}
+</ul>
