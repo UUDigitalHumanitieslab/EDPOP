@@ -3,17 +3,19 @@ from rdflib import RDF, Literal, Graph, URIRef
 
 from vre.models import Collection
 from .constants import EDPOPCOL, AS
-from .conversion import collection_to_graph
+from .conversion import add_collection_to_graph
 
 def triple_exists(graph: Graph, triple: Tuple[URIRef]):
     return any(graph.triples(triple))
 
-def test_collection_to_graph():
+def test_add_collection_to_graph(empty_graph):
+    g = empty_graph
+
     collection = Collection(
         description = 'a collection for testing'
     )
 
-    g = collection_to_graph(collection)
+    add_collection_to_graph(collection, g)
     
     assert triple_exists(g, (None, RDF.type, EDPOPCOL.Collection))
 
