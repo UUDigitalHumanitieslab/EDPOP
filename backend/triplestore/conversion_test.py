@@ -9,11 +9,11 @@ from .conversion import add_project_to_graph, add_collection_to_graph
 def triple_exists(graph: Graph, triple: Tuple[URIRef]):
     return any(graph.triples(triple))
 
-def find_triple(graph: Graph, triple: Tuple[URIRef]):
-    return next(graph.triples(triple))
 
-def find_subject(graph: Graph, predicate: URIRef, object: URIRef):
-    return find_triple(graph, (None, predicate, object))
+def find_subject_by_class(graph: Graph, rdf_class: URIRef):
+    subjects = graph.subjects(RDF.type, rdf_class)
+    return next(subjects, None)
+
 
 @pytest.fixture()
 def fake_group(db):
@@ -23,11 +23,14 @@ def fake_group(db):
     )
     return group
 
+
 def test_add_project_to_graph(fake_group, empty_graph):
     g = empty_graph
     add_project_to_graph(fake_group, g)
 
-    assert triple_exists(g, (None, RDF.type, EDPOPCOL.Project))
+    project = find_subject_by_class(g, EDPOPCOL.Project)
+    assert project
+
 
 @pytest.fixture()
 def fake_collection(db, fake_group):
@@ -38,6 +41,7 @@ def fake_collection(db, fake_group):
     collection.save()
     return collection
 
+
 def test_add_collection_to_graph(fake_group, fake_collection, empty_graph):
     g = empty_graph
 
@@ -46,7 +50,7 @@ def test_add_collection_to_graph(fake_group, fake_collection, empty_graph):
     
     assert triple_exists(g, (None, RDF.type, EDPOPCOL.Collection))
 
-    collection, _, _ = find_subject(g, RDF.type, EDPOPCOL.Collection)
+    collection = find_subject_by_class(g, EDPOPCOL.Collection)
 
     summary_triple = (collection, AS.summary, Literal('a collection for testing'))
     assert triple_exists(g, summary_triple)
