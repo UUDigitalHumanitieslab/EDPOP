@@ -8,7 +8,7 @@ ObjectURIs = Dict[int, URIRef]
 
 # APPLICATION
 
-def add_application_to_graph(g: Graph):
+def add_application_to_graph(g: Graph) -> URIRef:
     subject = BNode()
 
     g.add((subject, RDF.type, EDPOPCOL.Application))
@@ -86,7 +86,16 @@ def add_records_to_graph(records: Iterator[Record], g: Graph, collection_uris: O
 
 def add_record_to_graph(record: Record, g: Graph, collection_uris: ObjectURIs) -> URIRef:
     subject = BNode()
+
+    _add_record_collections_to_graph(record, g, subject, collection_uris)
+
     return subject
+
+
+def _add_record_collections_to_graph(record: Record, g: Graph, subject: URIRef, collection_uris: ObjectURIs) -> None:
+    for collection in record.collection.all():
+        collection_uri = collection_uris.get(collection.id)
+        g.add((subject, AS.context, collection_uri))
 
 
 # ANNOTATIONS
