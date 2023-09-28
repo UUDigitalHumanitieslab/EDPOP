@@ -2,8 +2,24 @@ from rdflib import Graph, RDF, BNode, Literal, URIRef
 from typing import Dict, Iterator
 from vre.models import ResearchGroup, Collection, Record, Annotation
 from .constants import EDPOPCOL, AS, OA
+from django.conf import settings
 
 ObjectURIs = Dict[int, URIRef]
+
+# APPLICATION
+
+def add_application_to_graph(g: Graph):
+    subject = BNode()
+
+    g.add((subject, RDF.type, EDPOPCOL.Application))
+    _add_application_name_to_graph(g, subject)    
+
+    return subject
+
+def _add_application_name_to_graph(g: Graph, subject: URIRef) -> None:
+    name = getattr(settings, 'SITE_NAME', None)
+    if name:
+        g.add((subject, AS.name, Literal(name)))
 
 # PROJECTS
 
@@ -75,9 +91,11 @@ def add_record_to_graph(record: Record, g: Graph, collection_uris: ObjectURIs) -
 
 # ANNOTATIONS
 
-def add_annotation_to_graph(annotation: Annotation, g: Graph, project_uris: ObjectURIs, record_uris: ObjectURIs) -> URIRef:
+def add_annotation_to_graph(annotation: Annotation, g: Graph, application_uri: URIRef, project_uris: ObjectURIs, record_uris: ObjectURIs) -> URIRef:
     subject = BNode()
     g.add((subject, RDF.type, EDPOPCOL.Annotation))
+    g.add((subject, OA.motivatedBy, OA.editing))
+    g.add((subject, AS.generator, application_uri))
 
     _add_annotation_target_to_graph(annotation, g, subject, record_uris)
     _add_annotation_context_to_graph(annotation, g, subject, project_uris)

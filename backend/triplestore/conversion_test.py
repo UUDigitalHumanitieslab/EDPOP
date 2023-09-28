@@ -5,7 +5,7 @@ import pytest
 from vre.models import ResearchGroup, Collection, Record, Annotation
 from .constants import EDPOPCOL, AS
 from .conversion import add_project_to_graph, add_projects_to_graph, add_collection_to_graph, \
-    add_annotation_to_graph, add_records_to_graph, add_collections_to_graph
+    add_annotation_to_graph, add_records_to_graph, add_collections_to_graph, add_application_to_graph
 
 def triple_exists(graph: Graph, triple: Tuple[URIRef]):
     return any(graph.triples(triple))
@@ -78,10 +78,14 @@ def fake_annotation(db, fake_group, fake_record):
 
 def test_add_annotation_to_graph(fake_group, fake_collection, fake_record, fake_annotation, empty_graph):
     g = empty_graph
-    project_uris = add_projects_to_graph([fake_group], g)
-    collection_uris = add_collections_to_graph([fake_collection], g, project_uris)
-    record_uris = add_records_to_graph([fake_record], g, collection_uris)
+    application = add_application_to_graph(g)
+    projects = add_projects_to_graph([fake_group], g)
+    collections = add_collections_to_graph([fake_collection], g, projects)
+    records = add_records_to_graph([fake_record], g, collections)
     
-    annotation = add_annotation_to_graph(fake_annotation, g, project_uris, record_uris)
+    annotation = add_annotation_to_graph(fake_annotation, g, application, projects, records)
 
     assert find_subject_by_class(g, EDPOPCOL.Annotation)
+
+    assert triple_exists(g, (annotation, AS.context, None))
+    assert triple_exists(g, (annotation, AS.generator, application))

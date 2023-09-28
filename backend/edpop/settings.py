@@ -178,3 +178,5 @@ STATICFILES_DIRS = (
     BASE_DIR / '..' / 'frontend' / 'vre',
 )
 STATIC_URL = '/static/'
+
+SITE_NAME = 'EDPOP VRE'
