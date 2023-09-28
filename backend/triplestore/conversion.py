@@ -56,7 +56,5 @@ def _add_collection_description_to_graph(collection: Collection, g: Graph, subje
 
 def _add_collection_projects_to_graph(collection: Collection, g: Graph, subject: URIRef, project_uris: ObjectURIs) -> None:
     for group in collection.managing_group.all():
-        project_uri = project_uris.get(group.id, None)
-
-        if project_uri:
-            g.add((subject, AS.context, project_uri))
+        project_uri = project_uris.get(group.id)
+        g.add((subject, AS.context, project_uri))
