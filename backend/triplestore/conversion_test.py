@@ -45,12 +45,14 @@ def fake_collection(db, fake_group):
 def test_add_collection_to_graph(fake_group, fake_collection, empty_graph):
     g = empty_graph
 
-    add_project_to_graph(fake_group, g)
-    add_collection_to_graph(fake_collection, g)
+    project_node =  add_project_to_graph(fake_group, g)
+    uris = {fake_group.id: project_node}
+    collection_node = add_collection_to_graph(fake_collection, g, uris)
     
     assert triple_exists(g, (None, RDF.type, EDPOPCOL.Collection))
 
-    collection = find_subject_by_class(g, EDPOPCOL.Collection)
-
-    summary_triple = (collection, AS.summary, Literal('a collection for testing'))
+    summary_triple = (collection_node, AS.summary, Literal('a collection for testing'))
     assert triple_exists(g, summary_triple)
+
+    context_triple = (collection_node, AS.context, project_node)
+    assert triple_exists(g, context_triple)
