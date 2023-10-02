@@ -6,8 +6,6 @@
 #
 asgiref==3.5.2
     # via django
-backports-zoneinfo==0.2.1
-    # via django
 beautifulsoup4==4.11.1
     # via -r requirements.in
 certifi==2022.9.24
