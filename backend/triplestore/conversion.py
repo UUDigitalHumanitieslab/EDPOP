@@ -9,7 +9,11 @@ ObjectURIs = Dict[int, URIRef]
 
 # APPLICATION
 
-def add_application_to_graph(g: Graph) -> URIRef:
+def application_to_graph(g: Graph) -> URIRef:
+    '''
+    Add the EDPOP VRE to the graph
+    '''
+    
     subject = BNode()
 
     g.add((subject, RDF.type, EDPOPCOL.Application))
@@ -41,6 +45,13 @@ def add_user_to_graph(user: User, g: Graph) -> URIRef:
 # PROJECTS
 
 def add_projects_to_graph(research_groups: Iterator[ResearchGroup], g: Graph) -> ObjectURIs:
+    '''
+    Convert research groups / projects to RDF representation
+
+    The old database has project as a property of research groups, the RDF graph uses "project"
+    as the central term because the relationship with user groups is less strict.
+    '''
+    
     return {
         group.id: add_project_to_graph(group, g)
         for group in research_groups
@@ -64,6 +75,9 @@ def _add_project_name_to_graph(research_group: ResearchGroup, g: Graph, subject:
 # COLLECTIONS
 
 def add_collections_to_graph(collections: Iterator[Collection], g: Graph, project_uris: ObjectURIs) -> ObjectURIs:
+    '''
+    Convert collections to RDF representation
+    '''
     return {
         collection.id: add_collection_to_graph(collection, g, project_uris)
         for collection in collections
@@ -95,6 +109,9 @@ def _add_collection_projects_to_graph(collection: Collection, g: Graph, subject:
 # RECORDS
 
 def add_records_to_graph(records: Iterator[Record], g: Graph, collection_uris: ObjectURIs) -> ObjectURIs:
+    '''
+    Convert records to RDF representation
+    '''
     return {
         record.id: add_record_to_graph(record, g, collection_uris)
         for record in records
@@ -118,6 +135,10 @@ def _add_record_collections_to_graph(record: Record, g: Graph, subject: URIRef, 
 # ANNOTATIONS
 
 def add_annotation_to_graph(annotation: Annotation, g: Graph, application_uri: URIRef, project_uris: ObjectURIs, record_uris: ObjectURIs) -> URIRef:
+    '''
+    Convert annotations to RDF representation
+    '''
+    
     subject = BNode()
     g.add((subject, RDF.type, EDPOPCOL.Annotation))
     g.add((subject, OA.motivatedBy, OA.editing))
