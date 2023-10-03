@@ -138,7 +138,7 @@ def _add_record_collections_to_graph(record: Record, g: Graph, subject: URIRef, 
 
 # ANNOTATIONS
 
-def add_annotations_to_graph(annotations: Iterator[Annotation],
+def annotations_to_graph(annotations: Iterator[Annotation],
                              application_uri: URIRef,
                              project_uris: ObjectURIs,
                              record_uris: ObjectURIs) -> Tuple[ObjectURIs, Graph]:
@@ -199,3 +199,37 @@ def objects_to_graph(convert: Callable, objects: Iterator[Model]) -> Tuple[Objec
     }
     g = union_graphs(graphs)
     return object_uris, g
+
+
+def convert_all(users: Iterator[User],
+                research_groups: Iterator[ResearchGroup],
+                collections: Iterator[Collection],
+                records: Iterator[Record],
+                annotations: Iterator[Annotation]):
+    
+    '''
+    Combine all conversion functions and create an RDF representation of the database
+
+    Returns:
+    - A dict with URI lookups. For each table, gives a dict mapping object IDs to URIs in the graph.
+    - The graph representation of the data
+    '''
+
+    application_uri, application_graph = application_to_graph()
+    user_uris, users_graph = users_to_graph(users)
+    project_uris, projects_graph = projects_to_graph(research_groups)
+    collection_uris, collections_graph = collections_to_graph(collections, project_uris)
+    record_uris, records_graph = records_to_graph(records, collection_uris)
+    annotation_uris, annotations_graph = annotations_to_graph(annotations, application_uri, project_uris, record_uris)
+
+    graph = application_graph + users_graph + projects_graph + collections_graph + records_graph + annotations_graph
+
+    uriref = {
+        'users': user_uris,
+        'projects': project_uris,
+        'collections': collection_uris,
+        'records': record_uris,
+        'annotations': annotation_uris
+    }
+
+    return uriref, graph
