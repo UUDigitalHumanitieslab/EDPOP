@@ -3,6 +3,7 @@ from typing import Dict, Iterator
 from vre.models import ResearchGroup, Collection, Record, Annotation
 from .constants import EDPOPCOL, AS, OA
 from django.conf import settings
+from django.contrib.auth.models import User
 
 ObjectURIs = Dict[int, URIRef]
 
@@ -20,6 +21,22 @@ def _add_application_name_to_graph(g: Graph, subject: URIRef) -> None:
     name = getattr(settings, 'SITE_NAME', None)
     if name:
         g.add((subject, AS.name, Literal(name)))
+
+
+# USERS
+
+def add_user_to_graph(user: User, g: Graph) -> URIRef:
+    '''
+    Add a user to the graph.
+
+    It is up to users whether they want to make their account name public,
+    so this just creates a blank node of the User type.
+    '''
+
+    subject = BNode()
+    g.add((subject, RDF.type, EDPOPCOL.User))
+    return subject
+
 
 # PROJECTS
 
