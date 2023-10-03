@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from django.db.models import Model
 
 from .utils import union_graphs
+from .import_legacy_records import import_record
 
 ObjectURIs = Dict[int, URIRef]
 
@@ -122,8 +123,11 @@ def records_to_graph(records: Iterator[Record], collection_uris: ObjectURIs) -> 
 
 
 def record_to_graph(record: Record, collection_uris: ObjectURIs) -> Tuple[URIRef, Graph]:
-    g = Graph()
-    subject = BNode()
+    try:
+        subject, g  = import_record(record.uri)
+    except:
+        g = Graph()
+        subject = BNode()
 
     _add_record_collections_to_graph(record, g, subject, collection_uris)
 
