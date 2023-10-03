@@ -1,11 +1,13 @@
 from typing import Tuple
 from rdflib import RDF, Literal, Graph, URIRef
 import pytest
+from django.contrib.auth.models import User
 
 from vre.models import ResearchGroup, Collection, Record, Annotation
 from .constants import EDPOPCOL, AS
-from .conversion import add_project_to_graph, add_projects_to_graph, add_collection_to_graph, \
-    add_annotation_to_graph, add_records_to_graph, add_collections_to_graph, add_application_to_graph
+from .conversion import project_to_graph, projects_to_graph, collection_to_graph, \
+    annotation_to_graph, records_to_graph, collections_to_graph, application_to_graph, \
+    users_to_graph
 
 def triple_exists(graph: Graph, triple: Tuple[URIRef]):
     return any(graph.triples(triple))
@@ -25,10 +27,8 @@ def fake_group(db):
     return group
 
 
-def test_add_project_to_graph(fake_group, empty_graph):
-    g = empty_graph
-    add_project_to_graph(fake_group, g)
-
+def test_add_project_to_graph(fake_group):
+    _, g = project_to_graph(fake_group)
     project = find_subject_by_class(g, EDPOPCOL.Project)
     assert project
 
@@ -43,10 +43,9 @@ def fake_collection(db, fake_group):
     return collection
 
 
-def test_add_collection_to_graph(fake_group, fake_collection, empty_graph):
-    g = empty_graph
-    project_uris = add_projects_to_graph([fake_group], g)
-    collection_node = add_collection_to_graph(fake_collection, g, project_uris)
+def test_add_collection_to_graph(fake_group, fake_collection):
+    project_uris, _ = projects_to_graph([fake_group])
+    collection_node, g = collection_to_graph(fake_collection, project_uris)
     
     assert triple_exists(g, (None, RDF.type, EDPOPCOL.Collection))
 
@@ -67,6 +66,7 @@ def fake_record(db, fake_collection):
     record.save()
     return record
 
+
 @pytest.fixture()
 def fake_annotation(db, fake_group, fake_record):
     annotation = Annotation.objects.create(
@@ -76,16 +76,29 @@ def fake_annotation(db, fake_group, fake_record):
     )
     return annotation
 
-def test_add_annotation_to_graph(fake_group, fake_collection, fake_record, fake_annotation, empty_graph):
-    g = empty_graph
-    application = add_application_to_graph(g)
-    projects = add_projects_to_graph([fake_group], g)
-    collections = add_collections_to_graph([fake_collection], g, projects)
-    records = add_records_to_graph([fake_record], g, collections)
+
+def test_add_annotation_to_graph(fake_group, fake_collection, fake_record, fake_annotation):
+
+    application_uri, _ = application_to_graph()
+    project_uris, _ = projects_to_graph([fake_group])
+    collection_uris, _ = collections_to_graph([fake_collection], project_uris)
+    record_uris, _ = records_to_graph([fake_record], collection_uris)
     
-    annotation = add_annotation_to_graph(fake_annotation, g, application, projects, records)
+    annotation, g = annotation_to_graph(fake_annotation, application_uri, project_uris, record_uris)
 
     assert find_subject_by_class(g, EDPOPCOL.Annotation)
 
     assert triple_exists(g, (annotation, AS.context, None))
-    assert triple_exists(g, (annotation, AS.generator, application))
+    assert triple_exists(g, (annotation, AS.generator, application_uri))
+
+
+@pytest.fixture()
+def fake_user(db):
+    user = User.objects.create()
+    return user
+
+def test_users_to_graph(fake_user):
+    uris, g = users_to_graph([fake_user])
+
+    user_node = uris[fake_user.id]
+    assert triple_exists(g, (user_node, RDF.type, EDPOPCOL.User))
