@@ -12,3 +12,6 @@ AS = Namespace('https://www.w3.org/ns/activitystreams#')
 
 OA = Namespace('http://www.w3.org/ns/oa#')
 '''Web Annotation vocabulary'''
+
+SKOS = Namespace('http://www.w3.org/2004/02/skos/core#')
+'''SKOS (Simple Knowledge Organization System) vocabulary'''

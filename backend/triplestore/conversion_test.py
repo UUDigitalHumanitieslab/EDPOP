@@ -5,18 +5,10 @@ from django.contrib.auth.models import User
 
 from vre.models import ResearchGroup, Collection, Record, Annotation
 from .constants import EDPOPCOL, AS
+from .utils import find_subject_by_class, triple_exists
 from .conversion import project_to_graph, projects_to_graph, collection_to_graph, \
     annotation_to_graph, records_to_graph, collections_to_graph, application_to_graph, \
     users_to_graph
-
-def triple_exists(graph: Graph, triple: Tuple[URIRef]):
-    return any(graph.triples(triple))
-
-
-def find_subject_by_class(graph: Graph, rdf_class: URIRef):
-    subjects = graph.subjects(RDF.type, rdf_class)
-    return next(subjects, None)
-
 
 @pytest.fixture()
 def fake_group(db):
