@@ -1,25 +1,14 @@
-from typing import Tuple, List, Dict
+from typing import Tuple, List, Dict, Union
 from rdflib import Graph, URIRef, BNode, RDF, Literal
 from edpop_explorer.readers import HPBReader
+from edpop_explorer.record import BibliographicalRecord
 from .constants import SKOS
 from .utils import ObjectURIs, objects_to_graph
 
 from vre.models import Record
 from .constants import EDPOPREC
 
-def known_bibliographical_fields() -> List[URIRef]:
-    return [
-        EDPOPREC.title,
-        EDPOPREC.alternativeTitle,
-        EDPOPREC.contributor,
-        EDPOPREC.publisherOrPrinter,
-        EDPOPREC.placeOfPublication,
-        EDPOPREC.dating,
-        EDPOPREC.language,
-        EDPOPREC.extent,
-        EDPOPREC.size,
-        EDPOPREC.physicalDescription,
-    ]
+FIELDS = BibliographicalRecord(HPBReader())._fields
 
 def legacy_catalog_to_graph() -> Tuple[URIRef, Graph]:
     reader = HPBReader()
@@ -29,7 +18,13 @@ def legacy_catalog_to_graph() -> Tuple[URIRef, Graph]:
 
 def import_properties(keys: List[str]) -> Tuple[ObjectURIs, Graph]:
     identity = lambda key: key
-    return objects_to_graph(new_property, identity, set(keys))
+    return objects_to_graph(import_property, identity, set(keys))
+
+def import_property(label: str) -> Tuple[URIRef, Graph]:
+    return existing_property(label) or new_property(label)
+
+def existing_property(label: str) -> Union[Tuple[URIRef, Graph], None]:
+    return None
 
 def new_property(key: str) -> Tuple[URIRef, Graph]:
     g = Graph()
