@@ -6,10 +6,9 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.db.models import Model
 
-from .utils import union_graphs
+from .utils import union_graphs, ObjectURIs, objects_to_graph
 from .import_legacy_records import legacy_catalog_to_graph, import_record
 
-ObjectURIs = Dict[int, URIRef]
 
 # APPLICATION
 
@@ -35,7 +34,7 @@ def _add_application_name_to_graph(g: Graph, subject: URIRef) -> None:
 # USERS
 
 def users_to_graph(users: Iterator[User]) -> Tuple[ObjectURIs, Graph]:
-    return objects_to_graph(user_to_graph, users)
+    return models_to_graph(user_to_graph, users)
     
 
 def user_to_graph(user: User) -> Tuple[URIRef, Graph]:
@@ -62,7 +61,7 @@ def projects_to_graph(research_groups: Iterator[ResearchGroup]) -> Tuple[ObjectU
     as the central term because the relationship with user groups is less strict.
     '''
 
-    return objects_to_graph(project_to_graph, research_groups)
+    return models_to_graph(project_to_graph, research_groups)
 
 
 def project_to_graph(research_group: ResearchGroup) -> Tuple[URIRef, Graph]:
@@ -87,7 +86,7 @@ def collections_to_graph(collections: Iterator[Collection], project_uris: Object
     Convert collections to RDF representation
     '''
     convert = lambda collection: collection_to_graph(collection, project_uris)
-    return objects_to_graph(convert, collections)
+    return models_to_graph(convert, collections)
 
 def collection_to_graph(collection: Collection, project_uris: ObjectURIs) -> Tuple[URIRef, Graph]:
     g = Graph()
@@ -120,7 +119,7 @@ def records_to_graph(records: Iterator[Record], collection_uris: ObjectURIs) -> 
     '''
     catalog_uri, catalog_graph = legacy_catalog_to_graph()
     convert = lambda record: record_to_graph(record, collection_uris, catalog_uri)
-    return objects_to_graph(convert, records)
+    return models_to_graph(convert, records)
 
 
 def record_to_graph(record: Record, collection_uris: ObjectURIs, catalog_uri) -> Tuple[URIRef, Graph]:
@@ -152,7 +151,7 @@ def annotations_to_graph(annotations: Iterator[Annotation],
     '''
 
     convert = lambda annotation: annotation_to_graph(annotation, application_uri, project_uris, record_uris)
-    return objects_to_graph(convert, annotations)
+    return models_to_graph(convert, annotations)
 
 
 def annotation_to_graph(annotation: Annotation, application_uri: URIRef, project_uris: ObjectURIs, record_uris: ObjectURIs) -> Tuple[URIRef, Graph]:
@@ -180,31 +179,11 @@ def _add_annotation_context_to_graph(annotation: Annotation, g: Graph, subject: 
 
 # UTILITY
 
-def objects_to_graph(convert: Callable, objects: Iterator[Model]) -> Tuple[ObjectURIs, Graph]:
-    '''
-    Convert a list of database objects to a graph and a dict with URI references.
+def model_id(model: Model):
+    return model.id
 
-    Arguments:
-    - `objects`: a list of django model instances
-    - `convert`: a function that convert a model instance to a graph. It should return a tuple
-    of the subject node for the object, and the graph it has created.
-
-    Returns:
-    A tuple of
-    - object URIs: a dict that maps object `id`s to their URI
-    - a graph containing the representation of all objects
-    '''
-    
-    objects = list(objects)
-    result = map(convert, objects)
-    uris, graphs = zip(*result)
-    object_uris = {
-        obj.id: uri
-        for obj, uri in zip(objects, uris)
-    }
-    g = union_graphs(graphs)
-    return object_uris, g
-
+def models_to_graph(convert: Callable, objects: Iterator[Model]):
+    return objects_to_graph(convert, model_id, objects)
 
 def convert_all(users: Iterator[User],
                 research_groups: Iterator[ResearchGroup],
