@@ -2,7 +2,7 @@ import pytest
 from vre.models import Record
 from rdflib import RDF, Graph
 from .constants import EDPOPREC
-from .import_legacy_records import import_record, legacy_catalog_to_graph, import_properties
+from .import_legacy_records import import_record, legacy_catalog_to_graph, import_properties, import_property
 from .utils import triple_exists
 
 @pytest.fixture()
@@ -36,4 +36,7 @@ def test_import_properties():
     properties_in_graph = graph.triples((None, RDF.type, RDF.Property))
     assert len(list(properties_in_graph)) == 3
 
-    
+def test_match_property():
+    label = 'Title'
+    uri, _ = import_property(label)
+    assert uri == EDPOPREC.title
