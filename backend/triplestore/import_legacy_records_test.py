@@ -4,6 +4,7 @@ from rdflib import RDF, Graph
 from .constants import EDPOPREC
 from .import_legacy_records import import_record, legacy_catalog_to_graph, import_properties, import_property
 from .utils import triple_exists
+from .record_ontology import import_ontology
 
 @pytest.fixture()
 def record_obj(db):
@@ -25,18 +26,23 @@ def test_import_record(record_obj):
     assert triple_exists(g, (record, RDF.type, EDPOPREC.Record))
 
 def test_import_properties():
-    g = Graph()
-
     properties = ['Title', 'Author', 'Title', 'Date']
-
-    uris, graph = import_properties(properties)
-
+    uris, _ = import_properties(properties)
     assert all(p in uris for p in properties)
 
-    properties_in_graph = graph.triples((None, RDF.type, RDF.Property))
-    assert len(list(properties_in_graph)) == 3
+@pytest.fixture(scope='session')
+def ontology():
+    return import_ontology()
 
-def test_match_property():
+def test_import_property(ontology):
     label = 'Title'
-    uri, _ = import_property(label)
+    uri, graph = import_property(label, ontology)
     assert uri == EDPOPREC.title
+    assert not triple_exists(graph, (None, None, None))
+
+def import_unknown_property(ontology):
+    label = 'Special title'
+    uri, graph = import_property(label, ontology)
+    assert triple_exists(graph, (uri, RDF.type, RDF.Property))
+
+    
