@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from django.db.models import Model
 
 from .utils import union_graphs, ObjectURIs, objects_to_graph
-from .import_legacy_records import legacy_catalog_to_graph, import_record
+from .import_legacy_records import legacy_catalog_to_graph, import_records
 
 
 # APPLICATION
@@ -117,21 +117,15 @@ def records_to_graph(records: Iterator[Record], collection_uris: ObjectURIs) -> 
     '''
     Convert records to RDF representation
     '''
-    catalog_uri, catalog_graph = legacy_catalog_to_graph()
-    convert = lambda record: record_to_graph(record, collection_uris, catalog_uri)
-    return models_to_graph(convert, records)
 
+    records_list = list(records)
+    record_uris, graph = import_records(records_list)
 
-def record_to_graph(record: Record, collection_uris: ObjectURIs, catalog_uri) -> Tuple[URIRef, Graph]:
-    try:
-        subject, g  = import_record(record, catalog_uri)
-    except:
-        g = Graph()
-        subject = BNode()
+    for record in records_list:
+        uri = record_uris[record.id]
+        _add_record_collections_to_graph(record, graph, uri, collection_uris)
 
-    _add_record_collections_to_graph(record, g, subject, collection_uris)
-
-    return subject, g
+    return record_uris, graph
 
 
 def _add_record_collections_to_graph(record: Record, g: Graph, subject: URIRef, collection_uris: ObjectURIs) -> None:
