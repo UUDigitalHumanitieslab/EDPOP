@@ -1,11 +1,10 @@
-from rdflib import RDF, Literal
+from rdflib import RDF, Literal, BNode
 
 from ..constants import EDPOPCOL, AS
 from ..utils import find_subject_by_class, triple_exists
 from .conversion import project_to_graph, projects_to_graph, collection_to_graph, \
     annotation_to_graph, records_to_graph, collections_to_graph, application_to_graph, \
     users_to_graph
-
 
 def test_add_project_to_graph(fake_group):
     _, g = project_to_graph(fake_group)
@@ -32,9 +31,9 @@ def test_add_annotation_to_graph(fake_group, fake_collection, fake_record, fake_
     application_uri, _ = application_to_graph()
     project_uris, _ = projects_to_graph([fake_group])
     collection_uris, _ = collections_to_graph([fake_collection], project_uris)
-    record_uris, _ = records_to_graph([fake_record], collection_uris)
-    
-    annotation, g = annotation_to_graph(fake_annotation, application_uri, project_uris, record_uris)
+    property_uris = { 'content': BNode() }
+    record_uris, _ = records_to_graph([fake_record], collection_uris, property_uris)
+    annotation, g = annotation_to_graph(fake_annotation, application_uri, project_uris, record_uris, property_uris)
 
     assert find_subject_by_class(g, EDPOPCOL.Annotation)
 

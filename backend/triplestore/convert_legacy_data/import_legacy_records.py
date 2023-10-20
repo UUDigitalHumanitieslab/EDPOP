@@ -4,43 +4,20 @@ from edpop_explorer.readers import HPBReader
 from ..constants import SKOS
 from ..utils import ObjectURIs, objects_to_graph
 
-from vre.models import Record
+from vre.models import Record, Annotation
 from ..constants import EDPOPREC
 from ..record_ontology import import_ontology
 
-def records_to_graph(records: Iterator[Record]) -> Tuple[ObjectURIs, Graph]:
+def content_property_labels_to_graph(objects: Iterator[Union[Record, Annotation]]) -> Tuple[ObjectURIs, Graph]:
     '''
-    Convert legacy records to graph representation
-    '''
-    
-    catalog_uri, catalog_graph = legacy_catalog_to_graph()
-    property_uris, property_graph = record_property_labels_to_graph(records)
-    
-    convert = lambda record: record_to_graph(record, catalog_uri, property_uris)
-    to_id = lambda record: record.id
-    record_uris, records_graph =  objects_to_graph(convert, to_id, records)
-    g = catalog_graph + property_graph + records_graph
-    return record_uris, g
-
-def legacy_catalog_to_graph() -> Tuple[URIRef, Graph]:
-    '''
-    Convert the catalogue for legacy data (HPB) to a graph representation
-    '''
-
-    reader = HPBReader()
-    graph = reader.catalog_to_graph()
-    subject, _, _ = next(graph.triples((None, RDF.type, None)))
-    return subject, graph
-
-def record_property_labels_to_graph(records: Iterator[Record]) -> Tuple[ObjectURIs, Graph]:
-    '''
-    Collect all the keys for the content of records and convert them to a graph representation.
+    Collect all the keys for the content of records and annotations
+    and convert them to a graph representation.
     '''
     
     property_keys = set(
         key
-        for record in records
-        for key in record.content
+        for obj in objects
+        for key in obj.content
     )
     return property_labels_to_graph(property_keys)
 
@@ -117,6 +94,30 @@ def new_property(label: str) -> Tuple[URIRef, Graph]:
     g.add((property, SKOS.prefLabel, Literal(label)))
 
     return property, g
+
+def records_to_graph(records: Iterator[Record], property_uris: ObjectURIs) -> Tuple[ObjectURIs, Graph]:
+    '''
+    Convert legacy records to graph representation
+    '''
+    
+    catalog_uri, catalog_graph = legacy_catalog_to_graph()
+    
+    convert = lambda record: record_to_graph(record, catalog_uri, property_uris)
+    to_id = lambda record: record.id
+    record_uris, records_graph =  objects_to_graph(convert, to_id, records)
+    g = catalog_graph + records_graph
+    return record_uris, g
+
+def legacy_catalog_to_graph() -> Tuple[URIRef, Graph]:
+    '''
+    Convert the catalogue for legacy data (HPB) to a graph representation
+    '''
+
+    reader = HPBReader()
+    graph = reader.catalog_to_graph()
+    subject, _, _ = next(graph.triples((None, RDF.type, None)))
+    return subject, graph
+
 
 def record_to_graph(record: Record, catalog: URIRef, record_properties: ObjectURIs) -> Tuple[URIRef, Graph]:
     '''

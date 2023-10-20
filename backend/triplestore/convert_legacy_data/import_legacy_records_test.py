@@ -1,6 +1,6 @@
 import pytest
 from vre.models import Record
-from rdflib import RDF, Graph
+from rdflib import RDF, BNode
 from ..constants import EDPOPREC
 from .import_legacy_records import records_to_graph, record_to_graph, legacy_catalog_to_graph, property_labels_to_graph, property_label_to_graph
 from ..utils import triple_exists
@@ -19,7 +19,8 @@ def record_obj(db):
     )
 
 def test_import_records(record_obj):
-    uris, graph = records_to_graph([record_obj])
+    property_uris = {'Title': BNode(), 'Author': BNode()}
+    uris, graph = records_to_graph([record_obj], property_uris)
     assert record_obj.id in uris
     uri = uris[record_obj.id]
     assert triple_exists(graph, (uri, RDF.type, EDPOPREC.Record))

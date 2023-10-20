@@ -5,9 +5,10 @@ from ..constants import EDPOPCOL, AS, OA
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db.models import Model
+from itertools import chain
 
 from ..utils import ObjectURIs, objects_to_graph
-from .import_legacy_records import records_to_graph as records_content_to_graph
+from .import_legacy_records import records_to_graph as records_content_to_graph, content_property_labels_to_graph
 from .annotation_body import annotation_body_to_graph
 
 
@@ -114,13 +115,13 @@ def _add_collection_projects_to_graph(collection: Collection, g: Graph, subject:
 
 # RECORDS
 
-def records_to_graph(records: Iterator[Record], collection_uris: ObjectURIs) -> Tuple[ObjectURIs, Graph]:
+def records_to_graph(records: Iterator[Record], collection_uris: ObjectURIs, property_uris: ObjectURIs) -> Tuple[ObjectURIs, Graph]:
     '''
     Convert records to RDF representation
     '''
 
     records_list = list(records)
-    record_uris, graph = records_content_to_graph(records_list)
+    record_uris, graph = records_content_to_graph(records_list, property_uris)
 
     for record in records_list:
         uri = record_uris[record.id]
@@ -138,18 +139,20 @@ def _add_record_collections_to_graph(record: Record, g: Graph, subject: URIRef, 
 # ANNOTATIONS
 
 def annotations_to_graph(annotations: Iterator[Annotation],
-                             application_uri: URIRef,
-                             project_uris: ObjectURIs,
-                             record_uris: ObjectURIs) -> Tuple[ObjectURIs, Graph]:
+                        application_uri: URIRef,
+                        project_uris: ObjectURIs,
+                        record_uris: ObjectURIs,
+                        property_uris: ObjectURIs) -> Tuple[ObjectURIs, Graph]:
     '''
     Convert annotations to RDF representation
     '''
 
-    convert = lambda annotation: annotation_to_graph(annotation, application_uri, project_uris, record_uris)
+    convert = lambda annotation: annotation_to_graph(annotation,
+        application_uri, project_uris, record_uris, property_uris)
     return models_to_graph(convert, annotations)
 
 
-def annotation_to_graph(annotation: Annotation, application_uri: URIRef, project_uris: ObjectURIs, record_uris: ObjectURIs) -> Tuple[URIRef, Graph]:
+def annotation_to_graph(annotation: Annotation, application_uri: URIRef, project_uris: ObjectURIs, record_uris: ObjectURIs, property_uris: ObjectURIs) -> Tuple[URIRef, Graph]:
     g = Graph()
     subject = BNode()
     g.add((subject, RDF.type, EDPOPCOL.Annotation))
@@ -158,7 +161,7 @@ def annotation_to_graph(annotation: Annotation, application_uri: URIRef, project
 
     _add_annotation_target_to_graph(annotation, g, subject, record_uris)
     _add_annotation_context_to_graph(annotation, g, subject, project_uris)
-    g += annotation_body_to_graph(annotation, subject)
+    g += annotation_body_to_graph(annotation, subject, property_uris)
 
     return subject, g
 
@@ -199,10 +202,11 @@ def convert_all(users: Iterator[User],
     user_uris, users_graph = users_to_graph(users)
     project_uris, projects_graph = projects_to_graph(research_groups)
     collection_uris, collections_graph = collections_to_graph(collections, project_uris)
-    record_uris, records_graph = records_to_graph(records, collection_uris)
-    annotation_uris, annotations_graph = annotations_to_graph(annotations, application_uri, project_uris, record_uris)
+    property_uris, properties_graph = content_property_labels_to_graph(chain(records, annotations))
+    record_uris, records_graph = records_to_graph(records, collection_uris, property_uris)
+    annotation_uris, annotations_graph = annotations_to_graph(annotations, application_uri, project_uris, record_uris, property_uris)
 
-    graph = application_graph + users_graph + projects_graph + collections_graph + records_graph + annotations_graph
+    graph = application_graph + users_graph + projects_graph + collections_graph + properties_graph + records_graph + annotations_graph
 
     uriref = {
         'users': user_uris,
