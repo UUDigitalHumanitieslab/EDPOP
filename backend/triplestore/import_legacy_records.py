@@ -1,4 +1,4 @@
-from typing import Tuple, List, Union, Iterator
+from typing import Tuple, Union, Iterator, Set
 from rdflib import Graph, URIRef, BNode, RDF, Literal, RDFS
 from edpop_explorer.readers import HPBReader
 from .constants import SKOS
@@ -8,37 +8,63 @@ from vre.models import Record
 from .constants import EDPOPREC
 from .record_ontology import import_ontology
 
-def import_records(records: Iterator[Record]) -> Tuple[ObjectURIs, Graph]:
-    catalog_uri, catalog_graph = legacy_catalog_to_graph()
-    property_uris, property_graph = import_record_properties(records)
+def records_to_graph(records: Iterator[Record]) -> Tuple[ObjectURIs, Graph]:
+    '''
+    Convert legacy records to graph representation
+    '''
     
-    convert = lambda record: import_record(record, catalog_uri, property_uris)
+    catalog_uri, catalog_graph = legacy_catalog_to_graph()
+    property_uris, property_graph = record_property_labels_to_graph(records)
+    
+    convert = lambda record: record_to_graph(record, catalog_uri, property_uris)
     to_id = lambda record: record.id
     record_uris, records_graph =  objects_to_graph(convert, to_id, records)
     g = catalog_graph + property_graph + records_graph
     return record_uris, g
 
 def legacy_catalog_to_graph() -> Tuple[URIRef, Graph]:
+    '''
+    Convert the catalogue for legacy data (HPB) to a graph representation
+    '''
+
     reader = HPBReader()
     graph = reader.catalog_to_graph()
     subject, _, _ = next(graph.triples((None, RDF.type, None)))
     return subject, graph
 
-def import_record_properties(records: Iterator[Record]):
-    property_keys = [
+def record_property_labels_to_graph(records: Iterator[Record]) -> Tuple[ObjectURIs, Graph]:
+    '''
+    Collect all the keys for the content of records and convert them to a graph representation.
+    '''
+    
+    property_keys = set(
         key
         for record in records
         for key in record.content
-    ]
-    return import_properties(property_keys)
+    )
+    return property_labels_to_graph(property_keys)
 
-def import_properties(keys: List[str]) -> Tuple[ObjectURIs, Graph]:
+def property_labels_to_graph(labels: Set[str]) -> Tuple[ObjectURIs, Graph]:
+    '''
+    Convert a collection of labels (strings) to graph representation.
+
+    If labels are not recognised from the ontology, a new resource will be created for them.
+    Output is a lookup dict (labels to URIs) and a graph defining any new properties.
+    '''
+
     identity = lambda key: key
     ontology = import_ontology()
-    convert = lambda label: import_property(label, ontology)
-    return objects_to_graph(convert, identity, set(keys))
+    convert = lambda label: property_label_to_graph(label, ontology)
+    return objects_to_graph(convert, identity, labels)
 
-def import_property(label: str, ontology: Graph) -> Tuple[URIRef, Graph]:
+def property_label_to_graph(label: str, ontology: Graph) -> Tuple[URIRef, Graph]:
+    '''
+    Convert a label for a record property to a graph representation.
+
+    Tries to match the label with the ontology, and creates a new label if no
+    match is available.
+    '''
+
     return existing_property(label, ontology) or new_property(label)
 
 def existing_property(label: str, ontology: Graph) -> Union[Tuple[URIRef, Graph], None]:
@@ -75,17 +101,28 @@ def existing_property(label: str, ontology: Graph) -> Union[Tuple[URIRef, Graph]
         return match, Graph()
 
 
-def new_property(key: str) -> Tuple[URIRef, Graph]:
+def new_property(label: str) -> Tuple[URIRef, Graph]:
+    '''
+    Create a new record property based on a string label.
+
+    The property will have edpoprec:Record as its domain and
+    edpoprec:Field as its range.
+    '''
+
     g = Graph()
     property = BNode()
     g.add((property, RDF.type, RDF.Property))
     g.add((property, RDFS.domain, EDPOPREC.Record))
     g.add((property, RDFS.range, EDPOPREC.Field))
-    g.add((property, SKOS.prefLabel, Literal(key)))
+    g.add((property, SKOS.prefLabel, Literal(label)))
 
     return property, g
 
-def import_record(record: Record, catalog: URIRef, record_properties: ObjectURIs) -> Tuple[URIRef, Graph]:
+def record_to_graph(record: Record, catalog: URIRef, record_properties: ObjectURIs) -> Tuple[URIRef, Graph]:
+    '''
+    Convert a record to graph representation
+    '''
+
     g = Graph()
     subject = BNode()
     g.add((subject, RDF.type, EDPOPREC.Record))
@@ -95,12 +132,16 @@ def import_record(record: Record, catalog: URIRef, record_properties: ObjectURIs
 
     for (key, value) in record.content.items():
         property = record_properties[key]
-        g += import_field(subject, property, value)
+        g += field_to_graph(subject, property, value)
 
     return subject, g
 
 
-def import_field(subject: URIRef, property: URIRef, value: str) -> Graph:
+def field_to_graph(subject: URIRef, property: URIRef, value: str) -> Graph:
+    '''
+    Convert a field of a record to graph representation
+    '''
+    
     g = Graph()
 
     field = BNode()
