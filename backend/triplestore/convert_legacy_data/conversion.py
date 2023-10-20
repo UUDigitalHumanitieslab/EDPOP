@@ -8,6 +8,7 @@ from django.db.models import Model
 
 from ..utils import ObjectURIs, objects_to_graph
 from .import_legacy_records import records_to_graph as records_content_to_graph
+from .annotation_body import annotation_body_to_graph
 
 
 # APPLICATION
@@ -157,6 +158,7 @@ def annotation_to_graph(annotation: Annotation, application_uri: URIRef, project
 
     _add_annotation_target_to_graph(annotation, g, subject, record_uris)
     _add_annotation_context_to_graph(annotation, g, subject, project_uris)
+    g += annotation_body_to_graph(annotation, subject)
 
     return subject, g
 
