@@ -1,13 +1,13 @@
 from rdflib import Graph, RDF, BNode, Literal, URIRef
 from typing import Iterator, Tuple, Callable
 from vre.models import ResearchGroup, Collection, Record, Annotation
-from .constants import EDPOPCOL, AS, OA
+from ..constants import EDPOPCOL, AS, OA
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db.models import Model
 
-from .utils import ObjectURIs, objects_to_graph
-from .import_legacy_records import records_to_graph
+from ..utils import ObjectURIs, objects_to_graph
+from .import_legacy_records import records_to_graph as records_content_to_graph
 
 
 # APPLICATION
@@ -119,7 +119,7 @@ def records_to_graph(records: Iterator[Record], collection_uris: ObjectURIs) -> 
     '''
 
     records_list = list(records)
-    record_uris, graph = records_to_graph(records_list)
+    record_uris, graph = records_content_to_graph(records_list)
 
     for record in records_list:
         uri = record_uris[record.id]

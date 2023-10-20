@@ -1,10 +1,10 @@
 import pytest
 from vre.models import Record
 from rdflib import RDF, Graph
-from .constants import EDPOPREC
+from ..constants import EDPOPREC
 from .import_legacy_records import records_to_graph, record_to_graph, legacy_catalog_to_graph, property_labels_to_graph, property_label_to_graph
-from .utils import triple_exists
-from .record_ontology import import_ontology
+from ..utils import triple_exists
+from ..record_ontology import import_ontology
 
 @pytest.fixture()
 def record_obj(db):

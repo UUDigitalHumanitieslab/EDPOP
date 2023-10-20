@@ -1,11 +1,10 @@
-from typing import Tuple
-from rdflib import RDF, Literal, Graph, URIRef
+from rdflib import RDF, Literal
 import pytest
 from django.contrib.auth.models import User
 
 from vre.models import ResearchGroup, Collection, Record, Annotation
-from .constants import EDPOPCOL, AS
-from .utils import find_subject_by_class, triple_exists
+from ..constants import EDPOPCOL, AS
+from ..utils import find_subject_by_class, triple_exists
 from .conversion import project_to_graph, projects_to_graph, collection_to_graph, \
     annotation_to_graph, records_to_graph, collections_to_graph, application_to_graph, \
     users_to_graph

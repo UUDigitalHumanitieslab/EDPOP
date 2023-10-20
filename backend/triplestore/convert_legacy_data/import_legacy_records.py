@@ -1,12 +1,12 @@
 from typing import Tuple, Union, Iterator, Set
 from rdflib import Graph, URIRef, BNode, RDF, Literal, RDFS
 from edpop_explorer.readers import HPBReader
-from .constants import SKOS
-from .utils import ObjectURIs, objects_to_graph
+from ..constants import SKOS
+from ..utils import ObjectURIs, objects_to_graph
 
 from vre.models import Record
-from .constants import EDPOPREC
-from .record_ontology import import_ontology
+from ..constants import EDPOPREC
+from ..record_ontology import import_ontology
 
 def records_to_graph(records: Iterator[Record]) -> Tuple[ObjectURIs, Graph]:
     '''
