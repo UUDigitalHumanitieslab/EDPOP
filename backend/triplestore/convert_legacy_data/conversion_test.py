@@ -26,12 +26,11 @@ def test_add_collection_to_graph(fake_group, fake_collection):
     assert triple_exists(g, context_triple)
 
 
-def test_add_annotation_to_graph(fake_group, fake_collection, fake_record, fake_annotation):
+def test_add_annotation_to_graph(fake_group, fake_collection, fake_record, fake_annotation, property_uris):
 
     application_uri, _ = application_to_graph()
     project_uris, _ = projects_to_graph([fake_group])
     collection_uris, _ = collections_to_graph([fake_collection], project_uris)
-    property_uris = { 'content': BNode() }
     record_uris, _ = records_to_graph([fake_record], collection_uris, property_uris)
     annotation, g = annotation_to_graph(fake_annotation, application_uri, project_uris, record_uris, property_uris)
 

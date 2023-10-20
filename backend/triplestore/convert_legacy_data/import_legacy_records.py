@@ -133,12 +133,14 @@ def record_to_graph(record: Record, catalog: URIRef, record_properties: ObjectUR
 
     for (key, value) in record.content.items():
         property = record_properties[key]
-        g += field_to_graph(subject, property, value)
+        field, field_graph = field_to_graph(value)
+        g += field_graph
+        g.add((subject, property, field))
 
     return subject, g
 
 
-def field_to_graph(subject: URIRef, property: URIRef, value: str) -> Graph:
+def field_to_graph(value: str) -> Tuple[URIRef, Graph]:
     '''
     Convert a field of a record to graph representation
     '''
@@ -149,6 +151,4 @@ def field_to_graph(subject: URIRef, property: URIRef, value: str) -> Graph:
     g.add((field, RDF.type, EDPOPREC.Field))
     g.add((field, EDPOPREC.originalText, Literal(value)))    
 
-    g.add((subject, property, field))
-
-    return g
+    return field, g

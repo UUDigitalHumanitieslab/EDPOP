@@ -1,5 +1,6 @@
 import pytest
 from django.contrib.auth.models import User
+from rdflib import BNode
 
 from vre.models import ResearchGroup, Collection, Record, Annotation
 
@@ -33,7 +34,9 @@ def fake_collection(db, fake_group):
 def fake_record(db, fake_collection):
     record = Record.objects.create(
         uri = 'blablablablabla',
-        content = { 'content': 'test' }
+        content = {
+            'Title': 'Test'
+        }
     )
     record.collection.add(fake_collection)
     record.save()
@@ -45,6 +48,17 @@ def fake_annotation(db, fake_group, fake_record):
     annotation = Annotation.objects.create(
         record = fake_record,
         managing_group = fake_group,
-        content = { 'content':  'test' }
+        content = {
+            'Title': 'Different kind of test',
+            'Genre': 'Test material',
+        }
     )
     return annotation
+
+@pytest.fixture()
+def property_uris():
+    return {
+        'Title': BNode(),
+        'Author': BNode(),
+        'Genre': BNode()
+    }
