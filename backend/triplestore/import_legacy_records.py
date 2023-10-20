@@ -1,4 +1,4 @@
-from typing import Tuple, List, Union
+from typing import Tuple, List, Union, Iterator
 from rdflib import Graph, URIRef, BNode, RDF, Literal, RDFS
 from edpop_explorer.readers import HPBReader
 from .constants import SKOS
@@ -8,11 +8,29 @@ from vre.models import Record
 from .constants import EDPOPREC
 from .record_ontology import import_ontology
 
+def import_records(records: Iterator[Record]) -> Tuple[ObjectURIs, Graph]:
+    catalog_uri, catalog_graph = legacy_catalog_to_graph()
+    property_uris, property_graph = import_record_properties(records)
+    
+    convert = lambda record: import_record(record, catalog_uri, property_uris)
+    to_id = lambda record: record.id
+    record_uris, records_graph =  objects_to_graph(convert, to_id, records)
+    g = catalog_graph + property_graph + records_graph
+    return record_uris, g
+
 def legacy_catalog_to_graph() -> Tuple[URIRef, Graph]:
     reader = HPBReader()
     graph = reader.catalog_to_graph()
     subject, _, _ = next(graph.triples((None, RDF.type, None)))
     return subject, graph
+
+def import_record_properties(records: Iterator[Record]):
+    property_keys = [
+        key
+        for record in records
+        for key in record.content
+    ]
+    return import_properties(property_keys)
 
 def import_properties(keys: List[str]) -> Tuple[ObjectURIs, Graph]:
     identity = lambda key: key
