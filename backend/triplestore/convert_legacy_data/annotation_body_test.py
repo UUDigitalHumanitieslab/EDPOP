@@ -2,7 +2,7 @@ from rdflib import BNode, Graph
 import pytest
 
 from .annotation_body import annotation_body_to_graph, _replaced_labels
-from .import_legacy_records import record_to_graph
+from .records import record_to_graph
 from triplestore.utils import find_subject_by_class
 from triplestore.constants import EDPOPCOL, EDPOPREC
 

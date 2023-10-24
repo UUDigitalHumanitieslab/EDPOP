@@ -8,7 +8,7 @@ from django.db.models import Model
 from itertools import chain
 
 from ..utils import ObjectURIs, objects_to_graph
-from .import_legacy_records import records_to_graph as records_content_to_graph, content_property_labels_to_graph
+from .records import records_to_graph as records_content_to_graph, content_property_labels_to_graph
 from .annotation_body import annotation_body_to_graph
 
 
