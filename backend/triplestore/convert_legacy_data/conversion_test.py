@@ -4,7 +4,7 @@ from ..constants import EDPOPCOL, AS
 from ..utils import find_subject_by_class, triple_exists
 from .conversion import project_to_graph, projects_to_graph, collection_to_graph, \
     annotation_to_graph, records_to_graph, collections_to_graph, application_to_graph, \
-    users_to_graph
+    users_to_graph, convert_all
 
 def test_add_project_to_graph(fake_group):
     _, g = project_to_graph(fake_group)
@@ -45,3 +45,15 @@ def test_users_to_graph(fake_user):
 
     user_node = uris[fake_user.id]
     assert triple_exists(g, (user_node, RDF.type, EDPOPCOL.User))
+
+
+def test_convert_all(fake_user, fake_group, fake_collection, fake_record, fake_annotation):
+    refs, graph = convert_all(
+        [fake_user],
+        [fake_group],
+        [fake_collection],
+        [fake_record],
+        [fake_annotation]
+    )
+    assert graph
+
