@@ -19,9 +19,9 @@ def content_property_labels_to_graph(objects: Iterator[Union[Record, Annotation]
         for obj in objects
         for key in obj.content
     )
-    return property_labels_to_graph(property_keys)
+    return _property_labels_to_graph(property_keys)
 
-def property_labels_to_graph(labels: Set[str]) -> Tuple[ObjectURIs, Graph]:
+def _property_labels_to_graph(labels: Set[str]) -> Tuple[ObjectURIs, Graph]:
     '''
     Convert a collection of labels (strings) to graph representation.
 
@@ -31,10 +31,10 @@ def property_labels_to_graph(labels: Set[str]) -> Tuple[ObjectURIs, Graph]:
 
     identity = lambda key: key
     ontology = import_ontology()
-    convert = lambda label: property_label_to_graph(label, ontology)
+    convert = lambda label: _property_label_to_graph(label, ontology)
     return objects_to_graph(convert, identity, labels)
 
-def property_label_to_graph(label: str, ontology: Graph) -> Tuple[URIRef, Graph]:
+def _property_label_to_graph(label: str, ontology: Graph) -> Tuple[URIRef, Graph]:
     '''
     Convert a label for a record property to a graph representation.
 
@@ -42,9 +42,9 @@ def property_label_to_graph(label: str, ontology: Graph) -> Tuple[URIRef, Graph]
     match is available.
     '''
 
-    return existing_property(label, ontology) or new_property(label)
+    return _existing_property(label, ontology) or _new_property(label)
 
-def existing_property(label: str, ontology: Graph) -> Union[Tuple[URIRef, Graph], None]:
+def _existing_property(label: str, ontology: Graph) -> Union[Tuple[URIRef, Graph], None]:
     '''
     Match a string label to an existing property in the ontology.
 
@@ -78,7 +78,7 @@ def existing_property(label: str, ontology: Graph) -> Union[Tuple[URIRef, Graph]
         return match, Graph()
 
 
-def new_property(label: str) -> Tuple[URIRef, Graph]:
+def _new_property(label: str) -> Tuple[URIRef, Graph]:
     '''
     Create a new record property based on a string label.
 
@@ -95,20 +95,22 @@ def new_property(label: str) -> Tuple[URIRef, Graph]:
 
     return property, g
 
+# RECORD CONVERSION
+
 def records_to_graph(records: Iterator[Record], property_uris: ObjectURIs) -> Tuple[ObjectURIs, Graph]:
     '''
     Convert legacy records to graph representation
     '''
     
-    catalog_uri, catalog_graph = legacy_catalog_to_graph()
+    catalog_uri, catalog_graph = _legacy_catalog_to_graph()
     
-    convert = lambda record: record_to_graph(record, catalog_uri, property_uris)
+    convert = lambda record: _record_to_graph(record, catalog_uri, property_uris)
     to_id = lambda record: record.id
     record_uris, records_graph =  objects_to_graph(convert, to_id, records)
     g = catalog_graph + records_graph
     return record_uris, g
 
-def legacy_catalog_to_graph() -> Tuple[URIRef, Graph]:
+def _legacy_catalog_to_graph() -> Tuple[URIRef, Graph]:
     '''
     Convert the catalogue for legacy data (HPB) to a graph representation
     '''
@@ -119,7 +121,7 @@ def legacy_catalog_to_graph() -> Tuple[URIRef, Graph]:
     return subject, graph
 
 
-def record_to_graph(record: Record, catalog: URIRef, record_properties: ObjectURIs) -> Tuple[URIRef, Graph]:
+def _record_to_graph(record: Record, catalog: URIRef, record_properties: ObjectURIs) -> Tuple[URIRef, Graph]:
     '''
     Convert a record to graph representation
     '''
@@ -133,14 +135,14 @@ def record_to_graph(record: Record, catalog: URIRef, record_properties: ObjectUR
 
     for (key, value) in record.content.items():
         property = record_properties[key]
-        field, field_graph = field_to_graph(value)
+        field, field_graph = _field_to_graph(value)
         g += field_graph
         g.add((subject, property, field))
 
     return subject, g
 
 
-def field_to_graph(value: str) -> Tuple[URIRef, Graph]:
+def _field_to_graph(value: str) -> Tuple[URIRef, Graph]:
     '''
     Convert a field of a record to graph representation
     '''

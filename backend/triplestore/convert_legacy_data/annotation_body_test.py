@@ -2,13 +2,13 @@ from rdflib import BNode, Graph
 import pytest
 
 from .annotation_body import annotation_body_to_graph, _replaced_labels
-from .records import record_to_graph
+from .records import _record_to_graph
 from triplestore.utils import find_subject_by_class
 from triplestore.constants import EDPOPCOL, EDPOPREC
 
 @pytest.fixture()
 def annotation_body_graph(fake_annotation, property_uris):
-    record_uri, record_graph = record_to_graph(fake_annotation.record, BNode(), property_uris)
+    record_uri, record_graph = _record_to_graph(fake_annotation.record, BNode(), property_uris)
     record_uris = { fake_annotation.record.id: record_uri }
     annotation_uri = BNode()
 

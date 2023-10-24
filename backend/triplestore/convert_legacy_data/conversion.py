@@ -63,10 +63,10 @@ def projects_to_graph(research_groups: Iterator[ResearchGroup]) -> Tuple[ObjectU
     as the central term because the relationship with user groups is less strict.
     '''
 
-    return models_to_graph(project_to_graph, research_groups)
+    return models_to_graph(_project_to_graph, research_groups)
 
 
-def project_to_graph(research_group: ResearchGroup) -> Tuple[URIRef, Graph]:
+def _project_to_graph(research_group: ResearchGroup) -> Tuple[URIRef, Graph]:
     g = Graph()
     subject = BNode()
 
@@ -76,21 +76,25 @@ def project_to_graph(research_group: ResearchGroup) -> Tuple[URIRef, Graph]:
     return subject, g
 
 
-def _add_project_name_to_graph(research_group: ResearchGroup, g: Graph, subject: URIRef) -> None:
+def _add_project_name_to_graph(research_group: ResearchGroup,
+                               g: Graph,
+                               subject: URIRef) -> None:
     name = Literal(research_group.project)
     g.add((subject, AS.name, name))
 
 
 # COLLECTIONS
 
-def collections_to_graph(collections: Iterator[Collection], project_uris: ObjectURIs) -> Tuple[ObjectURIs, Graph]:
+def collections_to_graph(collections: Iterator[Collection],
+                         project_uris: ObjectURIs) -> Tuple[ObjectURIs, Graph]:
     '''
     Convert collections to RDF representation
     '''
-    convert = lambda collection: collection_to_graph(collection, project_uris)
+    convert = lambda collection: _collection_to_graph(collection, project_uris)
     return models_to_graph(convert, collections)
 
-def collection_to_graph(collection: Collection, project_uris: ObjectURIs) -> Tuple[URIRef, Graph]:
+def _collection_to_graph(collection: Collection,
+                        project_uris: ObjectURIs) -> Tuple[URIRef, Graph]:
     g = Graph()
     subject = BNode()
     g.add((subject, RDF.type, EDPOPCOL.Collection))
@@ -101,13 +105,18 @@ def collection_to_graph(collection: Collection, project_uris: ObjectURIs) -> Tup
     return subject, g
 
 
-def _add_collection_description_to_graph(collection: Collection, g: Graph, subject: URIRef) -> None:
+def _add_collection_description_to_graph(collection: Collection,
+                                         g: Graph,
+                                         subject: URIRef) -> None:
     if collection.description:
         description = Literal(collection.description)
         g.add((subject, AS.summary, description))
 
 
-def _add_collection_projects_to_graph(collection: Collection, g: Graph, subject: URIRef, project_uris: ObjectURIs) -> None:
+def _add_collection_projects_to_graph(collection: Collection,
+                                      g: Graph,
+                                      subject: URIRef,
+                                      project_uris: ObjectURIs) -> None:
     for group in collection.managing_group.all():
         project_uri = project_uris.get(group.id)
         g.add((subject, AS.context, project_uri))
@@ -115,7 +124,9 @@ def _add_collection_projects_to_graph(collection: Collection, g: Graph, subject:
 
 # RECORDS
 
-def records_to_graph(records: Iterator[Record], collection_uris: ObjectURIs, property_uris: ObjectURIs) -> Tuple[ObjectURIs, Graph]:
+def records_to_graph(records: Iterator[Record],
+                     collection_uris: ObjectURIs,
+                     property_uris: ObjectURIs) -> Tuple[ObjectURIs, Graph]:
     '''
     Convert records to RDF representation
     '''
@@ -130,7 +141,10 @@ def records_to_graph(records: Iterator[Record], collection_uris: ObjectURIs, pro
     return record_uris, graph
 
 
-def _add_record_collections_to_graph(record: Record, g: Graph, subject: URIRef, collection_uris: ObjectURIs) -> None:
+def _add_record_collections_to_graph(record: Record,
+                                     g: Graph,
+                                     subject: URIRef,
+                                     collection_uris: ObjectURIs) -> None:
     for collection in record.collection.all():
         collection_uri = collection_uris.get(collection.id)
         g.add((subject, AS.context, collection_uri))
@@ -148,12 +162,12 @@ def annotations_to_graph(annotations: Iterator[Annotation],
     Convert annotations to RDF representation
     '''
 
-    convert = lambda annotation: annotation_to_graph(annotation,
+    convert = lambda annotation: _annotation_to_graph(annotation,
         application_uri, project_uris, record_uris, property_uris, records_graph)
     return models_to_graph(convert, annotations)
 
 
-def annotation_to_graph(annotation: Annotation,
+def _annotation_to_graph(annotation: Annotation,
                         application_uri: URIRef,
                         project_uris: ObjectURIs,
                         record_uris: ObjectURIs,
@@ -172,12 +186,18 @@ def annotation_to_graph(annotation: Annotation,
     return subject, g
 
 
-def _add_annotation_target_to_graph(annotation: Annotation, g: Graph, subject: URIRef, record_uris: ObjectURIs) -> URIRef:
+def _add_annotation_target_to_graph(annotation: Annotation,
+                                    g: Graph,
+                                    subject: URIRef,
+                                    record_uris: ObjectURIs) -> URIRef:
     record = record_uris[annotation.record.id]
     g.add((subject, OA.hasTarget, record))
 
 
-def _add_annotation_context_to_graph(annotation: Annotation, g: Graph, subject: URIRef, project_uris: ObjectURIs) -> None:
+def _add_annotation_context_to_graph(annotation: Annotation,
+                                     g: Graph,
+                                     subject: URIRef,
+                                     project_uris: ObjectURIs) -> None:
     project = project_uris[annotation.managing_group.id]
     g.add((subject, AS.context, project))
 
@@ -189,6 +209,8 @@ def model_id(model: Model):
 
 def models_to_graph(convert: Callable, objects: Iterator[Model]):
     return objects_to_graph(convert, model_id, objects)
+
+#  CONVERT ALL
 
 def convert_all(users: Iterator[User],
                 research_groups: Iterator[ResearchGroup],

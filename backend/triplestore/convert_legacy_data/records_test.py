@@ -2,7 +2,7 @@ import pytest
 from vre.models import Record
 from rdflib import RDF, BNode
 from ..constants import EDPOPREC
-from .records import records_to_graph, record_to_graph, legacy_catalog_to_graph, property_labels_to_graph, property_label_to_graph
+from .records import records_to_graph, _record_to_graph, _legacy_catalog_to_graph, _property_labels_to_graph, _property_label_to_graph
 from ..utils import triple_exists
 from ..record_ontology import import_ontology
 
@@ -26,15 +26,15 @@ def test_import_records(record_obj):
     assert triple_exists(graph, (uri, RDF.type, EDPOPREC.Record))
 
 def test_import_record(record_obj):
-    catalog, _ = legacy_catalog_to_graph()
-    property_uris, _ = property_labels_to_graph(['Title', 'Author'])
-    record, g = record_to_graph(record_obj, catalog, property_uris)
+    catalog, _ = _legacy_catalog_to_graph()
+    property_uris, _ = _property_labels_to_graph(['Title', 'Author'])
+    record, g = _record_to_graph(record_obj, catalog, property_uris)
 
     assert triple_exists(g, (record, RDF.type, EDPOPREC.Record))
 
 def test_import_properties():
     properties = ['Title', 'Author', 'Title', 'Date']
-    uris, _ = property_labels_to_graph(properties)
+    uris, _ = _property_labels_to_graph(properties)
     assert all(p in uris for p in properties)
 
 @pytest.fixture(scope='session')
@@ -43,11 +43,11 @@ def ontology():
 
 def test_import_property(ontology):
     label = 'Title'
-    uri, graph = property_label_to_graph(label, ontology)
+    uri, graph = _property_label_to_graph(label, ontology)
     assert uri == EDPOPREC.title
     assert not triple_exists(graph, (None, None, None))
 
 def import_unknown_property(ontology):
     label = 'Special title'
-    uri, graph = property_label_to_graph(label, ontology)
+    uri, graph = _property_label_to_graph(label, ontology)
     assert triple_exists(graph, (uri, RDF.type, RDF.Property))

@@ -5,6 +5,11 @@ from rdflib import BNode
 from vre.models import ResearchGroup, Collection, Record, Annotation
 
 
+# Fixtures with data for conversion - currently just model instances.
+# However, this script concerns a data migration so these should eventually
+# be changed into standalone objects that mock pre-migration classes, rather than
+# current ones.
+
 @pytest.fixture()
 def fake_user(db):
     user = User.objects.create()
@@ -55,8 +60,13 @@ def fake_annotation(db, fake_group, fake_record):
     )
     return annotation
 
+
 @pytest.fixture()
 def property_uris():
+    '''
+    Quick stand-in for property URIs in the faked data
+    '''
+    
     return {
         'Title': BNode(),
         'Author': BNode(),

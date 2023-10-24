@@ -4,7 +4,7 @@ from typing import Tuple, Dict, Set
 from vre.models import Annotation
 from triplestore.constants import OA, EDPOPCOL
 from triplestore.utils import ObjectURIs, union_graphs
-from .records import field_to_graph
+from .records import _field_to_graph
 
 def annotation_body_to_graph(annotation: Annotation, annotation_uri: URIRef, record_uris: ObjectURIs, property_uris: ObjectURIs, records_graph: Graph) -> Graph:
     record_uri = _record_uri(annotation, record_uris)
@@ -27,7 +27,7 @@ def _additions_to_graph(annotation_content: Dict[str, str],
                         property_uris: ObjectURIs) -> Graph:
     g = Graph()
     for (key, value) in annotation_content.items():
-        field, field_graph = field_to_graph(value)
+        field, field_graph = _field_to_graph(value)
         property = property_uris[key]
         predicate, predicate_graph = _annotation_item_to_graph(property, field)
         g += field_graph
