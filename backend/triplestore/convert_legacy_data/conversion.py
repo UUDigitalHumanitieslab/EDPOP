@@ -1,7 +1,7 @@
 from rdflib import Graph, RDF, BNode, Literal, URIRef
 from typing import Iterator, Tuple, Callable
 from vre.models import ResearchGroup, Collection, Record, Annotation
-from ..constants import EDPOPCOL, AS, OA
+from ..constants import EDPOPCOL, AS, OA, EDPOPREC
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db.models import Model
@@ -136,19 +136,26 @@ def records_to_graph(records: Iterator[Record],
 
     for record in records_list:
         uri = record_uris[record.id]
-        _add_record_collections_to_graph(record, graph, uri, collection_uris)
+        graph += _record_uri_to_graph(record, uri)
+        graph += _record_collections_to_graph(record, uri, collection_uris)
 
     return record_uris, graph
 
 
-def _add_record_collections_to_graph(record: Record,
-                                     g: Graph,
+def _record_uri_to_graph(record: Record, subject: URIRef) -> Graph:
+    g = Graph()
+    g.add((subject, EDPOPREC.publicURL, Literal(record.uri)))
+    return g
+
+
+def _record_collections_to_graph(record: Record,
                                      subject: URIRef,
                                      collection_uris: ObjectURIs) -> None:
+    g = Graph()
     for collection in record.collection.all():
         collection_uri = collection_uris.get(collection.id)
         g.add((subject, AS.context, collection_uri))
-
+    return g
 
 # ANNOTATIONS
 
