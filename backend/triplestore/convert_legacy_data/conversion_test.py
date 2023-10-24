@@ -31,8 +31,8 @@ def test_add_annotation_to_graph(fake_group, fake_collection, fake_record, fake_
     application_uri, _ = application_to_graph()
     project_uris, _ = projects_to_graph([fake_group])
     collection_uris, _ = collections_to_graph([fake_collection], project_uris)
-    record_uris, _ = records_to_graph([fake_record], collection_uris, property_uris)
-    annotation, g = annotation_to_graph(fake_annotation, application_uri, project_uris, record_uris, property_uris)
+    record_uris, record_graph = records_to_graph([fake_record], collection_uris, property_uris)
+    annotation, g = annotation_to_graph(fake_annotation, application_uri, project_uris, record_uris, property_uris, record_graph)
 
     assert find_subject_by_class(g, EDPOPCOL.Annotation)
 

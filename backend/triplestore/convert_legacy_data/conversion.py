@@ -142,17 +142,23 @@ def annotations_to_graph(annotations: Iterator[Annotation],
                         application_uri: URIRef,
                         project_uris: ObjectURIs,
                         record_uris: ObjectURIs,
-                        property_uris: ObjectURIs) -> Tuple[ObjectURIs, Graph]:
+                        property_uris: ObjectURIs,
+                        records_graph: Graph) -> Tuple[ObjectURIs, Graph]:
     '''
     Convert annotations to RDF representation
     '''
 
     convert = lambda annotation: annotation_to_graph(annotation,
-        application_uri, project_uris, record_uris, property_uris)
+        application_uri, project_uris, record_uris, property_uris, records_graph)
     return models_to_graph(convert, annotations)
 
 
-def annotation_to_graph(annotation: Annotation, application_uri: URIRef, project_uris: ObjectURIs, record_uris: ObjectURIs, property_uris: ObjectURIs) -> Tuple[URIRef, Graph]:
+def annotation_to_graph(annotation: Annotation,
+                        application_uri: URIRef,
+                        project_uris: ObjectURIs,
+                        record_uris: ObjectURIs,
+                        property_uris: ObjectURIs,
+                        records_graph: Graph) -> Tuple[URIRef, Graph]:
     g = Graph()
     subject = BNode()
     g.add((subject, RDF.type, EDPOPCOL.Annotation))
@@ -161,7 +167,7 @@ def annotation_to_graph(annotation: Annotation, application_uri: URIRef, project
 
     _add_annotation_target_to_graph(annotation, g, subject, record_uris)
     _add_annotation_context_to_graph(annotation, g, subject, project_uris)
-    g += annotation_body_to_graph(annotation, subject, property_uris)
+    g += annotation_body_to_graph(annotation, subject, record_uris, property_uris, records_graph)
 
     return subject, g
 
@@ -204,7 +210,7 @@ def convert_all(users: Iterator[User],
     collection_uris, collections_graph = collections_to_graph(collections, project_uris)
     property_uris, properties_graph = content_property_labels_to_graph(chain(records, annotations))
     record_uris, records_graph = records_to_graph(records, collection_uris, property_uris)
-    annotation_uris, annotations_graph = annotations_to_graph(annotations, application_uri, project_uris, record_uris, property_uris)
+    annotation_uris, annotations_graph = annotations_to_graph(annotations, application_uri, project_uris, record_uris, property_uris, records_graph)
 
     graph = application_graph + users_graph + projects_graph + collections_graph + properties_graph + records_graph + annotations_graph
 
