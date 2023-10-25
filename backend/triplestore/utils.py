@@ -3,14 +3,28 @@ from rdflib import Graph, URIRef, RDF
 from functools import reduce
 
 def union_graphs(graphs: Iterator[Graph]) -> Graph:
+    '''
+    Return the union of a collection of graphs
+
+    `union_graphs([g1, g2, g3])` is equivalent to `g1 + g2 + g3` 
+    '''
     return reduce(Graph.__iadd__, graphs)
 
 
-def triple_exists(graph: Graph, triple: Tuple[URIRef]):
+def triple_exists(graph: Graph, triple: Tuple[URIRef]) -> bool:
+    '''
+    Check whether a triple exists in a graph.
+    '''
     return any(graph.triples(triple))
 
 
-def find_subject_by_class(graph: Graph, rdf_class: URIRef):
+def find_subject_by_class(graph: Graph, rdf_class: URIRef) -> URIRef:
+    '''
+    Search a graph and return the first subject with a particular class.
+
+    Returns `None` if no match exists.
+    '''
+    
     subjects = graph.subjects(RDF.type, rdf_class)
     return next(subjects, None)
 
@@ -18,7 +32,7 @@ ObjectURIs = Dict[int, URIRef]
 
 def objects_to_graph(convert: Callable, to_key: Callable, objects: Iterator[Any]) -> Tuple[ObjectURIs, Graph]:
     '''
-    Convert a list of database objects to a graph and a dict with URI references.
+    Convert a list of objects to a graph and a dict with URI references.
 
     Arguments:
     - `convert`: a function that convert an object to a graph. It should return a tuple
