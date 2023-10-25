@@ -8,7 +8,7 @@ def union_graphs(graphs: Iterator[Graph]) -> Graph:
 
     `union_graphs([g1, g2, g3])` is equivalent to `g1 + g2 + g3` 
     '''
-    return reduce(Graph.__iadd__, graphs)
+    return reduce(Graph.__iadd__, graphs, Graph())
 
 
 def triple_exists(graph: Graph, triple: Tuple[URIRef]) -> bool:
