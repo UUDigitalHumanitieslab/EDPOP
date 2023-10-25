@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'django_filters',
     'rest_framework',
     'vre.apps.VreConfig',
+    'triplestore',
 ]
 
 MIDDLEWARE = [
@@ -178,3 +179,5 @@ STATICFILES_DIRS = (
     BASE_DIR / '..' / 'frontend' / 'vre',
 )
 STATIC_URL = '/static/'
+
+SITE_NAME = 'EDPOP VRE'
