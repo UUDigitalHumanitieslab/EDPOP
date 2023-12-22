@@ -9,4 +9,4 @@ beautifulsoup4
 sruthi
 rdflib
 restframework-rdf
-edpop-explorer
+edpop-explorer==0.7.0
