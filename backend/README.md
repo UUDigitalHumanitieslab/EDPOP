@@ -17,7 +17,7 @@ ALTER USER edpopuser CREATEDB;
 
 ## Installing
 
-Switch to a virtual environment with Python 3.8 installed, then:
+Switch to a virtual environment with Python >= 3.9 installed, then:
 
 ```bash
 pip install pip-tools
