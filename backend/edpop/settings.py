@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'vre.apps.VreConfig',
     'triplestore',
+    'rdf',
 ]
 
 MIDDLEWARE = [
