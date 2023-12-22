@@ -20,7 +20,7 @@ cmd2==2.4.3
     # via edpop-explorer
 defusedxml==0.7.1
     # via sruthi
-django==5.0
+django==4.2.8
     # via
     #   -r requirements.in
     #   django-filter
@@ -44,7 +44,7 @@ idna==3.6
     # via requests
 isodate==0.6.1
     # via rdflib
-lxml==4.9.3
+lxml==4.9.4
     # via -r requirements.in
 psycopg2==2.9.9
     # via -r requirements.in
