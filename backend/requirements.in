@@ -9,4 +9,4 @@ beautifulsoup4
 sruthi
 rdflib
 restframework-rdf
-edpop-explorer==0.7.0
+edpop-explorer@git+https://github.com/UUDigitalHumanitieslab/edpop-explorer@feature/fetchinterface

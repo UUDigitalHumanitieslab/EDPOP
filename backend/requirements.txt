@@ -8,7 +8,7 @@ appdirs==1.4.4
     # via edpop-explorer
 asgiref==3.7.2
     # via django
-attrs==23.1.0
+attrs==23.2.0
     # via cmd2
 beautifulsoup4==4.12.2
     # via -r requirements.in
@@ -20,7 +20,7 @@ cmd2==2.4.3
     # via edpop-explorer
 defusedxml==0.7.1
     # via sruthi
-django==4.2.8
+django==4.2.9
     # via
     #   -r requirements.in
     #   django-filter
@@ -34,7 +34,7 @@ djangorestframework==3.14.0
     # via
     #   -r requirements.in
     #   restframework-rdf
-edpop-explorer==0.7.0
+edpop-explorer @ git+https://github.com/UUDigitalHumanitieslab/edpop-explorer@feature/fetchinterface
     # via -r requirements.in
 flatten-dict==0.4.2
     # via sruthi
@@ -44,7 +44,7 @@ idna==3.6
     # via requests
 isodate==0.6.1
     # via rdflib
-lxml==4.9.4
+lxml==5.0.0
     # via -r requirements.in
 psycopg==3.1.16
     # via -r requirements.in
