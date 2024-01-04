@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 from pathlib import Path
 import os
 
+from edpop_explorer import readers
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
 
@@ -183,3 +185,7 @@ STATICFILES_DIRS = (
 STATIC_URL = '/static/'
 
 SITE_NAME = 'EDPOP VRE'
+
+# CATALOG_READERS: a list of Reader classes from the edpop-explorer package.
+# These readers will be registered for use in the VRE.
+CATALOG_READERS = readers.ALL_READERS
