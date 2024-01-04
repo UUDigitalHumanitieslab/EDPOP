@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'django_filters',
     'rest_framework',
     'vre.apps.VreConfig',
+    'catalogs.apps.CatalogsConfig',
     'triplestore',
     'rdf',
 ]
