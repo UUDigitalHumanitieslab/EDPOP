@@ -1,7 +1,10 @@
+from typing import Optional
 from django.conf import settings
 
-from edpop_explorer import Reader
-from rdflib import URIRef, Graph
+from edpop_explorer import Reader, Record
+from rdflib import BNode, URIRef, Graph, RDF, Namespace
+
+AS = Namespace("https://www.w3.org/ns/activitystreams#")
 
 
 def _get_activated_readers() -> list[type[Reader]]:
@@ -22,7 +25,7 @@ READERS_BY_URIREF = _get_reader_dict()
 
 
 def get_reader_by_uriref(uriref: URIRef) -> type[Reader]:
-    """Return the reader class according to its URIRef. Raise ValueError
+    """Return the reader class according to its URIRef. Raise KeyError
     if reader does not exist."""
     return READERS_BY_URIREF[uriref]
 
@@ -32,3 +35,72 @@ def get_catalogs_graph() -> Graph:
     graphs = [x.catalog_to_graph() for x in _get_activated_readers()]
     graph = sum(graphs, Graph())  # Addition means union for graphs
     return graph
+
+
+class SearchGraphBuilder:
+    """Prepare and perform queries and build graphs from the results."""
+    reader: Reader
+    _records: list[Record]
+    _start: int
+    _max_items: int
+
+    def __init__(self, readerclass: type[Reader]):
+        self.reader = readerclass()
+        print(self.reader)
+
+    def set_query(
+            self,
+            query: str,
+            start: int = 0,
+            max_items: int = 50
+    ):
+        self._start = start
+        if start != 0:
+            self.reader.adjust_start_record(start)
+        self.reader.prepare_query(query)
+        self._max_items = max_items
+
+    def perform_fetch(self):
+        """Perform the fetch. This method is supposed to be called just
+        once."""
+        self.reader.fetch()
+        self._records = self.get_partial_results()
+
+    def get_partial_results(self) -> list[Record]:
+        if self._max_items and self._max_items <= len(self.reader.records):
+            end = self._start + self._max_items
+        else:
+            end = -1
+        results = self.reader.records[self._start:end]
+        if not all([isinstance(x, Record) for x in results]):
+            raise RuntimeError("Some results are None - this should not happen.")
+        return results  # type: ignore
+
+    def _get_content_graph(self) -> Graph:
+        """Return a graph containing the information of all requested
+        records."""
+        results = self._records
+        graphs = [x.to_graph() for x in results if isinstance(x, Record)]
+        content_graph = sum(graphs, Graph())
+        return content_graph
+    
+    def _get_collection_graph(self) -> Graph:
+        """Return a graph with an ActivityStreams Collection containing
+        references to the requested records in the right order."""
+        graph = Graph()
+        subject_node = BNode()
+        graph.add((subject_node, RDF.type, AS.OrderedCollection))
+        collection_node = BNode()
+        collection = graph.collection(collection_node)
+        graph.add((subject_node, AS.orderedItems, collection_node))
+        for record in self._records:
+            if record.iri is not None:
+                collection.append(URIRef(record.iri))
+            else:
+                pass
+        return graph
+
+    def get_result_graph(self) -> Graph:
+        """Represent the fetched records in a graph with an ActivityStreams
+        collection."""
+        return self._get_collection_graph() + self._get_content_graph()
