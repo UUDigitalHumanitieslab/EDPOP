@@ -46,7 +46,6 @@ class SearchGraphBuilder:
 
     def __init__(self, readerclass: type[Reader]):
         self.reader = readerclass()
-        print(self.reader)
 
     def set_query(
             self,
