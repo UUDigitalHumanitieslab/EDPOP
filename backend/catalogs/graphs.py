@@ -1,8 +1,7 @@
-from typing import Optional
 from django.conf import settings
 
 from edpop_explorer import Reader, Record
-from rdflib import BNode, URIRef, Graph, RDF, Namespace
+from rdflib import BNode, URIRef, Graph, RDF, Namespace, Literal
 
 AS = Namespace("https://www.w3.org/ns/activitystreams#")
 
@@ -40,7 +39,7 @@ def get_catalogs_graph() -> Graph:
 class SearchGraphBuilder:
     """Prepare and perform queries and build graphs from the results."""
     reader: Reader
-    _records: list[Record]
+    records: list[Record]
     _start: int
     _max_items: int
 
@@ -53,6 +52,8 @@ class SearchGraphBuilder:
             start: int = 0,
             max_items: int = 50
     ):
+        """Set the query. Should be called before calling
+        ``perform_fetch()``."""
         self._start = start
         if start != 0:
             self.reader.adjust_start_record(start)
@@ -61,15 +62,17 @@ class SearchGraphBuilder:
 
     def perform_fetch(self):
         """Perform the fetch. This method is supposed to be called just
-        once."""
-        self.reader.fetch()
-        self._records = self.get_partial_results()
+        once. After fetching, the requested records (and only those)
+        are available in the ``records`` attribute, and ``get_result_graph()``
+        can be called to create the accompanying graph."""
+        self.reader.fetch(self._max_items)
+        self.records = self._get_partial_results()
 
-    def get_partial_results(self) -> list[Record]:
-        if self._max_items and self._max_items <= len(self.reader.records):
+    def _get_partial_results(self) -> list[Record]:
+        if self._max_items <= len(self.reader.records):
             end = self._start + self._max_items
         else:
-            end = -1
+            end = len(self.reader.records)
         results = self.reader.records[self._start:end]
         if not all([isinstance(x, Record) for x in results]):
             raise RuntimeError("Some results are None - this should not happen.")
@@ -78,7 +81,7 @@ class SearchGraphBuilder:
     def _get_content_graph(self) -> Graph:
         """Return a graph containing the information of all requested
         records."""
-        results = self._records
+        results = self.records
         graphs = [x.to_graph() for x in results if isinstance(x, Record)]
         content_graph = sum(graphs, Graph())
         return content_graph
@@ -92,11 +95,14 @@ class SearchGraphBuilder:
         collection_node = BNode()
         collection = graph.collection(collection_node)
         graph.add((subject_node, AS.orderedItems, collection_node))
-        for record in self._records:
+        for record in self.records:
             if record.iri is not None:
                 collection.append(URIRef(record.iri))
-            else:
-                pass
+        graph.add((
+            subject_node,
+            AS.totalItems,
+            Literal(self.reader.number_of_results)
+        ))
         return graph
 
     def get_result_graph(self) -> Graph:
