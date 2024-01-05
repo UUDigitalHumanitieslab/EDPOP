@@ -1,7 +1,60 @@
+from typing import Optional
 import pytest
-from edpop_explorer import readers
+from edpop_explorer import readers, Reader, Record
 
-from .graphs import _get_reader_dict, get_reader_by_uriref, get_catalogs_graph
+from .graphs import SearchGraphBuilder, _get_reader_dict, get_reader_by_uriref, get_catalogs_graph
+
+
+class MockReader(Reader):
+    MAX_ITEMS = 25
+    IRI_PREFIX = "http://example.com/reader/"
+
+    def fetch(self, number: Optional[int] = None):
+        to_fetch_start = self.number_fetched
+        if number is None:
+            number = 10
+        to_fetch_end = self.number_fetched + number
+        if to_fetch_end > self.MAX_ITEMS:
+            to_fetch_end = self.MAX_ITEMS
+        identifiers = range(to_fetch_start, to_fetch_end)
+        self.records.extend([self.get_by_id(str(x)) for x in identifiers])
+        self.number_of_results = self.MAX_ITEMS
+        self.number_fetched = to_fetch_end
+
+    @classmethod
+    def get_by_id(cls, identifier: str) -> Record:
+        record = Record(cls)
+        record.identifier = identifier
+        return record
+
+    @classmethod
+    def transform_query(cls, query: str) -> str:
+        return query
+
+
+def test_mockreader():
+    # Small test to test the MockReader above
+    reader = MockReader()
+    reader.prepare_query("Hoi")
+    reader.fetch(5)
+    assert reader.number_fetched == 5
+    assert len(reader.records) == 5
+    assert reader.records[0].identifier == "0"
+    assert not reader.fetching_exhausted
+    reader.fetch()
+    assert reader.number_fetched == 15
+    assert reader.records[10].identifier == "10"
+    reader.fetch()
+    assert reader.number_fetched == 25
+    assert reader.fetching_exhausted
+    # Skipping first records
+    reader2 = MockReader()
+    reader2.prepare_query("Hoi")
+    reader2.adjust_start_record(5)
+    reader2.fetch(5)
+    assert reader2.number_fetched == 10
+    assert reader2.records[0] is None
+    assert reader2.records[5].identifier == "5"
 
 
 @pytest.fixture(autouse=True)
@@ -31,3 +84,31 @@ def test_get_catalogs_graph():
         pytest.skip("registered reader has no URIRef")
         return
     assert (sample_uriref, None, None) in graph
+
+
+class TestSearchGraphBuilder:
+    def test_graph_first_results(self):
+        builder = SearchGraphBuilder(MockReader)
+        builder.set_query("hoi", max_items=10)
+        builder.perform_fetch()
+        _ = builder.get_result_graph()
+        assert len(builder.records) == 10
+        assert builder.records[0].identifier == "0"
+
+    def test_graph_later_results(self):
+        builder = SearchGraphBuilder(MockReader)
+        builder.set_query("hoi", start=5, max_items=10)
+        builder.perform_fetch()
+        _ = builder.get_result_graph()
+        assert len(builder.records) == 10
+        assert builder.records[0].identifier == "5"
+    
+    def test_graph_request_more_than_available(self):
+        builder = SearchGraphBuilder(MockReader)
+        builder.set_query("hoi", start=5, max_items=50)
+        builder.perform_fetch()
+        _ = builder.get_result_graph()
+        # Assert that only the available records are fetched, which is 
+        # 20 because there are 25 records and we started with 5
+        assert len(builder.records) == 20
+        assert builder.records[0].identifier == "5"
