@@ -92,20 +92,21 @@ def test_get_catalogs_graph():
 
 def mock_builder(query, **kwargs):
     builder = SearchGraphBuilder(MockReader)
-    builder.set_query(query, **kwargs)
-    builder.perform_fetch()
-    _ = builder.get_result_graph()
+    _ = builder.query_to_graph(query, **kwargs)
     return builder
+
 
 def test_builder_first_results():
     builder = mock_builder("hoi", max_items=10)
     assert len(builder.records) == 10
     assert builder.records[0].identifier == "0"
 
+
 def test_buider_later_results():
     builder = mock_builder("hoi", start=5, max_items=10)
     assert len(builder.records) == 10
     assert builder.records[0].identifier == "5"
+
 
 def test_builder_more_than_available():
     builder = mock_builder("hoi", start=5, max_items=50)
