@@ -6,6 +6,9 @@ from .graphs import SearchGraphBuilder, _get_reader_dict, get_reader_by_uriref, 
 
 
 class MockReader(Reader):
+    """A special reader for testing purposes that does not access the
+    internet to fetch results. Produces 25 records that all have
+    their serial number (0 through 24) as their identifier."""
     MAX_ITEMS = 25
     IRI_PREFIX = "http://example.com/reader/"
 
@@ -14,8 +17,7 @@ class MockReader(Reader):
         if number is None:
             number = 10
         to_fetch_end = self.number_fetched + number
-        if to_fetch_end > self.MAX_ITEMS:
-            to_fetch_end = self.MAX_ITEMS
+        to_fetch_end = min(to_fetch_end, self.MAX_ITEMS)
         identifiers = range(to_fetch_start, to_fetch_end)
         self.records.extend([self.get_by_id(str(x)) for x in identifiers])
         self.number_of_results = self.MAX_ITEMS
@@ -32,8 +34,7 @@ class MockReader(Reader):
         return query
 
 
-def test_mockreader():
-    # Small test to test the MockReader above
+def test_mockreader_start_zero():
     reader = MockReader()
     reader.prepare_query("Hoi")
     reader.fetch(5)
@@ -47,6 +48,9 @@ def test_mockreader():
     reader.fetch()
     assert reader.number_fetched == 25
     assert reader.fetching_exhausted
+
+
+def test_mockreader_start_at_five():
     # Skipping first records
     reader2 = MockReader()
     reader2.prepare_query("Hoi")
@@ -82,8 +86,8 @@ def test_get_catalogs_graph():
     sample_uriref = readers.ALL_READERS[0].CATALOG_URIREF
     if sample_uriref is None:
         pytest.skip("registered reader has no URIRef")
-        return
-    assert (sample_uriref, None, None) in graph
+    else:
+        assert (sample_uriref, None, None) in graph
 
 
 class TestSearchGraphBuilder:
