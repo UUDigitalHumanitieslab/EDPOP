@@ -20,6 +20,12 @@ def _get_reader_dict() -> dict[URIRef, type[Reader]]:
     return {x.CATALOG_URIREF: x for x in settings.CATALOG_READERS
             if x.CATALOG_URIREF}
 
+
+def refresh_readers() -> None:
+    global READERS_BY_URIREF
+    READERS_BY_URIREF = _get_reader_dict()
+    
+
 READERS_BY_URIREF = _get_reader_dict()
 
 

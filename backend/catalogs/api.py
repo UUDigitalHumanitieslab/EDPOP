@@ -1,8 +1,7 @@
-from typing import Union
 from rest_framework import views
 from rdf.views import RDFView
 from rdflib import Graph, URIRef
-from rest_framework.exceptions import APIException, ParseError
+from rest_framework.exceptions import ParseError
 
 from .graphs import SearchGraphBuilder, get_catalogs_graph, get_reader_by_uriref
 

@@ -1,6 +1,7 @@
 from typing import Optional
 import pytest
 from edpop_explorer import readers, Reader, Record
+from rdflib import URIRef
 
 from .graphs import SearchGraphBuilder, _get_reader_dict, get_reader_by_uriref, get_catalogs_graph
 
@@ -11,6 +12,7 @@ class MockReader(Reader):
     their serial number (0 through 24) as their identifier."""
     MAX_ITEMS = 25
     IRI_PREFIX = "http://example.com/reader/"
+    CATALOG_URIREF = URIRef("http://example.com/reader")
 
     def fetch(self, number: Optional[int] = None):
         to_fetch_start = self.number_fetched
