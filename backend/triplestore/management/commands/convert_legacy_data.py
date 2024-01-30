@@ -7,6 +7,8 @@ from vre.models import Annotation, User, Collection, Record, ResearchGroup
 
 class Command(BaseCommand):
     def handle(self, **options):
+        # NOTE: this command only shows the resulting graph for now, because
+        # the actual triplestore is not yet implemented in the VRE.
         annotations = Annotation.objects.all()
         users = User.objects.all()
         collections = Collection.objects.all()
