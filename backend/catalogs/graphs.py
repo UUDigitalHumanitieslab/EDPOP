@@ -46,6 +46,18 @@ class SearchGraphBuilder:
     def __init__(self, readerclass: type[Reader]):
         self.reader = readerclass()
 
+    def query_to_graph(
+            self,
+            query: str,
+            start: int = 0,
+            max_items: int = 50
+    ) -> Graph:
+        """Convenience method that subsequently calls the ``set_query``,
+        ``perform_fetch`` and ``get_result_graph`` methods."""
+        self.set_query(query, start, max_items)
+        self.perform_fetch()
+        return self.get_result_graph()
+
     def set_query(
             self,
             query: str,
