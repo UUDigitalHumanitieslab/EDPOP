@@ -90,29 +90,26 @@ def test_get_catalogs_graph():
         assert (sample_uriref, None, None) in graph
 
 
-class TestSearchGraphBuilder:
-    def test_graph_first_results(self):
-        builder = SearchGraphBuilder(MockReader)
-        builder.set_query("hoi", max_items=10)
-        builder.perform_fetch()
-        _ = builder.get_result_graph()
-        assert len(builder.records) == 10
-        assert builder.records[0].identifier == "0"
+def mock_builder(query, **kwargs):
+    builder = SearchGraphBuilder(MockReader)
+    builder.set_query(query, **kwargs)
+    builder.perform_fetch()
+    _ = builder.get_result_graph()
+    return builder
 
-    def test_graph_later_results(self):
-        builder = SearchGraphBuilder(MockReader)
-        builder.set_query("hoi", start=5, max_items=10)
-        builder.perform_fetch()
-        _ = builder.get_result_graph()
-        assert len(builder.records) == 10
-        assert builder.records[0].identifier == "5"
-    
-    def test_graph_request_more_than_available(self):
-        builder = SearchGraphBuilder(MockReader)
-        builder.set_query("hoi", start=5, max_items=50)
-        builder.perform_fetch()
-        _ = builder.get_result_graph()
-        # Assert that only the available records are fetched, which is 
-        # 20 because there are 25 records and we started with 5
-        assert len(builder.records) == 20
-        assert builder.records[0].identifier == "5"
+def test_builder_first_results():
+    builder = mock_builder("hoi", max_items=10)
+    assert len(builder.records) == 10
+    assert builder.records[0].identifier == "0"
+
+def test_buider_later_results():
+    builder = mock_builder("hoi", start=5, max_items=10)
+    assert len(builder.records) == 10
+    assert builder.records[0].identifier == "5"
+
+def test_builder_more_than_available():
+    builder = mock_builder("hoi", start=5, max_items=50)
+    # Assert that only the available records are fetched, which is 
+    # 20 because there are 25 records and we started with 5
+    assert len(builder.records) == 20
+    assert builder.records[0].identifier == "5"
