@@ -136,6 +136,8 @@ REST_FRAMEWORK = {
     ),
 }
 
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
