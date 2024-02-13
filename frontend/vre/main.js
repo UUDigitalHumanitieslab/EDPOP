@@ -109,7 +109,7 @@ var finish = _.after(2, startRouting);
 if (Cookies.get('csrftoken')) {
     kickoff();
 } else {
-    $.ajax({url: '/login/'}).then(kickoff);
+    $.ajax({url: '/accounts/login/'}).then(kickoff);
 }
 
 // Ensure the DOM has fully loaded.

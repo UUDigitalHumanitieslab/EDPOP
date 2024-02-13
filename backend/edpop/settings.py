@@ -151,7 +151,7 @@ USE_I18N = True
 USE_TZ = True
 
 
-LOGIN_URL = '/login/'
+LOGIN_URL = '/accounts/login/'
 
 LOGGING = {
     'version': 1,
