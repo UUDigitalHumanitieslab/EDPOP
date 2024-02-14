@@ -50,8 +50,11 @@ INSTALLED_APPS = [
     'django_json_widget',
     'django_filters',
     'rest_framework',
+    'rest_framework.authtoken',
+    'dj_rest_auth',
     'vre.apps.VreConfig',
     'triplestore',
+    'accounts',
 ]
 
 MIDDLEWARE = [
@@ -152,6 +155,7 @@ USE_TZ = True
 
 
 LOGIN_URL = '/accounts/login/'
+LOGOUT_REDIRECT_URL = '/accounts/login/'
 
 LOGGING = {
     'version': 1,
@@ -183,3 +187,8 @@ STATICFILES_DIRS = (
 STATIC_URL = '/static/'
 
 SITE_NAME = 'EDPOP VRE'
+
+# Settings for dj-rest-auth
+REST_AUTH = {
+    "USER_DETAILS_SERIALIZER": "accounts.serializers.OurUserDetailsSerializer"
+}
