@@ -1,13 +1,13 @@
-django>=4
+django>=4,<5
 django-json-widget
 django-filter
 djangorestframework
-psycopg2
+psycopg
 requests
 lxml
 beautifulsoup4
 sruthi
 rdflib
 restframework-rdf
-edpop-explorer
 dj-rest-auth
+edpop-explorer@git+https://github.com/UUDigitalHumanitieslab/edpop-explorer@feature/fetchinterface

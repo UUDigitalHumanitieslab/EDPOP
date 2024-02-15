@@ -22,7 +22,7 @@ defusedxml==0.7.1
     # via sruthi
 dj-rest-auth==5.0.2
     # via -r requirements.in
-django==5.0.2
+django==4.2.10
     # via
     #   -r requirements.in
     #   dj-rest-auth
@@ -38,7 +38,7 @@ djangorestframework==3.14.0
     #   -r requirements.in
     #   dj-rest-auth
     #   restframework-rdf
-edpop-explorer==0.7.0
+edpop-explorer @ git+https://github.com/UUDigitalHumanitieslab/edpop-explorer@feature/fetchinterface
     # via -r requirements.in
 flatten-dict==0.4.2
     # via sruthi
@@ -50,7 +50,7 @@ isodate==0.6.1
     # via rdflib
 lxml==5.1.0
     # via -r requirements.in
-psycopg2==2.9.9
+psycopg==3.1.18
     # via -r requirements.in
 pygments==2.17.2
     # via edpop-explorer
@@ -90,6 +90,8 @@ sruthi==2.0.0
     #   edpop-explorer
 termcolor==2.4.0
     # via edpop-explorer
+typing-extensions==4.9.0
+    # via psycopg
 urllib3==2.2.0
     # via requests
 wcwidth==0.2.13
