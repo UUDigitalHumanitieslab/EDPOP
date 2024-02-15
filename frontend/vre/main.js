@@ -4,6 +4,7 @@ import Backbone from 'backbone';
 import Cookies from 'jscookie';
 
 import './record/record.opening.aspect';
+import { vreChannel } from './radio';
 import { Records } from './record/record.model';
 import { RecordListManagingView } from './record/record.list.managing.view';
 import { BlankRecordButtonView } from './record/blank.record.button.view';
@@ -18,6 +19,8 @@ import { AdvancedSearchView } from './search/advanced.search.view';
 import { SelectDatabaseView } from './database/select-db.view';
 import { addCSRFToken } from './utils/generic-functions';
 import { GlobalVariables } from './globals/variables';
+import { AccountMenuView } from './user/account.menu.view';
+import './globals/user';
 
 
 // Global variables
@@ -84,6 +87,10 @@ function prepareCollections() {
     GlobalVariables.router = new VRERouter();
     GlobalVariables.myCollections.on('update', finish);
     GlobalVariables.allGroups.on('update', finish);
+
+    // Retrieve user information and build account menu
+    var currentAccount = vreChannel.request('user');
+    GlobalVariables.accountMenu = new AccountMenuView({model: currentAccount});
 }
 
 // We want this code to run after prepareCollections has run and both
