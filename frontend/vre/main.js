@@ -19,8 +19,8 @@ import { AdvancedSearchView } from './search/advanced.search.view';
 import { SelectDatabaseView } from './database/select-db.view';
 import { addCSRFToken } from './utils/generic-functions';
 import { GlobalVariables } from './globals/variables';
-import { AccountMenuView } from './user/account.menu.view';
 import './globals/user';
+import { accountMenu } from './globals/accountMenu';
 
 
 // Global variables
@@ -88,9 +88,8 @@ function prepareCollections() {
     GlobalVariables.myCollections.on('update', finish);
     GlobalVariables.allGroups.on('update', finish);
 
-    // Retrieve user information and build account menu
-    var currentAccount = vreChannel.request('user');
-    GlobalVariables.accountMenu = new AccountMenuView({model: currentAccount});
+    // Add account menu
+    accountMenu.$el.appendTo('#navbar-right');
 }
 
 // We want this code to run after prepareCollections has run and both

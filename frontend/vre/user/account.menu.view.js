@@ -2,7 +2,8 @@ import { View } from 'backbone';
 import accountMenuTemplate from './account.menu.view.mustache';
 
 export var AccountMenuView = View.extend({
-    el: '#vre-account-menu',
+    tagName: 'li',
+    className: 'dropdown',
     template: accountMenuTemplate,
 
     initialize: function(options) {

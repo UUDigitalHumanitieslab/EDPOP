@@ -9,7 +9,6 @@ describe('AccountMenuView', function() {
             username: 'gebruiker',
             is_staff: false,
         });
-        $('body').append('<li id="vre-account-menu"></li>');
         this.view = new AccountMenuView({model: this.model});
     });
 
@@ -19,7 +18,7 @@ describe('AccountMenuView', function() {
 
     it('renders with the contents of its model', function() {
         const text = this.view.$el.text();
-        assert(text.includes(this.model.attributes.username));
+        assert(text.includes(this.model.get('username')));
     });
 
     it('shows link to admin page if user is staff user', function() {
