@@ -52,9 +52,12 @@ INSTALLED_APPS = [
     'django_json_widget',
     'django_filters',
     'rest_framework',
+    'rest_framework.authtoken',
+    'dj_rest_auth',
     'vre.apps.VreConfig',
     'catalogs.apps.CatalogsConfig',
     'triplestore',
+    'accounts',
     'rdf',
 ]
 
@@ -137,6 +140,8 @@ REST_FRAMEWORK = {
     ),
 }
 
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
@@ -150,7 +155,8 @@ USE_I18N = True
 USE_TZ = True
 
 
-LOGIN_URL = '/login/'
+LOGIN_URL = '/accounts/login/'
+LOGOUT_REDIRECT_URL = '/accounts/login/'
 
 LOGGING = {
     'version': 1,
@@ -182,6 +188,11 @@ STATICFILES_DIRS = (
 STATIC_URL = '/static/'
 
 SITE_NAME = 'EDPOP VRE'
+
+# Settings for dj-rest-auth
+REST_AUTH = {
+    "USER_DETAILS_SERIALIZER": "accounts.serializers.OurUserDetailsSerializer"
+}
 
 # CATALOG_READERS: a list of Reader classes from the edpop-explorer package.
 # These readers will be registered for use in the VRE.

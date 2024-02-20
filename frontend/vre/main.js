@@ -4,6 +4,7 @@ import Backbone from 'backbone';
 import Cookies from 'jscookie';
 
 import './record/record.opening.aspect';
+import { vreChannel } from './radio';
 import { Records } from './record/record.model';
 import { RecordListManagingView } from './record/record.list.managing.view';
 import { BlankRecordButtonView } from './record/blank.record.button.view';
@@ -18,6 +19,8 @@ import { AdvancedSearchView } from './search/advanced.search.view';
 import { SelectDatabaseView } from './database/select-db.view';
 import { addCSRFToken } from './utils/generic-functions';
 import { GlobalVariables } from './globals/variables';
+import './globals/user';
+import { accountMenu } from './globals/accountMenu';
 
 
 // Global variables
@@ -84,6 +87,9 @@ function prepareCollections() {
     GlobalVariables.router = new VRERouter();
     GlobalVariables.myCollections.on('update', finish);
     GlobalVariables.allGroups.on('update', finish);
+
+    // Add account menu
+    accountMenu.$el.appendTo('#navbar-right');
 }
 
 // We want this code to run after prepareCollections has run and both
@@ -109,7 +115,7 @@ var finish = _.after(2, startRouting);
 if (Cookies.get('csrftoken')) {
     kickoff();
 } else {
-    $.ajax({url: '/login/'}).then(kickoff);
+    $.ajax({url: '/accounts/login/'}).then(kickoff);
 }
 
 // Ensure the DOM has fully loaded.
