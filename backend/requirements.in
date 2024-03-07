@@ -10,4 +10,4 @@ sruthi
 rdflib
 restframework-rdf
 dj-rest-auth
-edpop-explorer@git+https://github.com/UUDigitalHumanitieslab/edpop-explorer@feature/fetchinterface
+edpop-explorer@git+https://github.com/UUDigitalHumanitieslab/edpop-explorer@feature/support-caching
