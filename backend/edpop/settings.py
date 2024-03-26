@@ -31,12 +31,11 @@ DEBUG = True
 # Dummy caching for development mode so we don't need to empty our
 # cache every time.
 # https://docs.djangoproject.com/en/1.11/topics/cache/#dummy-caching-for-development
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+CACHE = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
     }
 }
-
 ALLOWED_HOSTS = []
 
 

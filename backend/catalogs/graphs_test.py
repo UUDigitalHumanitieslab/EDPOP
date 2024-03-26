@@ -36,6 +36,10 @@ class MockReader(Reader):
         return query
 
 
+class FetchAllMockReader(MockReader):
+    FETCH_ALL_AT_ONCE = True
+
+
 def test_mockreader_start_zero():
     reader = MockReader()
     reader.prepare_query("Hoi")
@@ -116,3 +120,12 @@ def test_builder_more_than_available():
     # 20 because there are 25 records and we started with 5
     assert len(builder.records) == 20
     assert builder.records[0].identifier == "5"
+
+
+def test_builder_with_caching():
+    builder = SearchGraphBuilder(FetchAllMockReader)
+    graph = builder.query_to_graph("hoi", max_items=10)
+    # Just make sure that running this again does not cause any errors and
+    # that the cache has been used.
+    graph2 = builder.query_to_graph("hoi", max_items=10)
+    assert builder.cache_used is True

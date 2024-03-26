@@ -1,9 +1,19 @@
 from django.conf import settings
+from django.core.cache import cache
+import hashlib
 
 from edpop_explorer import Reader, Record
 from rdflib import BNode, URIRef, Graph, RDF, Namespace, Literal
 
 AS = Namespace("https://www.w3.org/ns/activitystreams#")
+
+# Cache timeout in seconds for readers that fetch all results at once
+CACHE_TIMEOUT = 60 * 60
+
+
+def _hash(input_str: str) -> str:
+    """Return a hashed (hex digest) version of the input string."""
+    return hashlib.sha224(input_str.encode()).hexdigest()
 
 
 def _get_activated_readers() -> list[type[Reader]]:
@@ -22,6 +32,8 @@ def _get_reader_dict() -> dict[URIRef, type[Reader]]:
 
 
 def refresh_readers() -> None:
+    """Refresh the list of loaded readers. Currently only used
+    for unit tests."""
     global READERS_BY_URIREF
     READERS_BY_URIREF = _get_reader_dict()
     
@@ -48,6 +60,8 @@ class SearchGraphBuilder:
     records: list[Record]
     _start: int
     _max_items: int
+    #: True if cache was used instead of fetching
+    cache_used: bool = False
 
     def __init__(self, readerclass: type[Reader]):
         self.reader = readerclass()
@@ -83,7 +97,33 @@ class SearchGraphBuilder:
         once. After fetching, the requested records (and only those)
         are available in the ``records`` attribute, and ``get_result_graph()``
         can be called to create the accompanying graph."""
-        self.reader.fetch(self._max_items)
+        self.cache_used = False
+        identifier = None
+        # Results are cached for readers that fetch all records at once. These
+        # are readers that cannot fetch a specific subset of records, so they
+        # always have to perform a (possibly expensive) full fetch.
+        # To identify caches, the `generate_identifier()` method of a reader
+        # is used, but this is hashed because this identifier may be too
+        # long and complicated to be used as a cache key. Two hashes may
+        # theoretically be used for the same identifier, so check if the
+        # reader from the cache is indeed appropriate.
+        if self.reader.FETCH_ALL_AT_ONCE:
+            identifier = _hash(self.reader.generate_identifier())
+            cached_reader = cache.get(identifier)
+            if cached_reader is not None and (
+                    cached_reader.prepared_query != self.reader.prepared_query
+                    or type(cached_reader) is not type(self.reader)):
+                # Reader types and/or queries are not identical, so ignore cache
+                cached_reader = None
+            if cached_reader is not None:
+                self.reader = cached_reader
+                self.cache_used = True
+        if not self.cache_used:
+            self.reader.fetch(self._max_items)
+            if self.reader.FETCH_ALL_AT_ONCE:
+                # Save reader in cache
+                assert identifier is not None
+                cache.set(identifier, self.reader, CACHE_TIMEOUT)
         self.records = self._get_partial_results()
 
     def _get_partial_results(self) -> list[Record]:
