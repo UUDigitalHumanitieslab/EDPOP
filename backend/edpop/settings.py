@@ -193,6 +193,19 @@ REST_AUTH = {
     "USER_DETAILS_SERIALIZER": "accounts.serializers.OurUserDetailsSerializer"
 }
 
+# RDF_NAMESPACE_ROOT is the common prefix for our own graphs.
+RDF_NAMESPACE_HOST = 'localhost'
+RDF_NAMESPACE_ROOT = f'http://{RDF_NAMESPACE_HOST}:8000/'
+
+# Default store for our graphs.
+TRIPLESTORE_NAMESPACE = 'edpop'
+TRIPLESTORE_BASE_URL = os.getenv('EDPOP_TRIPLESTORE_BASE_URL', 'http://localhost:9999/blazegraph')
+TRIPLESTORE_SPARQL_ENDPOINT = f'{TRIPLESTORE_BASE_URL}/namespace/{TRIPLESTORE_NAMESPACE}/sparql'
+RDFLIB_STORE = SPARQLUpdateStore(
+    query_endpoint=TRIPLESTORE_SPARQL_ENDPOINT,
+    update_endpoint=TRIPLESTORE_SPARQL_ENDPOINT,
+)
+
 # CATALOG_READERS: a list of Reader classes from the edpop-explorer package.
 # These readers will be registered for use in the VRE.
 CATALOG_READERS = readers.ALL_READERS
