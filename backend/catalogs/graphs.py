@@ -1,3 +1,5 @@
+from typing import Optional
+
 from django.conf import settings
 from django.core.cache import cache
 import hashlib
@@ -59,9 +61,10 @@ class SearchGraphBuilder:
     reader: Reader
     records: list[Record]
     _start: int
-    _max_items: int
-    #: True if cache was used instead of fetching
+    _end: int
+    _available_range: Optional[range] = None
     cache_used: bool = False
+    """True if cache was used instead of fetching"""
 
     def __init__(self, readerclass: type[Reader]):
         self.reader = readerclass()
@@ -70,11 +73,11 @@ class SearchGraphBuilder:
             self,
             query: str,
             start: int = 0,
-            max_items: int = 50
+            end: int = 50
     ) -> Graph:
         """Convenience method that subsequently calls the ``set_query``,
         ``perform_fetch`` and ``get_result_graph`` methods."""
-        self.set_query(query, start, max_items)
+        self.set_query(query, start, end)
         self.perform_fetch()
         return self.get_result_graph()
 
@@ -82,15 +85,13 @@ class SearchGraphBuilder:
             self,
             query: str,
             start: int = 0,
-            max_items: int = 50
+            end: int = 50
     ):
         """Set the query. Should be called before calling
         ``perform_fetch()``."""
         self._start = start
-        if start != 0:
-            self.reader.adjust_start_record(start)
+        self._end = end
         self.reader.prepare_query(query)
-        self._max_items = max_items
 
     def perform_fetch(self):
         """Perform the fetch. This method is supposed to be called just
@@ -119,7 +120,7 @@ class SearchGraphBuilder:
                 self.reader = cached_reader
                 self.cache_used = True
         if not self.cache_used:
-            self.reader.fetch(self._max_items)
+            self.reader.fetch_range(range(self._start, self._end))
             if self.reader.FETCH_ALL_AT_ONCE:
                 # Save reader in cache
                 assert identifier is not None
@@ -127,13 +128,9 @@ class SearchGraphBuilder:
         self.records = self._get_partial_results()
 
     def _get_partial_results(self) -> list[Record]:
-        if self._max_items <= len(self.reader.records):
-            end = self._start + self._max_items
-        else:
-            end = len(self.reader.records)
-        results = self.reader.records[self._start:end]
-        if not all([isinstance(x, Record) for x in results]):
-            raise RuntimeError("Some results are None - this should not happen.")
+        start = self._start
+        end = min(self._end, self.reader.number_of_results)
+        results = [self.reader.records[x] for x in range(start, end)]
         return results  # type: ignore
 
     def _get_content_graph(self) -> Graph:
@@ -142,6 +139,7 @@ class SearchGraphBuilder:
         results = self.records
         graphs = [x.to_graph() for x in results if isinstance(x, Record)]
         content_graph = sum(graphs, Graph())
+        self._save_to_triplestore(content_graph)
         return content_graph
     
     def _get_collection_graph(self) -> Graph:
@@ -167,3 +165,20 @@ class SearchGraphBuilder:
         """Represent the fetched records in a graph with an ActivityStreams
         collection."""
         return self._get_collection_graph() + self._get_content_graph()
+
+    @staticmethod
+    def _save_to_triplestore(content_graph: Graph) -> None:
+        """Save the fetched records to triplestore and update records that
+        already exist."""
+        graph_identifier = settings.RDF_NAMESPACE_ROOT + "records/"
+        store = settings.RDFLIB_STORE
+        # Add records graph (only has effect if graph does not yet exist)
+        store.add_graph(Graph(identifier=graph_identifier))
+        print(content_graph.serialize())
+        return
+        nodes = content_graph.triples((None, None, None))
+        triples = "\n".join([f"{n} {n[1]} {n[2]} ." for n in nodes])
+        sparql = f"WITH <{graph_identifier}> INSERT {{{triples}}} WHERE {{}}"
+        print(sparql)
+        store.update(sparql)
+

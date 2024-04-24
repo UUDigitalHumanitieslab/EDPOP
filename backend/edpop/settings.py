@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 
 from pathlib import Path
 import os
+from rdflib.plugins.stores.sparqlstore import SPARQLUpdateStore
 
 from edpop_explorer import readers
 
@@ -195,7 +196,7 @@ REST_AUTH = {
 
 # RDF_NAMESPACE_ROOT is the common prefix for our own graphs.
 RDF_NAMESPACE_HOST = 'localhost'
-RDF_NAMESPACE_ROOT = f'http://{RDF_NAMESPACE_HOST}:8000/'
+RDF_NAMESPACE_ROOT = f'http://{RDF_NAMESPACE_HOST}:8000/rdf/'
 
 # Default store for our graphs.
 TRIPLESTORE_NAMESPACE = 'edpop'
