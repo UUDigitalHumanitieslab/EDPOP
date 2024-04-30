@@ -4,8 +4,11 @@ from django.conf import settings
 from django.core.cache import cache
 import hashlib
 
-from edpop_explorer import Reader, Record
-from rdflib import BNode, URIRef, Graph, RDF, Namespace, Literal
+from edpop_explorer import Reader, Record, EDPOPREC
+from rdf.utils import prune_triples_cascade, prune_triples
+from rdflib import BNode, URIRef, Graph, RDF, Namespace, Literal, Dataset, ConjunctiveGraph
+
+from triplestore.utils import replace_blank_node
 
 AS = Namespace("https://www.w3.org/ns/activitystreams#")
 
@@ -166,19 +169,40 @@ class SearchGraphBuilder:
         collection."""
         return self._get_collection_graph() + self._get_content_graph()
 
-    @staticmethod
-    def _save_to_triplestore(content_graph: Graph) -> None:
+    @classmethod
+    def _prune_recursively(cls, graph: Graph, subject):
+        related_by_subject = list(graph.triples((subject, None, None)))
+
+        for s, p, o in related_by_subject:
+            if isinstance(o, URIRef) and o != s:
+                cls._prune_recursively(graph, o)
+
+        prune_triples(graph, related_by_subject)
+
+    def _save_to_triplestore(self, content_graph: Graph) -> None:
         """Save the fetched records to triplestore and update records that
         already exist."""
-        graph_identifier = settings.RDF_NAMESPACE_ROOT + "records/"
+        # Create an empty named graph to provide the right context
+        graph_identifier = URIRef(settings.RDF_NAMESPACE_ROOT + "records/")
+        record_graph = Graph(identifier=graph_identifier)
+
+        # Get the existing graph from Blazegraph
         store = settings.RDFLIB_STORE
-        # Add records graph (only has effect if graph does not yet exist)
-        store.add_graph(Graph(identifier=graph_identifier))
-        print(content_graph.serialize())
-        return
-        nodes = content_graph.triples((None, None, None))
-        triples = "\n".join([f"{n} {n[1]} {n[2]} ." for n in nodes])
-        sparql = f"WITH <{graph_identifier}> INSERT {{{triples}}} WHERE {{}}"
-        print(sparql)
-        store.update(sparql)
+        bggraph = Graph(store=store, identifier=graph_identifier)
+
+        # Delete nodes about existing records except for their counters
+        subject_nodes_to_prune = [URIRef(x.iri) for x in self.records]
+        for s in subject_nodes_to_prune:
+            self._prune_recursively(bggraph, s)
+
+        # Add content_graph to records graph
+        # Convert triples to quads to include the named graph
+        triples = content_graph.triples((None, None, None))
+        quads = [
+            (replace_blank_node(s),
+             replace_blank_node(p),
+             replace_blank_node(o),
+             record_graph) for (s, p, o) in triples
+        ]
+        store.addN(quads)
 
