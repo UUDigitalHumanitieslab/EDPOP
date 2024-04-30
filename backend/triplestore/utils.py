@@ -2,6 +2,9 @@ from typing import Iterator, Tuple, Callable, Dict, Any
 from rdflib import Graph, URIRef, RDF
 from functools import reduce
 
+from rdflib.term import Node, BNode
+
+
 def union_graphs(graphs: Iterator[Graph]) -> Graph:
     '''
     Return the union of a collection of graphs
@@ -30,6 +33,7 @@ def find_subject_by_class(graph: Graph, rdf_class: URIRef) -> URIRef:
 
 ObjectURIs = Dict[int, URIRef]
 
+
 def objects_to_graph(convert: Callable, to_key: Callable, objects: Iterator[Any]) -> Tuple[ObjectURIs, Graph]:
     '''
     Convert a list of objects to a graph and a dict with URI references.
@@ -55,3 +59,12 @@ def objects_to_graph(convert: Callable, to_key: Callable, objects: Iterator[Any]
     }
     g = union_graphs(graphs)
     return object_uris, g
+
+
+def replace_blank_node(node: Node) -> Node:
+    """Replace a blank node by a node with a URIRef node based on the
+    unique identifier inside a ``Graph``."""
+    if isinstance(node, BNode):
+        return URIRef(f"bnode:{node}")
+    else:
+        return node
