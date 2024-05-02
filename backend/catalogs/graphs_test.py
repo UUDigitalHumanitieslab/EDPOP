@@ -120,7 +120,6 @@ def test_builder_more_than_available():
 def test_builder_with_caching():
     builder = SearchGraphBuilder(FetchAllMockReader)
     graph = builder.query_to_graph("hoi", end=10)
-    # Just make sure that running this again does not cause any errors and
-    # that the cache has been used.
+    # Just make sure that running this again does not cause any errors
     graph2 = builder.query_to_graph("hoi", end=10)
     assert builder.cache_used is True

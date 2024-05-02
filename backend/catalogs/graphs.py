@@ -59,15 +59,30 @@ def get_catalogs_graph() -> Graph:
     return graph
 
 
+def range_available_in_reader(reader: Reader, r: range) -> bool:
+    """Return True if all of the range of records to fetch is already available
+    in the reader, else False. Return also True if parts of range are not
+    available but if these are out of range of the total number of results
+    for the query (e.g., requested range is (10, 20) and only records 10 through
+    14 are available but there are only 15 results, so they are all there)."""
+    if reader.number_of_results is not None:
+        rmax = min(r.stop, reader.number_of_results)
+    else:
+        rmax = r.stop
+    r = range(r.start, rmax)
+    return all([i in reader.records for i in r])
+
+
 class SearchGraphBuilder:
     """Prepare and perform queries and build graphs from the results."""
     reader: Reader
     records: list[Record]
+    cache_used: bool = False
+    """True after retrieving results if cache was used instead of fetching
+    from external database."""
     _start: int
     _end: int
     _available_range: Optional[range] = None
-    cache_used: bool = False
-    """True if cache was used instead of fetching"""
 
     def __init__(self, readerclass: type[Reader]):
         self.reader = readerclass()
@@ -101,33 +116,31 @@ class SearchGraphBuilder:
         once. After fetching, the requested records (and only those)
         are available in the ``records`` attribute, and ``get_result_graph()``
         can be called to create the accompanying graph."""
-        self.cache_used = False
-        identifier = None
-        # Results are cached for readers that fetch all records at once. These
-        # are readers that cannot fetch a specific subset of records, so they
-        # always have to perform a (possibly expensive) full fetch.
+        # Reader objects are cached for a limited period of time because
+        # certain queries may be expensive.
         # To identify caches, the `generate_identifier()` method of a reader
         # is used, but this is hashed because this identifier may be too
         # long and complicated to be used as a cache key. Two hashes may
         # theoretically be used for the same identifier, so check if the
         # reader from the cache is indeed appropriate.
-        if self.reader.FETCH_ALL_AT_ONCE:
-            identifier = _hash(self.reader.generate_identifier())
-            cached_reader = cache.get(identifier)
-            if cached_reader is not None and (
-                    cached_reader.prepared_query != self.reader.prepared_query
-                    or type(cached_reader) is not type(self.reader)):
-                # Reader types and/or queries are not identical, so ignore cache
-                cached_reader = None
-            if cached_reader is not None:
-                self.reader = cached_reader
-                self.cache_used = True
-        if not self.cache_used:
-            self.reader.fetch_range(range(self._start, self._end))
-            if self.reader.FETCH_ALL_AT_ONCE:
-                # Save reader in cache
-                assert identifier is not None
-                cache.set(identifier, self.reader, CACHE_TIMEOUT)
+        identifier = _hash(self.reader.generate_identifier())
+        cached_reader = cache.get(identifier)
+        if (cached_reader is not None and
+                cached_reader.prepared_query == self.reader.prepared_query
+                and type(cached_reader) is type(self.reader)):
+            # Reader types and/or queries are not identical, so ignore cache
+            self.reader = cached_reader
+
+        # Fetch records, if they are not already available from cache
+        range_to_fetch = range(self._start, self._end)
+        if range_available_in_reader(self.reader, range_to_fetch):
+            self.cache_used = True
+        else:
+            self.cache_used = False
+            self.reader.fetch_range(range_to_fetch)
+
+        # Save reader in cache
+        cache.set(identifier, self.reader, CACHE_TIMEOUT)
         self.records = self._get_partial_results()
 
     def _get_partial_results(self) -> list[Record]:
