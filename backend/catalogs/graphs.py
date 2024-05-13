@@ -9,8 +9,7 @@ from rdf.utils import prune_triples_cascade, prune_triples
 from rdflib import BNode, URIRef, Graph, RDF, Namespace, Literal, Dataset, ConjunctiveGraph
 
 from triplestore.utils import replace_blank_node
-
-AS = Namespace("https://www.w3.org/ns/activitystreams#")
+from triplestore.constants import AS
 
 # Cache timeout in seconds for readers that fetch all results at once
 CACHE_TIMEOUT = 60 * 60
