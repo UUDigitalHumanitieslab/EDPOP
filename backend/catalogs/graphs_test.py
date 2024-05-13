@@ -3,7 +3,8 @@ import pytest
 from edpop_explorer import readers, Reader, Record
 from rdflib import URIRef
 
-from .graphs import SearchGraphBuilder, _get_reader_dict, get_reader_by_uriref, get_catalogs_graph
+from .graphs import SearchGraphBuilder, _get_reader_dict, get_reader_by_uriref, get_catalogs_graph, \
+    range_available_in_reader
 
 
 class MockReader(Reader):
@@ -123,3 +124,26 @@ def test_builder_with_caching():
     # Just make sure that running this again does not cause any errors
     graph2 = builder.query_to_graph("hoi", end=10)
     assert builder.cache_used is True
+
+
+def test_range_available_in_reader_empty_reader():
+    reader = MockReader()
+    assert range_available_in_reader(reader, range(0, 10)) is False
+
+
+def test_range_available_in_reader_exact_range():
+    reader = MockReader()
+    reader.fetch(10)
+    assert range_available_in_reader(reader, range(0, 10)) is True
+
+
+def test_range_available_in_reader_partially_available():
+    reader = MockReader()
+    reader.fetch(10)
+    assert range_available_in_reader(reader, range(5, 15)) is False
+
+
+def test_range_available_in_reader_fully_available():
+    reader = MockReader()
+    reader.fetch(20)
+    assert range_available_in_reader(reader, range(5, 15)) is True

@@ -70,7 +70,9 @@ def range_available_in_reader(reader: Reader, r: range) -> bool:
     else:
         rmax = r.stop
     r = range(r.start, rmax)
-    return all([i in reader.records for i in r])
+    # Check for all numbers in the range if reader.records contains this number
+    # as a key (reader.records is a dictionary)
+    return all(i in reader.records for i in r)
 
 
 class SearchGraphBuilder:
