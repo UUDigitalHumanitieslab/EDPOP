@@ -6,7 +6,7 @@ from enum import Enum
 from django.conf import settings
 
 
-def test_blazegraph_connection() -> bool:
+def probe_blazegraph_connection() -> bool:
     """Return True if connection to Blazegraph triplestore is possible, else
     False."""
     status_url = settings.TRIPLESTORE_BASE_URL + "/status"

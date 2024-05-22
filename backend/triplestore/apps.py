@@ -4,12 +4,12 @@ from django.apps import AppConfig
 from django.core.checks import register, Tags, Error, Info
 from django.conf import settings
 
-from triplestore.blazegraph import test_blazegraph_connection, test_namespace_available, NamespaceStatus
+from triplestore.blazegraph import probe_blazegraph_connection, test_namespace_available, NamespaceStatus
 
 
-def test_blazegraph(app_configs, **kwargs) -> list:
+def probe_blazegraph(app_configs, **kwargs) -> list:
     errors = []
-    bg = test_blazegraph_connection()
+    bg = probe_blazegraph_connection()
     if bg is True:
         # Connection works; check namespace
         ns = test_namespace_available()
@@ -28,5 +28,5 @@ class TriplestoreConfig(AppConfig):
     name = 'triplestore'
 
     def ready(self) -> None:
-        register(test_blazegraph)
+        register(probe_blazegraph)
 
