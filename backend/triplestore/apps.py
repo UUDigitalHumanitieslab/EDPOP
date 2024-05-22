@@ -1,7 +1,5 @@
-import os
-
 from django.apps import AppConfig
-from django.core.checks import register, Tags, Error, Info
+from django.core.checks import register, Error
 from django.conf import settings
 
 from triplestore.blazegraph import probe_blazegraph_connection, test_namespace_available, NamespaceStatus
