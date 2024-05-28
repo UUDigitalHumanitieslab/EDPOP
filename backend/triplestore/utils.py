@@ -1,8 +1,13 @@
-from typing import Iterator, Tuple, Callable, Dict, Any
+from typing import Iterator, Tuple, Callable, Dict, Any, Iterable
 from rdflib import Graph, URIRef, RDF
 from functools import reduce
 
 from rdflib.term import Node, BNode
+
+Triple = tuple[Node, Node, Node]
+Triples = Iterable[Triple]
+Quad = tuple[Node, Node, Node, Graph]
+Quads = Iterable[Quad]
 
 
 def union_graphs(graphs: Iterator[Graph]) -> Graph:
@@ -68,3 +73,15 @@ def replace_blank_node(node: Node) -> Node:
         return URIRef(f"bnode:{node}")
     else:
         return node
+
+
+def replace_blank_nodes_in_triples(triples: Triples) -> Triples:
+    return ((
+        replace_blank_node(s),
+        replace_blank_node(p),
+        replace_blank_node(o),
+    ) for s, p, o in triples)
+
+
+def triples_to_quads(triples: Triples, record_graph: Graph) -> Quads:
+    return ((s, p, o, record_graph) for s, p, o in triples)

@@ -6,7 +6,8 @@ from rdf.utils import prune_triples
 from rdflib import URIRef, Graph
 from rdflib.term import Node
 
-from triplestore.utils import replace_blank_node
+from triplestore.utils import replace_blank_node, \
+    replace_blank_nodes_in_triples, triples_to_quads
 
 RECORDS_GRAPH_IDENTIFIER = URIRef(settings.RDF_NAMESPACE_ROOT + "records/")
 
@@ -42,10 +43,6 @@ def save_to_triplestore(content_graph: Graph) -> None:
     # Add content_graph to records graph
     # Convert triples to quads to include the named graph
     triples = content_graph.triples((None, None, None))
-    quads = [
-        (replace_blank_node(s),
-         replace_blank_node(p),
-         replace_blank_node(o),
-         record_graph) for (s, p, o) in triples
-    ]
+    triples = replace_blank_nodes_in_triples(triples)
+    quads = triples_to_quads(triples, record_graph)
     store.addN(quads)
