@@ -24,12 +24,14 @@ def verify_namespace_available() -> NamespaceStatus:
     """Check if the application's namespace exists in BlazeGraph and
     check if it supports quads."""
     namespace = settings.TRIPLESTORE_NAMESPACE
-    namespace_info_url = settings.TRIPLESTORE_BASE_URL + "/namespace/" + namespace + "/properties"
+    namespace_info_url = settings.TRIPLESTORE_BASE_URL + "/namespace/" + \
+        namespace + "/properties"
     response = requests.get(namespace_info_url)
     if response.status_code == 404:
         return NamespaceStatus.ABSENT
     root = etree.fromstring(response.text.encode())
-    quads_element = root.find('entry[@key="com.bigdata.rdf.store.AbstractTripleStore.quads"]')
+    quads_element = root.find(
+        'entry[@key="com.bigdata.rdf.store.AbstractTripleStore.quads"]')
     if quads_element.text == "true":
         return NamespaceStatus.OK
     else:

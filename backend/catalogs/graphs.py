@@ -8,6 +8,7 @@ from edpop_explorer import Reader, Record, EDPOPREC
 from rdf.utils import prune_triples_cascade, prune_triples
 from rdflib import BNode, URIRef, Graph, RDF, Namespace, Literal, Dataset, ConjunctiveGraph
 
+from catalogs.triplestore import remove_from_triplestore, save_to_triplestore
 from triplestore.utils import replace_blank_node
 from triplestore.constants import AS
 
@@ -156,8 +157,8 @@ class SearchGraphBuilder:
         results = self.records
         graphs = [x.to_graph() for x in results if isinstance(x, Record)]
         content_graph = sum(graphs, Graph())
-        self._remove_from_triplestore(results)
-        self._save_to_triplestore(content_graph)
+        remove_from_triplestore(results)
+        save_to_triplestore(content_graph)
         return content_graph
     
     def _get_collection_graph(self) -> Graph:

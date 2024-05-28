@@ -1,27 +1,29 @@
-"""Functions that deal with adding and updating catalog records in the triplestore."""
+"""Functions that deal with adding and updating catalog records in the
+triplestore."""
 from django.conf import settings
 from edpop_explorer import Record
 from rdf.utils import prune_triples
 from rdflib import URIRef, Graph
+from rdflib.term import Node
 
 from triplestore.utils import replace_blank_node
 
 RECORDS_GRAPH_IDENTIFIER = URIRef(settings.RDF_NAMESPACE_ROOT + "records/")
 
 
-def prune_recursively(cls, graph: Graph, subject):
+def prune_recursively(graph: Graph, subject: Node):
+    """Recursively prune triples """
     related_by_subject = list(graph.triples((subject, None, None)))
 
     for s, p, o in related_by_subject:
         if isinstance(o, URIRef) and o != s:
-            cls._prune_recursively(graph, o)
+            prune_recursively(graph, o)
 
     prune_triples(graph, related_by_subject)
 
 
 def remove_from_triplestore(records: list[Record]) -> None:
     """Delete given records from triplestore."""
-    # TODO: check c
     store = settings.RDFLIB_STORE
     bggraph = Graph(store=store, identifier=RECORDS_GRAPH_IDENTIFIER)
     subject_nodes_to_prune = [URIRef(x.iri) for x in records]
