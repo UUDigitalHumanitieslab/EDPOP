@@ -22,7 +22,7 @@ defusedxml==0.7.1
     # via sruthi
 dj-rest-auth==6.0.0
     # via -r requirements.in
-django==4.2.11
+django==4.2.13
     # via
     #   -r requirements.in
     #   dj-rest-auth
@@ -46,11 +46,11 @@ idna==3.7
     # via requests
 isodate==0.6.1
     # via rdflib
-lxml==5.2.1
+lxml==5.2.2
     # via -r requirements.in
-psycopg==3.1.18
+psycopg==3.1.19
     # via -r requirements.in
-pygments==2.17.2
+pygments==2.18.0
     # via edpop-explorer
 pyparsing==3.1.2
     # via rdflib
@@ -64,7 +64,7 @@ rdflib==7.0.0
     #   edpop-explorer
     #   restframework-rdf
     #   sparqlwrapper
-requests==2.31.0
+requests==2.32.2
     # via
     #   -r requirements.in
     #   sruthi
@@ -86,7 +86,7 @@ sruthi==2.0.0
     #   edpop-explorer
 termcolor==2.4.0
     # via edpop-explorer
-typing-extensions==4.11.0
+typing-extensions==4.12.0
     # via
     #   asgiref
     #   edpop-explorer
