@@ -76,6 +76,8 @@ def replace_blank_node(node: Node) -> Node:
 
 
 def replace_blank_nodes_in_triples(triples: Triples) -> Triples:
+    """Replace blank nodes in all triples using the ``replace_blank_node()``
+    function."""
     return ((
         replace_blank_node(s),
         replace_blank_node(p),
@@ -83,5 +85,6 @@ def replace_blank_nodes_in_triples(triples: Triples) -> Triples:
     ) for s, p, o in triples)
 
 
-def triples_to_quads(triples: Triples, record_graph: Graph) -> Quads:
-    return ((s, p, o, record_graph) for s, p, o in triples)
+def triples_to_quads(triples: Triples, graph: Graph) -> Quads:
+    """Convert all triples to quads according to a given named graph."""
+    return ((s, p, o, graph) for s, p, o in triples)
