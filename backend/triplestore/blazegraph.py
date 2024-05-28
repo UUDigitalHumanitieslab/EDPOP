@@ -6,7 +6,7 @@ from enum import Enum
 from django.conf import settings
 
 
-def probe_blazegraph_connection() -> bool:
+def verify_blazegraph_connection() -> bool:
     """Return True if connection to Blazegraph triplestore is possible, else
     False."""
     status_url = settings.TRIPLESTORE_BASE_URL + "/status"
@@ -20,7 +20,7 @@ class NamespaceStatus(Enum):
     NO_QUADS = 2
 
 
-def test_namespace_available() -> NamespaceStatus:
+def verify_namespace_available() -> NamespaceStatus:
     """Check if the application's namespace exists in BlazeGraph and
     check if it supports quads."""
     namespace = settings.TRIPLESTORE_NAMESPACE

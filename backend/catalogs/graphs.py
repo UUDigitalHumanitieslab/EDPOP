@@ -9,8 +9,7 @@ from rdf.utils import prune_triples_cascade, prune_triples
 from rdflib import BNode, URIRef, Graph, RDF, Namespace, Literal, Dataset, ConjunctiveGraph
 
 from triplestore.utils import replace_blank_node
-
-AS = Namespace("https://www.w3.org/ns/activitystreams#")
+from triplestore.constants import AS
 
 # Cache timeout in seconds for readers that fetch all results at once
 CACHE_TIMEOUT = 60 * 60
@@ -70,7 +69,9 @@ def range_available_in_reader(reader: Reader, r: range) -> bool:
     else:
         rmax = r.stop
     r = range(r.start, rmax)
-    return all([i in reader.records for i in r])
+    # Check for all numbers in the range if reader.records contains this number
+    # as a key (reader.records is a dictionary)
+    return all(i in reader.records for i in r)
 
 
 class SearchGraphBuilder:
@@ -155,6 +156,7 @@ class SearchGraphBuilder:
         results = self.records
         graphs = [x.to_graph() for x in results if isinstance(x, Record)]
         content_graph = sum(graphs, Graph())
+        self._remove_from_triplestore(results)
         self._save_to_triplestore(content_graph)
         return content_graph
     
@@ -182,40 +184,4 @@ class SearchGraphBuilder:
         collection."""
         return self._get_collection_graph() + self._get_content_graph()
 
-    @classmethod
-    def _prune_recursively(cls, graph: Graph, subject):
-        related_by_subject = list(graph.triples((subject, None, None)))
-
-        for s, p, o in related_by_subject:
-            if isinstance(o, URIRef) and o != s:
-                cls._prune_recursively(graph, o)
-
-        prune_triples(graph, related_by_subject)
-
-    def _save_to_triplestore(self, content_graph: Graph) -> None:
-        """Save the fetched records to triplestore and update records that
-        already exist."""
-        # Create an empty named graph to provide the right context
-        graph_identifier = URIRef(settings.RDF_NAMESPACE_ROOT + "records/")
-        record_graph = Graph(identifier=graph_identifier)
-
-        # Get the existing graph from Blazegraph
-        store = settings.RDFLIB_STORE
-        bggraph = Graph(store=store, identifier=graph_identifier)
-
-        # Delete nodes about existing records except for their counters
-        subject_nodes_to_prune = [URIRef(x.iri) for x in self.records]
-        for s in subject_nodes_to_prune:
-            self._prune_recursively(bggraph, s)
-
-        # Add content_graph to records graph
-        # Convert triples to quads to include the named graph
-        triples = content_graph.triples((None, None, None))
-        quads = [
-            (replace_blank_node(s),
-             replace_blank_node(p),
-             replace_blank_node(o),
-             record_graph) for (s, p, o) in triples
-        ]
-        store.addN(quads)
 
