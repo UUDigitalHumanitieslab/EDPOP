@@ -3,7 +3,8 @@ import requests
 
 from django.conf import settings
 
-from triplestore.blazegraph import verify_namespace_available, NamespaceStatus
+from triplestore.blazegraph import verify_namespace_available, NamespaceStatus, \
+    verify_blazegraph_connection
 
 
 def create_test_namespace() -> None:
@@ -33,6 +34,8 @@ def clear_triplestore(settings):
 
 def pytest_sessionstart(session):
     # Make sure the test namespace exists
+    if not verify_blazegraph_connection():
+        pytest.exit("Cannot connect to Blazegraph. Is it running?")
     if verify_namespace_available() != NamespaceStatus.OK:
         create_test_namespace()
     assert verify_namespace_available() == NamespaceStatus.OK
