@@ -77,7 +77,8 @@ def replace_blank_node(node: Node) -> Node:
 
 def replace_blank_nodes_in_triples(triples: Triples) -> Triples:
     """Replace blank nodes in all triples using the ``replace_blank_node()``
-    function."""
+    function. This function assumes that all triples come from the same
+    graph."""
     return ((
         replace_blank_node(s),
         replace_blank_node(p),
