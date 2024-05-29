@@ -205,6 +205,7 @@ TRIPLESTORE_SPARQL_ENDPOINT = f'{TRIPLESTORE_BASE_URL}/namespace/{TRIPLESTORE_NA
 RDFLIB_STORE = SPARQLUpdateStore(
     query_endpoint=TRIPLESTORE_SPARQL_ENDPOINT,
     update_endpoint=TRIPLESTORE_SPARQL_ENDPOINT,
+    autocommit=False,
 )
 
 # CATALOG_READERS: a list of Reader classes from the edpop-explorer package.

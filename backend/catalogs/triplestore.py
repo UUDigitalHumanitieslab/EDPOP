@@ -30,6 +30,7 @@ def remove_from_triplestore(records: list[Record]) -> None:
     subject_nodes_to_prune = [URIRef(x.iri) for x in records]
     for s in subject_nodes_to_prune:
         prune_recursively(bggraph, s)
+    store.commit()
 
 
 def save_to_triplestore(content_graph: Graph) -> None:
@@ -46,3 +47,4 @@ def save_to_triplestore(content_graph: Graph) -> None:
     triples = replace_blank_nodes_in_triples(triples)
     quads = triples_to_quads(triples, record_graph)
     store.addN(quads)
+    store.commit()
