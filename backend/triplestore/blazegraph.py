@@ -10,7 +10,10 @@ def verify_blazegraph_connection() -> bool:
     """Return True if connection to Blazegraph triplestore is possible, else
     False."""
     status_url = settings.TRIPLESTORE_BASE_URL + "/status"
-    response = requests.get(status_url)
+    try:
+        response = requests.get(status_url)
+    except requests.exceptions.ConnectionError:
+        return False
     return response.ok
 
 
