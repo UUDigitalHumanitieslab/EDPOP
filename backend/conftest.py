@@ -2,6 +2,7 @@ import pytest
 import requests
 
 from django.conf import settings
+from rdflib.plugins.stores.sparqlstore import SPARQLUpdateStore
 
 from triplestore.blazegraph import verify_namespace_available, NamespaceStatus, \
     verify_blazegraph_connection
@@ -25,7 +26,7 @@ com.bigdata.rdf.store.AbstractTripleStore.axiomsClass=com.bigdata.rdf.axioms.NoA
 
 
 @pytest.fixture(autouse=True)
-def clear_triplestore(settings):
+def empty_triplestore(settings) -> SPARQLUpdateStore:
     store = settings.RDFLIB_STORE
     store.update('CLEAR ALL')
     yield store
