@@ -31,11 +31,13 @@ class Project(models.Model):
     )
     users = models.ManyToManyField(
         to=User,
+        blank=True,
         related_name='projects',
         help_text='Users who can write RDF data in this project',
     )
     groups = models.ManyToManyField(
         to=Group,
+        blank=True,
         related_name='projects',
         help_text='User groups with write access to this project; all their members will '
             'gain access.',
