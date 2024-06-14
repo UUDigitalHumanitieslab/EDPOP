@@ -4,21 +4,26 @@ from django.conf import settings
 from rdf.utils import prune_triples
 
 from project.models import Project
-from project.graphs import new_project_graph
+from project.graphs import (
+    stored_project_metadata, project_metadata_to_graph
+)
 from triplestore.utils import triples_to_quads, all_triples
 
 @receiver(post_save, sender=Project)
-def create_project_graph(sender, instance: Project, created, **kwargs):
+def store_project_graph(sender, instance: Project, created, **kwargs):
     '''
-    Create a new graph for a project
+    Store project metadata in the triplestore.
     '''
-    if created:
-        store = settings.RDFLIB_STORE
-        g = new_project_graph(instance)
-        triples = all_triples(g)
-        quads = triples_to_quads(triples, instance.graph())
-        store.addN(quads)
-        store.commit()
+    store = settings.RDFLIB_STORE
+    g = instance.graph()
+
+    if not created:
+        prune_triples(g, stored_project_metadata(instance))
+
+    triples = all_triples(project_metadata_to_graph(instance))
+    quads = triples_to_quads(triples, g)
+    store.addN(quads)
+    store.commit()
 
 
 @receiver(post_delete, sender=Project)
