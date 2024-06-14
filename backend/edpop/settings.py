@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'triplestore',
     'accounts',
     'rdf',
+    'project',
 ]
 
 MIDDLEWARE = [
