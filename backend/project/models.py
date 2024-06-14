@@ -13,10 +13,17 @@ class Project(models.Model):
     '''
 
     name = models.SlugField(
-        max_length=256,
-        blank=False,
+        max_length=64,
         unique=True,
-        help_text='Name of the project; used in IRIs for the project\'s RDF data',
+        help_text='Identifier of the project; used in IRIs for the project\'s RDF data',
+    )
+    display_name = models.CharField(
+        max_length=256,
+        help_text='Human-friendly name for the project',
+    )
+    summary = models.TextField(
+        blank=True,
+        help_text='Summary of the project',
     )
     public = models.BooleanField(
         default=False,
@@ -33,6 +40,10 @@ class Project(models.Model):
         help_text='User groups with write access to this project; all their members will '
             'gain access.',
     )
+
+
+    def __str__(self) -> str:
+        return self.name
 
 
     def graph(self) -> Graph:
