@@ -34,8 +34,31 @@ class Project(models.Model):
             'gain access.',
     )
 
+
     def identifier(self) -> URIRef:
         '''
         Identifier of the project graph.
         '''
         return URIRef(settings.RDF_NAMESPACE_ROOT + 'project/' + self.name + '/')
+
+
+    def permit_query_by(self, user: User) -> bool:
+        '''
+        Whether a user should be permitted to make (read-only) queries on the project
+        graph.
+        '''
+        return self.public or user.is_superuser or self._granted_access(user)
+
+
+    def permit_update_by(self, user: User) -> bool:
+        '''
+        Whether a user should be permitted to make update queries on the project graph.
+        '''
+        return user.is_superuser or self._granted_access(user)
+
+
+    def _granted_access(self, user: User) -> bool:
+        '''
+        Whether a user has been given explicit access, either directly or through a group.
+        '''
+        return self.users.contains(user) or self.groups.filter(user=user).exists()
