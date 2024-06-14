@@ -1,3 +1,6 @@
 from django.contrib import admin
+from project import models
 
-# Register your models here.
+@admin.register(models.Project)
+class ProjectAdmin(admin.ModelAdmin):
+    pass
