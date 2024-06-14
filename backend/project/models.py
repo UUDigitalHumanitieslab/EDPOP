@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User, Group
-from rdflib import URIRef
+from rdflib import URIRef, Graph
 from django.conf import settings
 
 
@@ -35,11 +35,29 @@ class Project(models.Model):
     )
 
 
-    def identifier(self) -> URIRef:
+    def graph(self) -> Graph:
         '''
-        Identifier of the project graph.
+        RDF graph for the project.
+        '''
+        store = settings.RDFLIB_STORE
+        return Graph(store=store, identifier=self._graph_identifier())
+
+
+    def _graph_identifier(self) -> URIRef:
+        '''
+        Identifier for the graph of this project.
         '''
         return URIRef(settings.RDF_NAMESPACE_ROOT + 'project/' + self.name + '/')
+
+
+    def identifier(self) -> URIRef:
+        '''
+        Identifier for the subject node of this project.
+
+        This is a node within the project graph; it can be used to give context to the
+        project.
+        '''
+        return URIRef(self.name, base=self._graph_identifier())
 
 
     def permit_query_by(self, user: User) -> bool:

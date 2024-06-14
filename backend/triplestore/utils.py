@@ -36,6 +36,11 @@ def find_subject_by_class(graph: Graph, rdf_class: URIRef) -> URIRef:
     subjects = graph.subjects(RDF.type, rdf_class)
     return next(subjects, None)
 
+
+def all_triples(graph: Graph) -> Iterable[Any]:
+    return graph.triples((None, None, None))
+
+
 ObjectURIs = Dict[int, URIRef]
 
 
