@@ -92,4 +92,6 @@ class Project(models.Model):
         '''
         Whether a user has been given explicit access, either directly or through a group.
         '''
+        if user.is_anonymous:
+            return False
         return self.users.contains(user) or self.groups.filter(user=user).exists()
