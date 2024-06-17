@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+from projects.models import Project
 
 class ResearchGroup(models.Model):
     """ Research group with a given name and project;
@@ -26,6 +27,7 @@ class Collection(models.Model):
     """
     description = models.CharField(max_length=200)
     managing_group = models.ManyToManyField(ResearchGroup)
+    context = models.ForeignKey(Project, on_delete=models.CASCADE)
 
     class Meta:
         permissions = (
@@ -57,6 +59,7 @@ class Annotation(models.Model):
     but multiple groups can add annotations."""
     record = models.ForeignKey(Record, on_delete=models.CASCADE)
     managing_group = models.ForeignKey(ResearchGroup, on_delete=models.CASCADE)
+    context = models.ForeignKey(Project, on_delete=models.CASCADE)
     content = models.JSONField(dict)
 
     def __str__(self):
