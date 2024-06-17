@@ -1,5 +1,5 @@
 from django.contrib import admin
-from project import models
+from projects import models
 
 @admin.register(models.Project)
 class ProjectAdmin(admin.ModelAdmin):

@@ -2,7 +2,7 @@ from rdflib import RDF, Literal
 from django.conf import settings
 
 from triplestore.constants import EDPOPCOL, AS
-from project.models import Project
+from projects.models import Project
 
 
 def test_project_graph_created_and_deleted(db):

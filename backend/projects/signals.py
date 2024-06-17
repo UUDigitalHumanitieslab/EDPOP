@@ -3,8 +3,8 @@ from django.dispatch import receiver
 from django.conf import settings
 from rdf.utils import prune_triples
 
-from project.models import Project
-from project.graphs import (
+from projects.models import Project
+from projects.graphs import (
     stored_project_metadata, project_metadata_to_graph
 )
 from triplestore.utils import triples_to_quads, all_triples

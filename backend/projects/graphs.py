@@ -2,7 +2,7 @@ from rdflib import RDF, Literal
 from triplestore.constants import EDPOPCOL, AS
 from itertools import chain
 
-from project.models import Project
+from projects.models import Project
 
 def stored_project_metadata(project: Project):
     '''
