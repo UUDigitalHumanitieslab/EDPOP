@@ -26,7 +26,10 @@ com.bigdata.rdf.store.AbstractTripleStore.axiomsClass=com.bigdata.rdf.axioms.NoA
 
 
 @pytest.fixture(autouse=True)
-def empty_triplestore(settings) -> SPARQLUpdateStore:
+def triplestore(settings) -> SPARQLUpdateStore:
+    """Get the testing triplestore and make sure that it is empty both
+    before and after the test. This fixture is automatically applied,
+    but by explicitly adding it to a test it also offers convenient access."""
     store = settings.RDFLIB_STORE
     store.update('CLEAR ALL')
     yield store
