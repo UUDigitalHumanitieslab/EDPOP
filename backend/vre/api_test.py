@@ -2,6 +2,7 @@ import pytest
 
 import json
 
+from projects.models import Project
 from .models import Record, Collection
 
 
@@ -17,6 +18,9 @@ COLLECTIONS = [
     {'description': 'serious collection'},
 ]
 
+@pytest.fixture()
+def project(db):
+    return Project.objects.create(name='test', display_name='Test')
 
 @pytest.fixture
 def records(db):
@@ -27,9 +31,9 @@ def records(db):
 
 
 @pytest.fixture
-def collections(db):
+def collections(db, project):
     for data in COLLECTIONS:
-        Collection(**data).save()
+        Collection(**data, context=project).save()
     yield Collection.objects
     Collection.objects.all().delete()
 
