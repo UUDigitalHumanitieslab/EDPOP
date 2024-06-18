@@ -140,9 +140,9 @@ class SearchGraphBuilder:
         else:
             self.cache_used = False
             self.reader.fetch_range(range_to_fetch)
+            # Save reader in cache
+            cache.set(identifier, self.reader, CACHE_TIMEOUT)
 
-        # Save reader in cache
-        cache.set(identifier, self.reader, CACHE_TIMEOUT)
         self.records = self._get_partial_results()
 
     def _get_partial_results(self) -> list[Record]:
