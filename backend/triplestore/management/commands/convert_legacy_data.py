@@ -2,7 +2,7 @@ from django.core.management import BaseCommand
 from rdflib import Graph
 
 from triplestore.convert_legacy_data.conversion import convert_all
-from vre.models import Annotation, User, Collection, Record, ResearchGroup
+from vre.models import Annotation, User, Collection, Record
 
 
 class Command(BaseCommand):
@@ -13,9 +13,8 @@ class Command(BaseCommand):
         users = User.objects.all()
         collections = Collection.objects.all()
         records = Record.objects.all()
-        researchgroups = ResearchGroup.objects.all()
         uris, graph = convert_all(
-            users, researchgroups, collections, records, annotations
+            users, collections, records, annotations
         )
         assert isinstance(graph, Graph)
         print(graph.serialize())

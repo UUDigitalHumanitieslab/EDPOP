@@ -2,7 +2,8 @@ import pytest
 from django.contrib.auth.models import User
 from rdflib import BNode
 
-from vre.models import ResearchGroup, Collection, Record, Annotation
+from projects.models import Project
+from vre.models import Collection, Record, Annotation
 
 
 # Fixtures with data for conversion - currently just model instances.
@@ -17,21 +18,20 @@ def fake_user(db):
 
 
 @pytest.fixture()
-def fake_group(db):
-    group = ResearchGroup.objects.create(
-        name='test researchers',
-        project='test project'
+def fake_project(db):
+    project = Project.objects.create(
+        name='test_project',
+        display_name='Test Project'
     )
-    return group
+    return project
 
 
 @pytest.fixture()
-def fake_collection(db, fake_group):
+def fake_collection(db, fake_project):
     collection = Collection.objects.create(
         description='a collection for testing',
+        context = fake_project,
     )
-    collection.managing_group.add(fake_group)
-    collection.save()
     return collection
 
 
@@ -49,10 +49,10 @@ def fake_record(db, fake_collection):
 
 
 @pytest.fixture()
-def fake_annotation(db, fake_group, fake_record):
+def fake_annotation(db, fake_project, fake_record):
     annotation = Annotation.objects.create(
         record = fake_record,
-        managing_group = fake_group,
+        context = fake_project,
         content = {
             'Title': 'Different kind of test',
             'Genre': 'Test material',
