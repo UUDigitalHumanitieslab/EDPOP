@@ -130,7 +130,7 @@ class SearchGraphBuilder:
         if (cached_reader is not None and
                 cached_reader.prepared_query == self.reader.prepared_query
                 and type(cached_reader) is type(self.reader)):
-            # Reader types and/or queries are not identical, so ignore cache
+            # Only use cache if types and queries are identical
             self.reader = cached_reader
 
         # Fetch records, if they are not already available from cache
@@ -184,5 +184,3 @@ class SearchGraphBuilder:
         """Represent the fetched records in a graph with an ActivityStreams
         collection."""
         return self._get_collection_graph() + self._get_content_graph()
-
-
