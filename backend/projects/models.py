@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User, Group
+from django.contrib import admin
 from rdflib import URIRef, Graph
 from django.conf import settings
 
@@ -62,7 +63,7 @@ class Project(models.Model):
         '''
         return URIRef(settings.RDF_NAMESPACE_ROOT + 'project/' + self.name + '/')
 
-
+    @admin.display()
     def identifier(self) -> URIRef:
         '''
         Identifier for the subject node of this project.
