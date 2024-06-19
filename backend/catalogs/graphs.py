@@ -1,9 +1,24 @@
+from typing import Optional
+
 from django.conf import settings
+from django.core.cache import cache
+import hashlib
 
-from edpop_explorer import Reader, Record
-from rdflib import BNode, URIRef, Graph, RDF, Namespace, Literal
+from edpop_explorer import Reader, Record, EDPOPREC
+from rdf.utils import prune_triples_cascade, prune_triples
+from rdflib import BNode, URIRef, Graph, RDF, Namespace, Literal, Dataset, ConjunctiveGraph
 
-AS = Namespace("https://www.w3.org/ns/activitystreams#")
+from catalogs.triplestore import remove_from_triplestore, save_to_triplestore
+from triplestore.utils import replace_blank_node
+from triplestore.constants import AS
+
+# Cache timeout in seconds for readers that fetch all results at once
+CACHE_TIMEOUT = 60 * 60
+
+
+def _hash(input_str: str) -> str:
+    """Return a hashed (hex digest) version of the input string."""
+    return hashlib.sha224(input_str.encode()).hexdigest()
 
 
 def _get_activated_readers() -> list[type[Reader]]:
@@ -22,6 +37,8 @@ def _get_reader_dict() -> dict[URIRef, type[Reader]]:
 
 
 def refresh_readers() -> None:
+    """Refresh the list of loaded readers. Currently only used
+    for unit tests."""
     global READERS_BY_URIREF
     READERS_BY_URIREF = _get_reader_dict()
     
@@ -42,12 +59,32 @@ def get_catalogs_graph() -> Graph:
     return graph
 
 
+def range_available_in_reader(reader: Reader, r: range) -> bool:
+    """Return True if all of the range of records to fetch is already available
+    in the reader, else False. Return also True if parts of range are not
+    available but if these are out of range of the total number of results
+    for the query (e.g., requested range is (10, 20) and only records 10 through
+    14 are available but there are only 15 results, so they are all there)."""
+    if reader.number_of_results is not None:
+        rmax = min(r.stop, reader.number_of_results)
+    else:
+        rmax = r.stop
+    r = range(r.start, rmax)
+    # Check for all numbers in the range if reader.records contains this number
+    # as a key (reader.records is a dictionary)
+    return all(i in reader.records for i in r)
+
+
 class SearchGraphBuilder:
     """Prepare and perform queries and build graphs from the results."""
     reader: Reader
     records: list[Record]
+    cache_used: bool = False
+    """True after retrieving results if cache was used instead of fetching
+    from external database."""
     _start: int
-    _max_items: int
+    _end: int
+    _available_range: Optional[range] = None
 
     def __init__(self, readerclass: type[Reader]):
         self.reader = readerclass()
@@ -56,11 +93,11 @@ class SearchGraphBuilder:
             self,
             query: str,
             start: int = 0,
-            max_items: int = 50
+            end: int = 50
     ) -> Graph:
         """Convenience method that subsequently calls the ``set_query``,
         ``perform_fetch`` and ``get_result_graph`` methods."""
-        self.set_query(query, start, max_items)
+        self.set_query(query, start, end)
         self.perform_fetch()
         return self.get_result_graph()
 
@@ -68,32 +105,50 @@ class SearchGraphBuilder:
             self,
             query: str,
             start: int = 0,
-            max_items: int = 50
+            end: int = 50
     ):
         """Set the query. Should be called before calling
         ``perform_fetch()``."""
         self._start = start
-        if start != 0:
-            self.reader.adjust_start_record(start)
+        self._end = end
         self.reader.prepare_query(query)
-        self._max_items = max_items
 
     def perform_fetch(self):
         """Perform the fetch. This method is supposed to be called just
         once. After fetching, the requested records (and only those)
         are available in the ``records`` attribute, and ``get_result_graph()``
         can be called to create the accompanying graph."""
-        self.reader.fetch(self._max_items)
+        # Reader objects are cached for a limited period of time because
+        # certain queries may be expensive.
+        # To identify caches, the `generate_identifier()` method of a reader
+        # is used, but this is hashed because this identifier may be too
+        # long and complicated to be used as a cache key. Two hashes may
+        # theoretically be used for the same identifier, so check if the
+        # reader from the cache is indeed appropriate.
+        identifier = _hash(self.reader.generate_identifier())
+        cached_reader = cache.get(identifier)
+        if (cached_reader is not None and
+                cached_reader.prepared_query == self.reader.prepared_query
+                and type(cached_reader) is type(self.reader)):
+            # Only use cache if types and queries are identical
+            self.reader = cached_reader
+
+        # Fetch records, if they are not already available from cache
+        range_to_fetch = range(self._start, self._end)
+        if range_available_in_reader(self.reader, range_to_fetch):
+            self.cache_used = True
+        else:
+            self.cache_used = False
+            self.reader.fetch_range(range_to_fetch)
+            # Save reader in cache
+            cache.set(identifier, self.reader, CACHE_TIMEOUT)
+
         self.records = self._get_partial_results()
 
     def _get_partial_results(self) -> list[Record]:
-        if self._max_items <= len(self.reader.records):
-            end = self._start + self._max_items
-        else:
-            end = len(self.reader.records)
-        results = self.reader.records[self._start:end]
-        if not all([isinstance(x, Record) for x in results]):
-            raise RuntimeError("Some results are None - this should not happen.")
+        start = self._start
+        end = min(self._end, self.reader.number_of_results)
+        results = [self.reader.records[x] for x in range(start, end)]
         return results  # type: ignore
 
     def _get_content_graph(self) -> Graph:
@@ -102,6 +157,8 @@ class SearchGraphBuilder:
         results = self.records
         graphs = [x.to_graph() for x in results if isinstance(x, Record)]
         content_graph = sum(graphs, Graph())
+        remove_from_triplestore(results)
+        save_to_triplestore(content_graph)
         return content_graph
     
     def _get_collection_graph(self) -> Graph:

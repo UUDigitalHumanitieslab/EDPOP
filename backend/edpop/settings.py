@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 
 from pathlib import Path
 import os
+from rdflib.plugins.stores.sparqlstore import SPARQLUpdateStore
 
 from edpop_explorer import readers
 
@@ -31,12 +32,11 @@ DEBUG = True
 # Dummy caching for development mode so we don't need to empty our
 # cache every time.
 # https://docs.djangoproject.com/en/1.11/topics/cache/#dummy-caching-for-development
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+CACHE = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
     }
 }
-
 ALLOWED_HOSTS = []
 
 
@@ -193,6 +193,20 @@ SITE_NAME = 'EDPOP VRE'
 REST_AUTH = {
     "USER_DETAILS_SERIALIZER": "accounts.serializers.OurUserDetailsSerializer"
 }
+
+# RDF_NAMESPACE_ROOT is the common prefix for our own graphs.
+RDF_NAMESPACE_HOST = 'localhost'
+RDF_NAMESPACE_ROOT = f'http://{RDF_NAMESPACE_HOST}:8000/rdf/'
+
+# Default store for our graphs.
+TRIPLESTORE_NAMESPACE = 'edpop'
+TRIPLESTORE_BASE_URL = os.getenv('EDPOP_TRIPLESTORE_BASE_URL', 'http://localhost:9999/blazegraph')
+TRIPLESTORE_SPARQL_ENDPOINT = f'{TRIPLESTORE_BASE_URL}/namespace/{TRIPLESTORE_NAMESPACE}/sparql'
+RDFLIB_STORE = SPARQLUpdateStore(
+    query_endpoint=TRIPLESTORE_SPARQL_ENDPOINT,
+    update_endpoint=TRIPLESTORE_SPARQL_ENDPOINT,
+    autocommit=False,
+)
 
 # CATALOG_READERS: a list of Reader classes from the edpop-explorer package.
 # These readers will be registered for use in the VRE.

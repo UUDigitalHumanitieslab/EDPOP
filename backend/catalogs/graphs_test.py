@@ -3,7 +3,8 @@ import pytest
 from edpop_explorer import readers, Reader, Record
 from rdflib import URIRef
 
-from .graphs import SearchGraphBuilder, _get_reader_dict, get_reader_by_uriref, get_catalogs_graph
+from .graphs import SearchGraphBuilder, _get_reader_dict, get_reader_by_uriref, get_catalogs_graph, \
+    range_available_in_reader
 
 
 class MockReader(Reader):
@@ -14,16 +15,12 @@ class MockReader(Reader):
     IRI_PREFIX = "http://example.com/reader/"
     CATALOG_URIREF = URIRef("http://example.com/reader")
 
-    def fetch(self, number: Optional[int] = None):
-        to_fetch_start = self.number_fetched
-        if number is None:
-            number = 10
-        to_fetch_end = self.number_fetched + number
-        to_fetch_end = min(to_fetch_end, self.MAX_ITEMS)
-        identifiers = range(to_fetch_start, to_fetch_end)
-        self.records.extend([self.get_by_id(str(x)) for x in identifiers])
+    def fetch_range(self, range_to_fetch: range) -> range:
+        range_to_fetch = range(range_to_fetch.start, min(range_to_fetch.stop, self.MAX_ITEMS))
+        for i in range_to_fetch:
+            self.records[i] = self.get_by_id(str(i))
         self.number_of_results = self.MAX_ITEMS
-        self.number_fetched = to_fetch_end
+        return range_to_fetch
 
     @classmethod
     def get_by_id(cls, identifier: str) -> Record:
@@ -34,6 +31,10 @@ class MockReader(Reader):
     @classmethod
     def transform_query(cls, query: str) -> str:
         return query
+
+
+class FetchAllMockReader(MockReader):
+    FETCH_ALL_AT_ONCE = True
 
 
 def test_mockreader_start_zero():
@@ -52,14 +53,12 @@ def test_mockreader_start_zero():
     assert reader.fetching_exhausted
 
 
-def test_mockreader_start_at_five():
+def test_mockreader_range():
     # Skipping first records
     reader2 = MockReader()
     reader2.prepare_query("Hoi")
-    reader2.adjust_start_record(5)
-    reader2.fetch(5)
-    assert reader2.number_fetched == 10
-    assert reader2.records[0] is None
+    reader2.fetch_range(range(5, 10))
+    assert reader2.number_fetched == 5
     assert reader2.records[5].identifier == "5"
 
 
@@ -99,20 +98,52 @@ def mock_builder(query, **kwargs):
 
 
 def test_builder_first_results():
-    builder = mock_builder("hoi", max_items=10)
-    assert len(builder.records) == 10
+    builder = mock_builder("hoi", start=0, end=10)
     assert builder.records[0].identifier == "0"
+    assert len(builder.records) == 10
 
 
 def test_buider_later_results():
-    builder = mock_builder("hoi", start=5, max_items=10)
+    builder = mock_builder("hoi", start=5, end=15)
     assert len(builder.records) == 10
+    # Builder stores a list of records starting with the first acquired record
     assert builder.records[0].identifier == "5"
 
 
 def test_builder_more_than_available():
-    builder = mock_builder("hoi", start=5, max_items=50)
+    builder = mock_builder("hoi", start=5, end=50)
     # Assert that only the available records are fetched, which is 
     # 20 because there are 25 records and we started with 5
     assert len(builder.records) == 20
     assert builder.records[0].identifier == "5"
+
+
+def test_builder_with_caching():
+    builder = SearchGraphBuilder(FetchAllMockReader)
+    graph = builder.query_to_graph("hoi", end=10)
+    # Just make sure that running this again does not cause any errors
+    graph2 = builder.query_to_graph("hoi", end=10)
+    assert builder.cache_used is True
+
+
+def test_range_available_in_reader_empty_reader():
+    reader = MockReader()
+    assert range_available_in_reader(reader, range(0, 10)) is False
+
+
+def test_range_available_in_reader_exact_range():
+    reader = MockReader()
+    reader.fetch(10)
+    assert range_available_in_reader(reader, range(0, 10)) is True
+
+
+def test_range_available_in_reader_partially_available():
+    reader = MockReader()
+    reader.fetch(10)
+    assert range_available_in_reader(reader, range(5, 15)) is False
+
+
+def test_range_available_in_reader_fully_available():
+    reader = MockReader()
+    reader.fetch(20)
+    assert range_available_in_reader(reader, range(5, 15)) is True
