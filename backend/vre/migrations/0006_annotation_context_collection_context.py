@@ -16,7 +16,7 @@ def save_annotation_managing_group_as_context(apps, schema_editor):
     for obj in Annotation.objects.all():
         research_group = obj.managing_group
         # find the matching project (created by data migration in projects app)
-        project = Project.objects.get(name=research_group.name)
+        project = Project.objects.get(display_name=research_group.name)
         obj.context = project
         obj.save()
 
@@ -46,10 +46,10 @@ def save_collection_managing_group_as_context(apps, schema_editor):
         matching_name = obj.managing_group.filter(name=obj.name)
         if matching_name.exists():
             research_group = matching_name.first()
-            project = Project.objects.get(name=research_group.name)
+            project = Project.objects.get(display_name=research_group.name)
         elif obj.managing_group.exclude(name='EDPOP VRE Research Group').count() == 1:
             research_group = obj.managing_group.exclude(name='EDPOP VRE Research Group').first()
-            project = Project.objects.get(name=research_group.name)
+            project = Project.objects.get(display_name=research_group.name)
         else:
             project = Project.objects.create(
                 name=name_to_slug(obj.name),

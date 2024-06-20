@@ -2,7 +2,7 @@
 
 from django.db import migrations
 from projects.migration_utils import name_to_slug
-from projects.signals import store_project_graph
+from projects.signals import store_project_graph, delete_project_graph
 
 def research_groups_to_projects(apps, schema_editor):
     ResearchGroup = apps.get_model('vre', 'ResearchGroup')
@@ -16,8 +16,26 @@ def research_groups_to_projects(apps, schema_editor):
         for user in research_group.members.all():
             project.users.add(user)
         project.save()
+
+        # signals are not triggered by migrations; manually call function to save the
+        # project in the triplestore
         store_project_graph(Project, project, True)
 
+
+def projects_to_research_groups(apps, schema_editor):
+    ResearchGroup = apps.get_model('vre', 'ResearchGroup')
+    Project = apps.get_model('projects', 'Project')
+
+    for project in Project.objects.all():
+        research_group = ResearchGroup.objects.create(
+            name=project.display_name,
+        )
+
+        for user in project.users.all():
+            research_group.members.add(user)
+
+        project.delete()
+        delete_project_graph(Project, project)
 
 class Migration(migrations.Migration):
     '''
@@ -40,6 +58,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunPython(
             research_groups_to_projects,
-            reverse_code=migrations.RunPython.noop,
+            reverse_code=projects_to_research_groups,
         )
     ]
