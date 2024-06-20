@@ -1,7 +1,9 @@
+from rdf.renderers import TurtleRenderer, JsonLdRenderer
 from rest_framework import views
 from rdf.views import RDFView
 from rdflib import Graph, URIRef
 from rest_framework.exceptions import ParseError
+from rest_framework.renderers import JSONRenderer
 
 from .graphs import SearchGraphBuilder, get_catalogs_graph, get_reader_by_uriref
 
@@ -37,6 +39,12 @@ class SearchView(RDFView):
 
 class CatalogsView(RDFView):
     """Return a graph containing all activated catalogs."""
+    renderer_classes = (JsonLdRenderer,)
+    json_ld_context = {
+        "schema": "https://schema.org/",
+        "name": "schema:name",
+        "description": "schema:description",
+    }
     
     def get_graph(self, request: views.Request, **kwargs) -> Graph:
         graph = get_catalogs_graph()
