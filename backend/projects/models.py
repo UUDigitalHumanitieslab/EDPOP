@@ -71,7 +71,8 @@ class Project(models.Model):
         This is a node within the project graph; it can be used to give context to the
         project.
         '''
-        return URIRef(self.name, base=self._graph_identifier())
+        if self.name:
+            return URIRef(self.name, base=self._graph_identifier())
 
 
     def permit_query_by(self, user: User) -> bool:
