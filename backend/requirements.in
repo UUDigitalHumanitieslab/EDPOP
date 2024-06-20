@@ -10,4 +10,4 @@ sruthi
 rdflib
 restframework-rdf
 dj-rest-auth
-edpop-explorer==0.8.0
+edpop-explorer@git+https://github.com/CentreForDigitalHumanities/edpop-explorer@feature/more-descriptions
