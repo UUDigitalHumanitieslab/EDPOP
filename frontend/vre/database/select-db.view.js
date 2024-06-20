@@ -12,7 +12,10 @@ export var SelectDatabaseView = Backbone.View.extend({
         this.render();
     },
     render: function() {
-        var collections = {'collections': this.collection.toJSON()};
+        var collections = {
+            'collections': this.collection[0].toJSON(),
+            'catalogs': this.collection[1].toJSON(),
+        };
         this.$el.html(this.template(collections));
     },
     select: function(event) {

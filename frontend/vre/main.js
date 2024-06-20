@@ -21,6 +21,7 @@ import { addCSRFToken } from './utils/generic-functions';
 import { GlobalVariables } from './globals/variables';
 import './globals/user';
 import { accountMenu } from './globals/accountMenu';
+import {Catalogs} from "./database/catalog.model";
 
 
 // Global variables
@@ -78,6 +79,8 @@ var VRERouter = Backbone.Router.extend({
 function prepareCollections() {
     $('#result-detail').modal({show: false});
     GlobalVariables.myCollections = VRECollections.mine();
+    GlobalVariables.catalogs = new Catalogs();
+    GlobalVariables.catalogs.fetch();
     GlobalVariables.recordsList = new RecordListManagingView({
         collection: GlobalVariables.records,
     });
@@ -87,6 +90,7 @@ function prepareCollections() {
     GlobalVariables.router = new VRERouter();
     GlobalVariables.myCollections.on('update', finish);
     GlobalVariables.allGroups.on('update', finish);
+    GlobalVariables.catalogs.on('update', finish);
 
     // Add account menu
     accountMenu.$el.appendTo('#navbar-right');
@@ -96,7 +100,10 @@ function prepareCollections() {
 // GlobalVariables.myCollections and GlobalVariables.allGroups have fully
 // loaded.
 function startRouting() {
-    GlobalVariables.dropDown = new SelectDatabaseView({collection: GlobalVariables.myCollections});
+    console.log(GlobalVariables.catalogs);
+    GlobalVariables.dropDown = new SelectDatabaseView({
+        collection: [GlobalVariables.myCollections, GlobalVariables.catalogs]
+    });
     $('.nav').first().append(
         GlobalVariables.dropDown.el,
         GlobalVariables.blankRecordButton.el,
@@ -109,7 +116,7 @@ function startRouting() {
 
 // _.after ensures that a function runs only after a given number of calls.
 var kickoff = _.after(2, prepareCollections);
-var finish = _.after(2, startRouting);
+var finish = _.after(3, startRouting);
 
 // Ensure we have a CSRF cookie.
 if (Cookies.get('csrftoken')) {
