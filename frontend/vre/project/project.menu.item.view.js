@@ -1,36 +1,36 @@
 import { View } from 'backbone';
-import groupMenuItemTemplate from './group.menu.item.view.mustache';
+import projectMenuItemTemplate from './project.menu.item.view.mustache';
 
-export var GroupMenuItemView = View.extend({
+export var ProjectMenuItemView = View.extend({
     tagName: 'li',
-    template: groupMenuItemTemplate,
+    template: projectMenuItemTemplate,
 
     events: {
         'click': 'select',
     },
 
-    initialize: function() {
+    initialize: function () {
         this.render().listenTo(this.model, {
             select: this.activate,
             deselect: this.deactivate,
         });
     },
 
-    render: function() {
+    render: function () {
         this.$el.html(this.template(this.model.attributes));
         return this;
     },
 
-    select: function(event) {
+    select: function (event) {
         event.preventDefault();
         this.model.trigger('select', this.model);
     },
 
-    activate: function(model) {
+    activate: function (model) {
         this.$el.addClass('active');
     },
 
-    deactivate: function(model) {
+    deactivate: function (model) {
         this.$el.removeClass('active');
     },
 });

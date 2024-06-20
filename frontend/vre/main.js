@@ -6,13 +6,13 @@ import Cookies from 'jscookie';
 import './record/record.opening.aspect';
 import { vreChannel } from './radio';
 import { Records } from './record/record.model';
+import { Projects } from './project/project.model';
 import { RecordListManagingView } from './record/record.list.managing.view';
 import { BlankRecordButtonView } from './record/blank.record.button.view';
 import { VRECollections } from './collection/collection.model';
 import { SRUView } from './database/sru.view';
 import { CollectionView } from './database/collection.view';
-import { ResearchGroups } from './group/group.model';
-import { GroupMenuView } from './group/group.menu.view';
+import { ProjectMenuView } from './project/project.menu.view';
 import { SearchResults } from './search/search.model';
 import { SearchView } from './search/search.view';
 import { AdvancedSearchView } from './search/advanced.search.view';
@@ -25,7 +25,7 @@ import { accountMenu } from './globals/accountMenu';
 
 // Global variables
 GlobalVariables.records = new Records();
-GlobalVariables.allGroups = new ResearchGroups();
+GlobalVariables.allProjects = new Projects();
 GlobalVariables.results = new SearchResults();
 GlobalVariables.searchView  = new SearchView({model: GlobalVariables.results});
 GlobalVariables.blankRecordButton = new BlankRecordButtonView();
@@ -81,19 +81,19 @@ function prepareCollections() {
     GlobalVariables.recordsList = new RecordListManagingView({
         collection: GlobalVariables.records,
     });
-    GlobalVariables.allGroups.fetch();
-    var myGroups = ResearchGroups.mine();
-    GlobalVariables.groupMenu = new GroupMenuView({collection: myGroups});
+    GlobalVariables.allProjects.fetch();
+    var myProjects = Projects.mine()
+    GlobalVariables.projectMenu = new ProjectMenuView({ collection: myProjects });
     GlobalVariables.router = new VRERouter();
     GlobalVariables.myCollections.on('update', finish);
-    GlobalVariables.allGroups.on('update', finish);
+    GlobalVariables.allProjects.on('update', finish);
 
     // Add account menu
     accountMenu.$el.appendTo('#navbar-right');
 }
 
 // We want this code to run after prepareCollections has run and both
-// GlobalVariables.myCollections and GlobalVariables.allGroups have fully
+// GlobalVariables.myCollections and GlobalVariables.allProjects have fully
 // loaded.
 function startRouting() {
     GlobalVariables.dropDown = new SelectDatabaseView({collection: GlobalVariables.myCollections});

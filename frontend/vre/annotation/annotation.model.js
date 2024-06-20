@@ -13,16 +13,16 @@ export var FlatAnnotations = APICollection.extend({
     },
     // How to uniquely identify a field annotation.
     modelId: function(attributes) {
-        return attributes.key + ':' + attributes.group;
+        return attributes.key + ':' + attributes.context;
     },
     initialize: function(models, options) {
         _.assign(this, _.pick(options, ['record']));
         this.underlying = this.record.getAnnotations();
         this.underlying.forEach(this.toFlat.bind(this));
-        this.markedGroups = new Backbone.Collection([]);
+        this.markedProjects = new Backbone.Collection([]);
         this.listenTo(this.underlying, 'add change:content', this.toFlat);
-        this.on('add change:value remove', this.markGroup);
-        this.markedGroups.on('add', _.debounce(this.fromFlat), this);
+        this.on('add change:value remove', this.markProject);
+        this.markedProjects.on('add', _.debounce(this.fromFlat), this);
         // this.listenTo(this.underlying, 'remove', TODO);
     },
     // translate the official representation to the flat one
@@ -36,12 +36,12 @@ export var FlatAnnotations = APICollection.extend({
             } else annotation.save(null, {silent: true});
         }
         var id = annotation.id,
-            groupId = annotation.get('managing_group'),
-            groupName = GlobalVariables.allGroups.get(groupId).get('name'),
+            projectId = annotation.get('context'),
+            projectName = GlobalVariables.allProjects.get(projectId).get('name'),
             content = annotation.get('content'),
-            existing = _.map(this.filter({group: groupName}), 'attributes'),
+            existing = _.map(this.filter({ context: projectName }), 'attributes'),
             replacements = _.map(content, function(value, key) {
-                return {id: id, key: key, value: value, group: groupName};
+                return { id: id, key: key, value: value, context: projectName };
             }),
             obsolete = _.differenceBy(existing, replacements, this.modelId);
         // After the next two lines, this.models will be up-to-date and
@@ -49,27 +49,27 @@ export var FlatAnnotations = APICollection.extend({
         this.remove(obsolete);
         this.add(replacements, {merge: true});
     },
-    markGroup: function(flatAnnotation) {
-        this.markedGroups.add({id: flatAnnotation.get('group')});
+    markProject: function (flatAnnotation) {
+        this.markedProjects.add({ id: flatAnnotation.get('context') });
     },
     // translate the flat representation to the official one, save immediately
     fromFlat: function() {
         var flat = this,
             record = flat.record,
             recordId = record.id,
-            flatPerGroup = flat.groupBy('group');
-        var newContent = flat.markedGroups.map('id').map(function(groupName) {
-            var groupId = GlobalVariables.allGroups.findWhere({name: groupName}).id,
-                existing = flat.underlying.findWhere({managing_group: groupId}),
+            flatPerProject = flat.groupBy('context');
+        var newContent = flat.markedProjects.map('id').map(function (projectName) {
+            var projectId = GlobalVariables.allProjects.findWhere({ name: projectName }).id,
+                existing = flat.underlying.findWhere({ context: projectId }),
                 id = existing && existing.id,
-                annotations = flatPerGroup[groupName],
+                annotations = flatPerProject[projectName],
                 content = annotations && _(annotations).map(function(model) {
                     return [model.get('key'), model.get('value')];
                 }).fromPairs().value() || {};
             return {
                 id: id,
                 record: recordId,
-                managing_group: groupId,
+                context: projectId,
                 content: content,
             };
         });
@@ -79,6 +79,6 @@ export var FlatAnnotations = APICollection.extend({
             _.invokeMap(flat.underlying.models, 'set', 'record', record.id);
         });
         flat.underlying.add(newContent, {merge: true});
-        flat.markedGroups.reset();
+        flat.markedProjects.reset();
     },
 });

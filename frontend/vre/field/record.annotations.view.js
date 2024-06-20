@@ -17,8 +17,8 @@ export var RecordAnnotationsView = RecordFieldsBaseView.extend({
     },
 
     edit: function(model) {
-        var group = GlobalVariables.groupMenu.model.get('name'),
-            editTarget = model.clone().set('group', group),
+        var project = GlobalVariables.projectMenu.model.get('name'),
+            editTarget = model.clone().set('context', project),
             preExisting = this.collection.get(editTarget),
             newRow;
         if (preExisting) {
