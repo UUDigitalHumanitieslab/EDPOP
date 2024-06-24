@@ -94,3 +94,18 @@ def replace_blank_nodes_in_triples(triples: Triples) -> Triples:
 def triples_to_quads(triples: Triples, graph: Graph) -> Quads:
     """Convert all triples to quads according to a given named graph."""
     return ((s, p, o, graph) for s, p, o in triples)
+
+
+def replace_triples(graph: Graph, stored_triples: Triples, triples_to_store: Triples):
+    '''
+    Replace one set of triples with another.
+    '''
+
+    to_delete = set(stored_triples).difference(triples_to_store)
+    to_add = set(triples_to_store).difference(stored_triples)
+
+    for triple in to_delete:
+        graph.remove(triple)
+    
+    for triple in to_add:
+        graph.add(triple)
