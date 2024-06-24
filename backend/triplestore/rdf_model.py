@@ -42,7 +42,7 @@ class RDFModel():
         '''
         Lists RDFFields of this model.
         '''
-        attributes = self.__class__.__dict__()
+        attributes = self.__class__.__dict__
         return {
             attr: item
             for (attr, item) in attributes.items()
