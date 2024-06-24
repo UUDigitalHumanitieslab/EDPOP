@@ -139,18 +139,3 @@ class RDFUniquePropertyField(RDFPropertyField):
 
     def set(self, g: Graph, instance, object: Optional[Identifier]):
         return super().set(g, instance, [object])
-
-
-class RDFClassField(RDFPredicateField):
-    '''
-    Field to represent an RDF class.
-
-    This implementation assumes that the class is a constant for the model.
-    '''
-
-    def __init__(self, class_uri: URIRef):
-        self.class_uri = URIRef
-        super().init(RDF.type, class_uri)
-
-    def set(self, g: Graph, instance, value):
-        return super().set(g, instance, self.class_uri)
