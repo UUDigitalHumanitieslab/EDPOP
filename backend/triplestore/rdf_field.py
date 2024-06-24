@@ -2,7 +2,7 @@
 Base classes for Django-esque management of RDF data; defines field classes.
 '''
 
-from rdflib.term import Identifier
+from rdflib.term import Identifier, Literal
 from rdflib import URIRef, Graph, RDF
 from typing import Optional, Dict
 
@@ -107,10 +107,15 @@ class RDFPropertyField(RDFField):
         ]
 
     def node_to_value(self, node: Identifier):
+        if isinstance(node, Literal):
+            return node.value
         return node
 
     def value_to_node(self, value) -> Identifier:
-        return value
+        if isinstance(value, Identifier):
+            return value
+        else:
+            return Literal(value)
 
     def _stored_triples(self, g: Graph, instance):
         subject = instance.uri
@@ -129,7 +134,7 @@ class RDFUniquePropertyField(RDFPropertyField):
     def get(self, g: Graph, instance):
         values = super().get(g, instance)
         if len(values):
-            return values[1]
+            return values[0]
 
 
     def set(self, g: Graph, instance, object: Optional[Identifier]):

@@ -1,26 +1,16 @@
 from rdflib import Literal, BNode, Namespace
-from rdflib.term import Identifier
 from triplestore.rdf_model import RDFModel
-from triplestore.rdf_field import RDFPredicateField, RDFPropertyField
+from triplestore.rdf_field import (
+    RDFPredicateField, RDFPropertyField, RDFUniquePropertyField,
+)
 from triplestore.utils import triple_exists
 
 Test = Namespace('https://www.test.org/test#')
 
-class LuckyNumbers(RDFPropertyField):
-    def __init__(self):
-        super().__init__(Test.luckyNumber)
-    
-    def node_to_value(self, node: Literal):
-        return node.value
-
-    def value_to_node(self, value) -> Identifier:
-        return Literal(value)
-
-
 class Example(RDFModel):
     named_bob = RDFPredicateField(Test.name, Literal('Bob'))
-    lucky_numbers = LuckyNumbers()
-
+    lucky_numbers = RDFPropertyField(Test.luckyNumber)
+    location = RDFUniquePropertyField(Test.location)
 
 def test_predicate_field(empty_graph):
     g = empty_graph
@@ -49,3 +39,18 @@ def test_property_field(empty_graph):
 
     Example.lucky_numbers.clear(g, instance)
     assert not triple_exists(g, (instance.uri, Test.luckyNumber, None))
+
+def test_unique_property_field(empty_graph):
+    g = empty_graph
+    instance = Example(g, BNode())
+
+    assert Example.location.get(g, instance) is None
+
+    x = BNode()
+    g.add((instance.uri, Test.location, x))
+    assert Example.location.get(g, instance) == x
+
+    y = BNode()
+    Example.location.set(g, instance, y)
+    assert not triple_exists(g, (instance.uri, Test.location, x))
+    assert triple_exists(g, (instance.uri, Test.location, y))
