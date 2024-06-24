@@ -77,7 +77,7 @@ class RDFPredicateField(RDFField):
         self.object = object
 
     def get(self, g: Graph, instance):
-        return len(self._stored_triples(g, instance)) > 0
+        return any(self._stored_triples(g, instance))
 
     def _stored_triples(self, g: Graph, instance):
         subject = instance.uri
@@ -102,7 +102,7 @@ class RDFPropertyField(RDFField):
 
     def get(self, g: Graph, instance):
         return [
-            self.object_to_value(o)
+            self.node_to_value(o)
             for (s, p, o) in self._stored_triples(g, instance)
         ]
 
