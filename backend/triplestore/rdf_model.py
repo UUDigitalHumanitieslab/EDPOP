@@ -2,17 +2,19 @@
 Base classes for Django-esque management of RDF data.
 '''
 
-from rdflib.term import Identifier
 from rdflib import URIRef, Graph, RDF
-from typing import Optional, Dict
+from typing import Dict
+from django.conf import settings
 
 from triplestore.rdf_field import RDFField
+from triplestore.utils import triples_to_quads
 
 class RDFModel():
     '''
     Abstract class for RDF data models
     '''
 
+    store = settings.RDFLIB_STORE
     rdf_class = None
 
     def __init__(self, graph: Graph, uri: URIRef):
@@ -28,11 +30,13 @@ class RDFModel():
         '''
         Store the data of this instance in the graph
         '''
-        for triple in self._class_triples():
-            self.graph.add(triple)
+
+        self.graph.addN(triples_to_quads(self._class_triples(), self.graph))
 
         for name, field in self._fields().items():
             field.set(self.graph, self, getattr(self, name))
+
+        self.store.commit()
 
 
     def delete(self):
@@ -44,6 +48,8 @@ class RDFModel():
 
         for field in self._fields().values(): 
             field.clear(self.graph, self)
+        
+        self.store.commit()
 
     def _class_triples(self):
         '''

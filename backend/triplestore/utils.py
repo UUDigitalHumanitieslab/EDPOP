@@ -107,5 +107,5 @@ def replace_triples(graph: Graph, stored_triples: Triples, triples_to_store: Tri
     for triple in to_delete:
         graph.remove(triple)
     
-    for triple in to_add:
-        graph.add(triple)
+    quads = triples_to_quads(to_add, graph)
+    graph.addN(quads)
