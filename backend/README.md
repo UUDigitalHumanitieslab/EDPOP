@@ -1,5 +1,17 @@
 # EDPOP: backend
 
+This is a [Django][django] application that also uses [Django REST Framework][drf], [rdflib][rdflib], [restframework-rdf][rest-rdf] and [edpop-explorer][explorer]. It is heavily based on [RDF][rdf] and draws on [Web annotations][oa], [EDPOP Records][records] and [EDPOP Collections][collections] for its main vocabularies.
+
+[django]: https://www.djangoproject.com
+[drf]: https://www.django-rest-framework.org
+[rdflib]: https://rdflib.readthedocs.io/en/stable/
+[rest-rdf]: https://pypi.org/project/restframework-rdf/
+[explorer]: https://pypi.org/project/edpop-explorer/
+[rdf]: https://www.w3.org/TR/rdf11-primer/
+[oa]: https://www.w3.org/TR/annotation-vocab/
+[records]: https://github.com/UUDigitalHumanitieslab/edpop-record-ontology
+[collections]: https://github.com/UUDigitalHumanitieslab/edpop-collection-ontology
+
 ## Relational database
 
 The project uses [PostgreSQL](https://www.postgresql.org/).

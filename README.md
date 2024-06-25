@@ -4,7 +4,7 @@ This web application provides a virtual research environment (VRE) that lets you
 
 The VRE consists of separate backend and frontend applications. They are documented in more detail in their respective directories. To run them jointly during development, take the following steps:
 
-## With Docker
+## With Docker (recommended)
 
 When running with Docker for the first time, you need to take the following steps:
 
@@ -27,7 +27,7 @@ docker-compose exec backend python manage.py createsuperuser
 
 ## Without Docker
 
-1. Make sure you have taken all preparation steps in the READMEs of both applications.
+1. Make sure you have taken all preparation steps in the READMEs of both applications. Consult the `docker-compose.yml` and the `Dockerfile`s for recommended software versions.
 2. Open a new terminal in the `frontend` directory and run `npm run watch`.
 3. Open a new terminal in the `backend` directory and run `python manage.py runserver`.
 4. Open `localhost:8000`.
