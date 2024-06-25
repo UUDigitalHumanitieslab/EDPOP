@@ -1,14 +1,12 @@
 from rdflib.namespace import Namespace
+from triplestore.namespaces import _AS, _EDPOPCOL
 
-
-EDPOPCOL = Namespace('https://dhstatic.hum.uu.nl/edpop-collection/0.0.0#')
-'''EDPOP Collection Ontology'''
+EDPOPCOL = _EDPOPCOL.EDPOPCOL
 
 EDPOPREC = Namespace('https://dhstatic.hum.uu.nl/edpop-records/0.1.0-SNAPSHOT/')
 '''EDPOP Record Ontology'''
 
-AS = Namespace('https://www.w3.org/ns/activitystreams#')
-'''Activity Streams vocabluary'''
+AS =_AS.AS
 
 OA = Namespace('http://www.w3.org/ns/oa#')
 '''Web Annotation vocabulary'''
