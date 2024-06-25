@@ -1,0 +1,8 @@
+<a href="" class="dropdown-toggle" data-toggle="dropdown"
+    id="database-menu-title" aria-haspopup="true" aria-expanded="false"> <b>Collection:</b> {{selected_collection}} <span class="caret"></span>
+</a>
+<ul class="dropdown-menu">
+    {{#collections}}
+        <li> <a href="{{id}}" id="{{id}}">{{description}}</a></li>
+    {{/collections}}
+</ul>

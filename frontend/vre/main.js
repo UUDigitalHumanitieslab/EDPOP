@@ -9,19 +9,20 @@ import { Records } from './record/record.model';
 import { RecordListManagingView } from './record/record.list.managing.view';
 import { BlankRecordButtonView } from './record/blank.record.button.view';
 import { VRECollections } from './collection/collection.model';
-import { SRUView } from './database/sru.view';
-import { CollectionView } from './database/collection.view';
+import { SRUView } from './catalog/sru.view';
+import { BrowseCollectionView } from './collection/browse-collection.view';
 import { ResearchGroups } from './group/group.model';
 import { GroupMenuView } from './group/group.menu.view';
 import { SearchResults } from './search/search.model';
 import { SearchView } from './search/search.view';
 import { AdvancedSearchView } from './search/advanced.search.view';
-import { SelectDatabaseView } from './database/select-db.view';
+import { SelectCollectionView } from './collection/select-collection.view';
 import { addCSRFToken } from './utils/generic-functions';
 import { GlobalVariables } from './globals/variables';
 import './globals/user';
 import { accountMenu } from './globals/accountMenu';
-import {Catalogs} from "./database/catalog.model";
+import {Catalogs} from "./catalog/catalog.model";
+import {SelectCatalogView} from "./catalog/select-catalog.view";
 
 
 // Global variables
@@ -60,7 +61,7 @@ var VRERouter = Backbone.Router.extend({
             // records in the current collection.
             $('#HPB-info').hide();
             GlobalVariables.currentVRECollection = GlobalVariables.myCollections.get(id);
-            var collectionView = new CollectionView({model:GlobalVariables.currentVRECollection});
+            var collectionView = new BrowseCollectionView({model:GlobalVariables.currentVRECollection});
             GlobalVariables.searchView.$el.appendTo(collectionView.$('.page-header'));
             $('#content').replaceWith(collectionView.$el);
             GlobalVariables.records = GlobalVariables.currentVRECollection.getRecords();
@@ -100,12 +101,15 @@ function prepareCollections() {
 // GlobalVariables.myCollections and GlobalVariables.allGroups have fully
 // loaded.
 function startRouting() {
-    console.log(GlobalVariables.catalogs);
-    GlobalVariables.dropDown = new SelectDatabaseView({
-        collection: [GlobalVariables.myCollections, GlobalVariables.catalogs]
+    GlobalVariables.catalogDropdown = new SelectCatalogView({
+        collection: GlobalVariables.catalogs
+    });
+    GlobalVariables.collectionDropdown = new SelectCollectionView({
+        collection: GlobalVariables.myCollections
     });
     $('.nav').first().append(
-        GlobalVariables.dropDown.el,
+        GlobalVariables.catalogDropdown.el,
+        GlobalVariables.collectionDropdown.el,
         GlobalVariables.blankRecordButton.el,
     );
     Backbone.history.start({

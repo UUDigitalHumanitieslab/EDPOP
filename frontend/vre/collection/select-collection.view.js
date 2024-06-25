@@ -1,7 +1,7 @@
 import Backbone from 'backbone';
-import selectDBTemplate from './select-db.view.mustache';
+import selectDBTemplate from './select-collection.view.mustache';
 
-export var SelectDatabaseView = Backbone.View.extend({
+export var SelectCollectionView = Backbone.View.extend({
     template: selectDBTemplate,
     tagName: 'li',
     className: 'dropdown',
@@ -13,8 +13,7 @@ export var SelectDatabaseView = Backbone.View.extend({
     },
     render: function() {
         var collections = {
-            'collections': this.collection[0].toJSON(),
-            'catalogs': this.collection[1].toJSON(),
+            'collections': this.collection.toJSON(),
         };
         this.$el.html(this.template(collections));
     },
@@ -22,7 +21,7 @@ export var SelectDatabaseView = Backbone.View.extend({
         event.preventDefault();
         var href = $(event.target).attr('href');
         Backbone.history.navigate(href, true);
-        var selectedDB = event.target.innerText;
-        this.$el.html(this.template({'selected-db': selectedDB, 'collections': this.collection.toJSON()}));
+        var selectedCollection = event.target.innerText;
+        this.$el.html(this.template({'selected_collection': selectedCollection, 'collections': this.collection.toJSON()}));
     },
 });
