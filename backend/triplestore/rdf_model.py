@@ -1,21 +1,30 @@
 '''
-Base classes for Django-esque management of RDF data.
+Base class for Django-esque management of RDF data.
 '''
 
 from rdflib import URIRef, Graph, RDF
-from typing import Dict
+from typing import Dict, Optional
 from django.conf import settings
 
 from triplestore.rdf_field import RDFField
-from triplestore.utils import triples_to_quads
+from triplestore.utils import triples_to_quads, Triples
 
 class RDFModel():
     '''
     Abstract class for RDF data models
+
+    Create subclasses to model a data class.
+
     '''
 
     store = settings.RDFLIB_STORE
-    rdf_class = None
+    '''Triplestore to which data is saved'''
+
+    rdf_class: Optional[URIRef] = None
+    '''
+    RDF class that is being modelled. If this is filled in, an instance identified as `x`
+    will include a triple `(x, RDF.type, rdf_class)` in its graph representation.
+    '''
 
     def __init__(self, graph: Graph, uri: URIRef):
         self.graph = graph
@@ -26,7 +35,7 @@ class RDFModel():
             self.__setattr__(name, value)
 
 
-    def save(self):
+    def save(self) -> None:
         '''
         Store the data of this instance in the graph
         '''
@@ -39,7 +48,7 @@ class RDFModel():
         self.store.commit()
 
 
-    def delete(self):
+    def delete(self) -> None:
         '''
         Delete this instance from the graph
         '''
@@ -51,7 +60,7 @@ class RDFModel():
         
         self.store.commit()
 
-    def _class_triples(self):
+    def _class_triples(self) -> Triples:
         '''
         A set of triples that is common to all instances of the model.
 
