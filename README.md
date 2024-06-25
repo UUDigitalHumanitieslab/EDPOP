@@ -1,8 +1,31 @@
 # EDPOP
 
-Creating a virtual research environment (VRE) from CERL resources.
+This web application provides a virtual research environment (VRE) that lets you collect, align and annotate bibliographical and biographical records from several online catalogs.
 
 The VRE consists of separate backend and frontend applications. They are documented in more detail in their respective directories. To run them jointly during development, take the following steps:
+
+## With Docker
+
+When running with Docker for the first time, you need to take the following steps:
+
+1. Run `docker-compose up -d blazegraph`.
+2. Visit the Blazegraph web interface and create the `edpop` and `edpop_testing` namespaces, as explained in more detail in the backend README.
+
+From then on, running the application is just a single command:
+
+``` shell
+docker-compose up -d
+```
+
+You can then access the application at `localhost:8000`. Manually refresh the browser to see code changes reflected.
+
+You can still run all the other commands that are discussed in the backend and frontend READMEs. You just have to prefix them with `docker-compose exec $SERVICE` in order to execute them within the right container. The services are listed in the `docker-compose.yml`. For example, to create a Django superuser, run this:
+
+``` shell
+docker-compose exec backend python manage.py createsuperuser
+```
+
+## Without Docker
 
 1. Make sure you have taken all preparation steps in the READMEs of both applications.
 2. Open a new terminal in the `frontend` directory and run `npm run watch`.
