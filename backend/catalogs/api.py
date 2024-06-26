@@ -44,6 +44,7 @@ class CatalogsView(RDFView):
         "schema": "https://schema.org/",
         "name": "schema:name",
         "description": "schema:description",
+        "identifier": "schema:identifier",
     }
     
     def get_graph(self, request: views.Request, **kwargs) -> Graph:
