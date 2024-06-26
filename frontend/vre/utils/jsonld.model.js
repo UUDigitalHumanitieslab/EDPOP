@@ -6,6 +6,7 @@ import {APICollection} from "./api.model";
  */
 export var JsonLdCollection = APICollection.extend({
     parse: function(response) {
+        const graph = response["@graph"];
         return response["@graph"];
     }
 });
