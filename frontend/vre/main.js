@@ -9,7 +9,7 @@ import { Records } from './record/record.model';
 import { RecordListManagingView } from './record/record.list.managing.view';
 import { BlankRecordButtonView } from './record/blank.record.button.view';
 import { VRECollections } from './collection/collection.model';
-import { SRUView } from './catalog/sru.view';
+import { CollectionSearchView } from './catalog/collection.search.view';
 import { BrowseCollectionView } from './collection/browse-collection.view';
 import { ResearchGroups } from './group/group.model';
 import { GroupMenuView } from './group/group.menu.view';
@@ -43,13 +43,14 @@ const SRUIDS = ['hpb', 'vd16', 'vd17', 'vd18', 'gallica', 'cerl-thesaurus'];
 var VRERouter = Backbone.Router.extend({
     routes: {
         ':id/': 'showDatabase',
+        'catalog/:id/': 'showCatalog',
     },
     showDatabase: function(id) {
         GlobalVariables.searchView.source = id;
         GlobalVariables.searchView.render();
         if (SRUIDS.includes(id)) {
             //$('#content').empty();
-            var sruView = new SRUView();
+            var sruView = new CollectionSearchView();
             GlobalVariables.searchView.$el.appendTo(sruView.$('.page-header'));
             $('#content').replaceWith(sruView.$el);
             var advancedSearchView = new AdvancedSearchView();
@@ -71,6 +72,17 @@ var VRERouter = Backbone.Router.extend({
             });
             GlobalVariables.recordsList.render().$el.insertAfter($('.page-header'));
         }
+    },
+    showCatalog: function(id) {
+        console.log("Hoi " + id);
+        GlobalVariables.currentCatalog = GlobalVariables.catalogs.findWhere({
+            identifier: id,
+        });
+        const catalogView = new CollectionSearchView({
+            model: GlobalVariables.currentCatalog,
+        });
+        GlobalVariables.searchView.$el.appendTo(catalogView.$('.page-header'));
+        $('#content').replaceWith(catalogView.$el);
     },
 });
 
