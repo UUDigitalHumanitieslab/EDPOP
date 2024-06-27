@@ -9,7 +9,22 @@ from rdflib.term import Node
 from triplestore.utils import replace_blank_node, \
     replace_blank_nodes_in_triples, triples_to_quads
 
-RECORDS_GRAPH_IDENTIFIER = URIRef(settings.RDF_NAMESPACE_ROOT + "records/")
+RECORDS_GRAPH_URI = settings.RDF_NAMESPACE_ROOT + "records/"
+RECORDS_GRAPH_IDENTIFIER = URIRef(RECORDS_GRAPH_URI)
+
+purge_old_update = '''
+with <{records_graph}>
+delete {{
+  ?r ?p1 ?o1.
+  ?f ?p2 ?o2.
+}}
+where {{
+  values ?r {{ {obsolete_records} }}
+  ?r ?p1 ?o1;
+     ?pt ?f.
+  ?f ?p2 ?o2.
+}}
+'''.format
 
 
 def prune_recursively(graph: Graph, subject: Node):
@@ -26,10 +41,10 @@ def prune_recursively(graph: Graph, subject: Node):
 def remove_from_triplestore(records: list[Record]) -> None:
     """Delete given records from triplestore."""
     store = settings.RDFLIB_STORE
-    bggraph = Graph(store=store, identifier=RECORDS_GRAPH_IDENTIFIER)
-    subject_nodes_to_prune = [URIRef(x.iri) for x in records]
-    for s in subject_nodes_to_prune:
-        prune_recursively(bggraph, s)
+    store.update(purge_old_update(
+        records_graph=RECORDS_GRAPH_URI,
+        obsolete_records=' '.join(f'<{x.iri}>' for x in records)
+    ))
     store.commit()
 
 
