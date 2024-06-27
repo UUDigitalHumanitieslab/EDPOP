@@ -102,7 +102,7 @@ DATABASES = {
         'NAME': 'edpop',
         'USER': 'edpopuser',
         'PASSWORD': 'edpop',
-        'HOST': 'localhost',
+        'HOST': os.getenv('EDPOP_DATABASE_HOST', 'localhost'),
         'PORT': '5432',
     }
 }
@@ -183,9 +183,13 @@ LOGGING = {
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
-STATICFILES_DIRS = (
+STATICFILES_DIRS_ENV = os.getenv('EDPOP_STATICFILES_DIRS', '')
+STATICFILES_DIRS = list(
+    filter(None, STATICFILES_DIRS_ENV.split(os.pathsep))
+) if STATICFILES_DIRS_ENV else (
     BASE_DIR / '..' / 'frontend' / 'vre',
 )
+
 STATIC_URL = '/static/'
 
 SITE_NAME = 'EDPOP VRE'
