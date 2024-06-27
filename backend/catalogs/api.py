@@ -10,6 +10,10 @@ from .graphs import SearchGraphBuilder, get_catalogs_graph, get_reader_by_uriref
 
 class SearchView(RDFView):
     """Search in a given external catalog according to a query."""
+    renderer_classes = (JsonLdRenderer,)
+    json_ld_context = {
+        "edpoprec": "https://dhstatic.hum.uu.nl/edpop-records/latest/",
+    }
     
     def get_graph(self, request: views.Request, **kwargs) -> Graph:
         try:
