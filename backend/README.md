@@ -33,7 +33,7 @@ While the server is running, you can access its web interface at http://localhos
 
 ### Setting up Blazegraph namespaces
 
-Visit the [web interface]( http://localhost:9999), navigate to the `NAMESPACES` tab. Use the `create namespace` form to create a new namespace. Choose `edpop` as a name, and set the mode to `quads`. All other checkboxes should be disabled. A popup is shown with additional settings. Leave these at their default values and choose `Create`. The created namespace should now appear in the list of namespaces. Choose `use` to use the readit namespace when operating the web interface
+Visit the [web interface]( http://localhost:9999), navigate to the `NAMESPACES` tab. Use the `create namespace` form to create a new namespace. Choose `edpop` as a name, and set the mode to `quads`. All other checkboxes should be disabled. A popup is shown with additional settings. Leave these at their default values and choose `Create`. The created namespace should now appear in the list of namespaces. Choose `use` to use the edpop namespace when operating the web interface
 
 In order to support the unittests, visit the Blazegraph web interface and create an additional namespace by the name `edpop_testing`.
 

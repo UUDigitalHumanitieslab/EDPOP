@@ -9,7 +9,7 @@ The VRE consists of separate backend and frontend applications. They are documen
 When running with Docker for the first time, you need to take the following steps:
 
 1. Run `docker-compose up -d blazegraph`.
-2. Visit the Blazegraph web interface and create the `edpop` and `edpop_testing` namespaces, as explained in more detail in the backend README.
+2. Visit the [Blazegraph web interface](http://localhost:9999/bigdata) and create the `edpop` and `edpop_testing` namespaces, as explained in more detail in the backend README. Note that the URL of the web interface ends in `/bigdata` when running Docker.
 
 From then on, running the application is just a single command:
 
