@@ -23,4 +23,5 @@ urlpatterns = [
     path('', include('vre.urls')),
     path('', include('accounts.urls')),
     path('', include('projects.urls')),
+    path('api/', include('collect.urls'))
 ]
