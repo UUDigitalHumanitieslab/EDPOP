@@ -1,13 +1,22 @@
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError, NotFound, PermissionDenied
+from rdflib import URIRef
+
 from projects.api import user_projects
 from projects.models import Project
+from collect.rdf_models import EDPOPCollection
+from collect.utils import name_to_slug
 
-def validate_required_keys(data, keys):
+def _validate_required_keys(data, keys):
     for key in keys:
         if not key in data:
             raise ValidationError(f'Key {key} is required')
+
+
+def _collection_uri(id: str):
+    return URIRef(id, base='collections/')
+
 
 class CollectionViewSet(ViewSet):
     '''
@@ -19,10 +28,17 @@ class CollectionViewSet(ViewSet):
         return Response([])
     
     def create(self, request):
-        validate_required_keys(request.data, ['id', 'name', 'summary', 'project'])
+        _validate_required_keys(request.data, ['name', 'summary', 'project'])
         project = self._get_project(request)
+        graph = project.graph()
+        uri = _collection_uri(name_to_slug(request.data['name']))
 
-        return Response(None)
+        collection = EDPOPCollection(graph, uri)
+        collection.name = request.data['name']
+        collection.summary = request.data['summary']
+        collection.save()
+
+        return Response(self._serialize_collection(collection))
 
     def retrieve(self, request, pk=None):
         return Response(None)
@@ -49,3 +65,11 @@ class CollectionViewSet(ViewSet):
             raise PermissionDenied('You do not have permission to edit data in this project.')
 
         return project
+   
+
+    def _serialize_collection(self, collection: EDPOPCollection):
+        return {
+            'uri': collection.uri,
+            'name': collection.name,
+            'summary': collection.summary,
+        }

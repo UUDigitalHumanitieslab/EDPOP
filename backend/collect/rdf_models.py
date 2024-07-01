@@ -42,6 +42,9 @@ class CollectionMembersField(RDFField):
 
 
 class EDPOPCollection(RDFModel):
+    '''
+    RDF model for EDPOP collections.
+    '''
     rdf_class = EDPOPCOL.Collection
 
     name = RDFUniquePropertyField(AS.name)
