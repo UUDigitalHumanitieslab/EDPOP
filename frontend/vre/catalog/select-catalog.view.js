@@ -14,7 +14,6 @@ export var SelectCatalogView = Backbone.View.extend({
     },
     getCatalogs: function() {
         const catalogs = _.sortBy(this.collection.toJSON(), 'name');
-        console.log(catalogs);
         const currentCatalog = GlobalVariables.currentCatalog;
         if (currentCatalog) {
             catalogs.find((el) => el["@id"] === currentCatalog.get("@id")).selected = true;
@@ -31,7 +30,6 @@ export var SelectCatalogView = Backbone.View.extend({
         event.preventDefault();
         var href = $(event.target).attr('href');
         Backbone.history.navigate(href, true);
-        var selectedDB = event.target.innerText;
-        this.$el.html(this.template({'catalogs': this.getCatalogs()}));
+        this.render();
     },
 });

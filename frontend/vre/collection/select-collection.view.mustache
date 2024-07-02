@@ -3,6 +3,6 @@
 </a>
 <ul class="dropdown-menu">
     {{#collections}}
-        <li> <a href="{{id}}" id="{{id}}">{{description}}</a></li>
+        <li {{#selected}}class="active" {{/selected}}> <a href="/collection/{{id}}/" id="{{id}}">{{description}}</a></li>
     {{/collections}}
 </ul>

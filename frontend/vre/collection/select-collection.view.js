@@ -13,15 +13,20 @@ export var SelectCollectionView = Backbone.View.extend({
         this.render();
     },
     render: function() {
-        var collections = {
-            'collections': this.collection.toJSON(),
-        };
-        this.$el.html(this.template(collections));
+        const collections = this.collection.toJSON();
+        const currentCollection = GlobalVariables.currentVRECollection;
+        if (currentCollection) {
+            collections.find((el) => el["id"] === currentCollection.get("id")).selected = true;
+        }
+        const context = {
+            'collections': collections,
+        }
+        this.$el.html(this.template(context));
     },
     select: function(event) {
         event.preventDefault();
         var href = $(event.target).attr('href');
         Backbone.history.navigate(href, true);
-        this.$el.html(this.template({'collections': this.collection.toJSON()}));
+        this.render();
     },
 });
