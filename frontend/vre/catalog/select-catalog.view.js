@@ -12,7 +12,7 @@ export var SelectCatalogView = Backbone.View.extend({
         this.render();
     },
     getCatalogs: function() {
-        return _.sortBy(this.collection.toJSON(), (x) => (x.name));
+        return _.sortBy(this.collection.toJSON(), 'name');
     },
     render: function() {
         var context = {
