@@ -23,7 +23,6 @@ import './globals/user';
 import { accountMenu } from './globals/accountMenu';
 import {Catalogs} from "./catalog/catalog.model";
 import {SelectCatalogView} from "./catalog/select-catalog.view";
-import {makeLinkEnabler} from "@uu-cdh/backbone-util";
 
 
 // Global variables
@@ -140,9 +139,6 @@ if (Cookies.get('csrftoken')) {
 } else {
     $.ajax({url: '/accounts/login/'}).then(kickoff);
 }
-
-const linkEnabler = new (makeLinkEnabler())(); // Create class and instantiate it
-linkEnabler.render();
 
 // Ensure the DOM has fully loaded.
 $(kickoff);
