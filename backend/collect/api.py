@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError, NotFound, PermissionDenied
 from rdflib import URIRef, RDF, Graph
 from django.conf import settings
+from django.contrib.auth.models import User
 
 from projects.api import user_projects
 from projects.models import Project
@@ -60,6 +61,7 @@ class CollectionViewSet(ViewSet):
     def retrieve(self, request, pk=None):
         uri = URIRef(pk)
         collection = self._get_collection(uri)
+        self._check_access(request.user, collection, False)
         return Response(self._serialize_collection(collection))
 
     def update(self, request, pk=None):
@@ -107,6 +109,14 @@ class CollectionViewSet(ViewSet):
 
         context = next(store.contexts(result))
         graph = Graph(store, context)
-        collection = EDPOPCollection(graph, uri)
+        return EDPOPCollection(graph, uri)
 
-        return collection
+    def _check_access(self, user: User, collection: EDPOPCollection, is_update = False):
+        project_uri = collection.project
+        project = Project.objects.get(uri=project_uri)
+
+        if not project.permit_query_by(user):
+            raise PermissionDenied('You do not have permission to view data in this project')
+
+        if is_update and not project.permit_update_by(user):
+            raise PermissionDenied('You do not have permission to edit data in this project')
