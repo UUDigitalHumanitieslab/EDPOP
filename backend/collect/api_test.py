@@ -5,6 +5,7 @@ from django.conf import settings
 from urllib.parse import quote
 
 from triplestore.constants import EDPOPCOL
+from collect.api import _collection_uri
 
 def post_collection(client, project_name):
     data = {
@@ -44,11 +45,20 @@ def test_list_collections(db, user, project, client: Client):
 
 def test_retrieve_collection(db, user, project, client: Client):
     client.force_login(user)
-
     response = post_collection(client, project.name)
-    uri = response.data['uri']
 
-    retrieve_url = '/api/collections/{}/'.format(quote(uri, safe=''))
-    response = client.get(retrieve_url)
+    retrieve_url = lambda uri: '/api/collections/{}/'.format(quote(uri, safe=''))
+    correct_url = retrieve_url(response.data['uri'])
+    nonexistent_uri = _collection_uri('does not exist')
+
+    response = client.get(retrieve_url(nonexistent_uri))
+    assert response.status_code == 404
+
+    response = client.get(correct_url)
     assert is_success(response.status_code)
     assert response.data['name'] == 'My collection'
+
+    client.logout()
+    response = client.get(correct_url)
+    assert response.status_code == 403
+
