@@ -1,8 +1,17 @@
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import pre_save, post_save, post_delete
 from django.dispatch import receiver
+from django.conf import settings
 
 from projects.models import Project
 from projects.rdf_models import RDFProject
+
+@receiver(pre_save, sender=Project)
+def store_project_graph(sender, instance: Project, **kwargs):
+    '''
+    Set project URI if it is empty.
+    '''
+    if not instance.uri:
+        instance.uri = settings.RDF_NAMESPACE_ROOT + 'projects/' + instance.name
 
 @receiver(post_save, sender=Project)
 def store_project_graph(sender, instance: Project, created, **kwargs):

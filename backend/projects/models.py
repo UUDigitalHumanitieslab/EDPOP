@@ -20,6 +20,11 @@ class Project(models.Model):
         unique=True,
         help_text='Identifier of the project; used in IRIs for the project\'s RDF data',
     )
+    uri = models.CharField(
+        max_length=256,
+        unique=True,
+        help_text='URI for the project in RDF data',
+    )
     display_name = models.CharField(
         max_length=256,
         help_text='Human-friendly name for the project',
@@ -73,8 +78,8 @@ class Project(models.Model):
         This is a node within the project graph; it can be used to give context to the
         project.
         '''
-        if self.name:
-            return URIRef(self.name, base=self._graph_identifier())
+        if self.uri:
+            return URIRef(self.uri)
 
 
     def permit_query_by(self, user: User) -> bool:
