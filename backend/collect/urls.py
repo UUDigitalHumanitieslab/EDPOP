@@ -4,7 +4,7 @@ from rest_framework import routers
 
 from collect import api
 
-api_router = routers.DefaultRouter()
+api_router = routers.SimpleRouter(use_regex_path=True)
 api_router.register(r'collections', api.CollectionViewSet, basename='collections')
 
 urlpatterns = [

@@ -1,13 +1,14 @@
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError, NotFound, PermissionDenied
-from rdflib import URIRef, Graph
+from rdflib import URIRef, RDF, Graph
 from django.conf import settings
 
 from projects.api import user_projects
 from projects.models import Project
 from collect.rdf_models import EDPOPCollection
 from collect.utils import name_to_slug
+from triplestore.constants import EDPOPCOL
 
 def _validate_required_keys(data, keys):
     for key in keys:
@@ -57,7 +58,9 @@ class CollectionViewSet(ViewSet):
         return Response(self._serialize_collection(collection))
 
     def retrieve(self, request, pk=None):
-        return Response(None)
+        uri = URIRef(pk)
+        collection = self._get_collection(uri)
+        return Response(self._serialize_collection(collection))
 
     def update(self, request, pk=None):
         return Response(None)
@@ -93,3 +96,17 @@ class CollectionViewSet(ViewSet):
             'summary': collection.summary,
             'project': project.name,
         }
+    
+    def _get_collection(self, uri):
+        store = settings.RDFLIB_STORE
+        triples = store.triples((uri, RDF.type, EDPOPCOL.Collection))
+        result, _ = next(triples, (None, None))
+
+        if not result:
+            raise NotFound(f'Collection does not exist')
+
+        context = next(store.contexts(result))
+        graph = Graph(store, context)
+        collection = EDPOPCollection(graph, uri)
+
+        return collection
