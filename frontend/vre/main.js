@@ -75,7 +75,6 @@ var VRERouter = Backbone.Router.extend({
         }
     },
     showCatalog: function(id) {
-        console.log("Hoi " + id);
         GlobalVariables.currentCatalog = GlobalVariables.catalogs.findWhere({
             identifier: id,
         });
