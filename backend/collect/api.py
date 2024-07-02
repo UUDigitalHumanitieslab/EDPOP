@@ -25,6 +25,8 @@ class CollectionViewSet(ViewSet):
     Viewset for listing or retrieving collections
     '''
 
+    lookup_value_regex = '.+'
+
     def list(self, request):
         projects = user_projects(request.user)
 
