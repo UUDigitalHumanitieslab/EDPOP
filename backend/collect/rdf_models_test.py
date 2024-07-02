@@ -18,7 +18,7 @@ def test_collection_model(project):
 
     collection = EDPOPCollection(project.graph, uri)
     collection.name = 'Test collection'
-    collection.projects = [project]
+    collection.project = project.uri
     collection.records = [
         URIRef('https://example.org/example1'),
         URIRef('https://example.org/example2')

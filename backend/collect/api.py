@@ -25,7 +25,18 @@ class CollectionViewSet(ViewSet):
 
     def list(self, request):
         projects = user_projects(request.user)
-        return Response([])
+
+        for project in projects:
+            model = project.rdf_model()
+            collections = model.collections
+
+        collections = [
+            EDPOPCollection(project.graph(), uri)
+            for project in projects
+            for uri in project.rdf_model().collections
+        ]
+        serialized = list(map(self._serialize_collection, collections))
+        return Response(serialized)
     
     def create(self, request):
         _validate_required_keys(request.data, ['name', 'summary', 'project'])
@@ -36,6 +47,7 @@ class CollectionViewSet(ViewSet):
         collection = EDPOPCollection(graph, uri)
         collection.name = request.data['name']
         collection.summary = request.data['summary']
+        collection.project = project.identifier()
         collection.save()
 
         return Response(self._serialize_collection(collection))

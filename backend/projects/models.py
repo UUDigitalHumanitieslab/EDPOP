@@ -4,6 +4,8 @@ from django.contrib import admin
 from rdflib import URIRef, Graph
 from django.conf import settings
 
+from projects.rdf_models import RDFProject
+
 
 class Project(models.Model):
     '''
@@ -97,3 +99,6 @@ class Project(models.Model):
         if user.is_anonymous:
             return False
         return self.users.contains(user) or self.groups.filter(user=user).exists()
+
+    def rdf_model(self):
+        return RDFProject(self.graph(), self.identifier())
