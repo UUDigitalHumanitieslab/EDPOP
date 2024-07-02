@@ -46,14 +46,12 @@ class CollectionViewSet(ViewSet):
     
     def create(self, request):
         _validate_required_keys(request.data, ['name', 'summary', 'project'])
-        project = self._get_project(request)
+        project = self._get_project(request.data, request.user)
         graph = project.graph()
         uri = _collection_uri(request.data['name'])
 
         collection = EDPOPCollection(graph, uri)
-        collection.name = request.data['name']
-        collection.summary = request.data['summary']
-        collection.project = project.identifier()
+        self._update_from_request_data(collection, request.data, request.user)
         collection.save()
 
         return Response(self._serialize_collection(collection))
@@ -65,7 +63,13 @@ class CollectionViewSet(ViewSet):
         return Response(self._serialize_collection(collection))
 
     def update(self, request, pk=None):
-        return Response(None)
+        _validate_required_keys(request.data, ['name', 'summary', 'project'])
+        uri = URIRef(pk)
+        collection = self._get_collection(uri)
+        self._check_access(request.user, collection, True)
+        self._update_from_request_data(collection, request.data, request.user)
+        collection.save()
+        return Response(self._serialize_collection(collection))
 
     def destroy(self, request, pk=None):
         uri = URIRef(pk)
@@ -74,19 +78,19 @@ class CollectionViewSet(ViewSet):
         collection.delete()
         return Response(None)
 
-    def _get_project(self, request):
+    def _get_project(self, data, user: User):
         '''
         get project from request data and verify permission
         '''
 
-        project_name = request.data['project']
+        project_name = data['project']
         projects = Project.objects.filter(name=project_name)
         if not projects.exists():
             raise NotFound(f'Project "{project_name}" does not exist')
         
         project = projects.first()
         
-        if not project.permit_update_by(request.user):
+        if not project.permit_update_by(user):
             raise PermissionDenied('You do not have permission to edit data in this project.')
 
         return project
@@ -124,3 +128,10 @@ class CollectionViewSet(ViewSet):
 
         if is_update and not project.permit_update_by(user):
             raise PermissionDenied('You do not have permission to edit data in this project')
+
+    def _update_from_request_data(self, collection: EDPOPCollection, data, user):
+        project = self._get_project(data, user)
+        collection.name = data['name']
+        collection.summary = data['summary']
+        collection.project = project.identifier()
+        return collection
