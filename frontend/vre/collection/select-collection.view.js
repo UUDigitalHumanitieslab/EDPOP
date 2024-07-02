@@ -1,5 +1,6 @@
 import Backbone from 'backbone';
 import selectDBTemplate from './select-collection.view.mustache';
+import {GlobalVariables} from "../globals/variables";
 
 export var SelectCollectionView = Backbone.View.extend({
     template: selectDBTemplate,
@@ -21,7 +22,6 @@ export var SelectCollectionView = Backbone.View.extend({
         event.preventDefault();
         var href = $(event.target).attr('href');
         Backbone.history.navigate(href, true);
-        var selectedCollection = event.target.innerText;
-        this.$el.html(this.template({'selected_collection': selectedCollection, 'collections': this.collection.toJSON()}));
+        this.$el.html(this.template({'collections': this.collection.toJSON()}));
     },
 });
