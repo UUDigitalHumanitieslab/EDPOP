@@ -1,7 +1,8 @@
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError, NotFound, PermissionDenied
-from rdflib import URIRef
+from rdflib import URIRef, Graph
+from django.conf import settings
 
 from projects.api import user_projects
 from projects.models import Project
@@ -14,8 +15,9 @@ def _validate_required_keys(data, keys):
             raise ValidationError(f'Key {key} is required')
 
 
-def _collection_uri(id: str):
-    return URIRef(id, base='collections/')
+def _collection_uri(name: str):
+    id = name_to_slug(name)
+    return URIRef(settings.RDF_NAMESPACE_ROOT + 'collections/' + id)
 
 
 class CollectionViewSet(ViewSet):
@@ -42,7 +44,7 @@ class CollectionViewSet(ViewSet):
         _validate_required_keys(request.data, ['name', 'summary', 'project'])
         project = self._get_project(request)
         graph = project.graph()
-        uri = _collection_uri(name_to_slug(request.data['name']))
+        uri = _collection_uri(request.data['name'])
 
         collection = EDPOPCollection(graph, uri)
         collection.name = request.data['name']
@@ -80,8 +82,12 @@ class CollectionViewSet(ViewSet):
    
 
     def _serialize_collection(self, collection: EDPOPCollection):
+        project_uri = str(collection.project)
+        project = Project.objects.get(uri=project_uri)
+
         return {
-            'uri': collection.uri,
+            'uri': str(collection.uri),
             'name': collection.name,
             'summary': collection.summary,
+            'project': project.name,
         }
