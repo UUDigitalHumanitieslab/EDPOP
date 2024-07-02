@@ -68,6 +68,10 @@ class CollectionViewSet(ViewSet):
         return Response(None)
 
     def destroy(self, request, pk=None):
+        uri = URIRef(pk)
+        collection = self._get_collection(uri)
+        self._check_access(request.user, collection, True)
+        collection.delete()
         return Response(None)
 
     def _get_project(self, request):

@@ -45,20 +45,31 @@ def test_list_collections(db, user, project, client: Client):
 
 def test_retrieve_collection(db, user, project, client: Client):
     client.force_login(user)
-    response = post_collection(client, project.name)
+    create_response = post_collection(client, project.name)
 
-    retrieve_url = lambda uri: '/api/collections/{}/'.format(quote(uri, safe=''))
-    correct_url = retrieve_url(response.data['uri'])
+    detail_url = lambda uri: '/api/collections/{}/'.format(quote(uri, safe=''))
+    correct_url = detail_url(create_response.data['uri'])
     nonexistent_uri = _collection_uri('does not exist')
 
-    response = client.get(retrieve_url(nonexistent_uri))
-    assert response.status_code == 404
+    not_found_response = client.get(detail_url(nonexistent_uri))
+    assert not_found_response.status_code == 404
 
-    response = client.get(correct_url)
-    assert is_success(response.status_code)
-    assert response.data['name'] == 'My collection'
+    success_response = client.get(correct_url)
+    assert is_success(success_response.status_code)
+    assert success_response.data['name'] == 'My collection'
 
     client.logout()
-    response = client.get(correct_url)
-    assert response.status_code == 403
+    no_permission_response = client.get(correct_url)
+    assert no_permission_response.status_code == 403
 
+def test_delete_collection(db, user, project, client: Client):
+    client.force_login(user)   
+    client.force_login(user)
+    create_response = post_collection(client, project.name)
+
+    detail_url = '/api/collections/{}/'.format(quote(create_response.data['uri'], safe=''))
+    delete_response = client.delete(detail_url)
+    assert is_success(delete_response.status_code)
+
+    retrieve_response = client.get(detail_url)
+    assert retrieve_response.status_code == 404
