@@ -30,9 +30,7 @@ class RDFModel():
         self.graph = graph
         self.uri = uri
 
-        for name, field in self._fields().items():
-            value = field.get(self.graph, self)
-            self.__setattr__(name, value)
+        self.refresh_from_store()
 
 
     def save(self) -> None:
@@ -59,6 +57,13 @@ class RDFModel():
             field.clear(self.graph, self)
         
         self.store.commit()
+
+
+    def refresh_from_store(self):
+        for name, field in self._fields().items():
+            value = field.get(self.graph, self)
+            self.__setattr__(name, value)
+
 
     def _class_triples(self) -> Triples:
         '''
