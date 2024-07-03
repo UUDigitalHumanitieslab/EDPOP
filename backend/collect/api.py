@@ -25,18 +25,30 @@ class CollectionViewSet(ViewSet):
 
     lookup_value_regex = '.+'
 
-    def list(self, request):
-        projects = user_projects(request.user)
 
-        for project in projects:
-            model = project.rdf_model()
-            collections = model.collections
-
-        collections = [
+    def get_queryset(self):
+        projects = user_projects(self.request.user)
+        return [
             EDPOPCollection(project.graph(), uri)
             for project in projects
             for uri in project.rdf_model().collections
         ]
+
+
+    def get_object(self):
+        uri = URIRef(self.kwargs['pk'])
+
+        if not collection_exists(uri):
+            raise NotFound(f'Collection does not exist')
+
+        store = settings.RDFLIB_STORE
+        context = next(store.contexts((uri, RDF.type, EDPOPCOL.Collection)))
+        graph = Graph(store, context)
+        return EDPOPCollection(graph, uri)
+
+
+    def list(self, request):
+        collections = self.get_queryset()
         serializer = CollectionSerializer(collections, many=True)
         return Response(serializer.data)
     
@@ -53,15 +65,13 @@ class CollectionViewSet(ViewSet):
         return Response(serializer.data)
 
     def retrieve(self, request, pk=None):
-        uri = URIRef(pk)
-        collection = self._get_collection(uri)
+        collection = self.get_object()
         self._check_access(request.user, collection, False)
         serializer = CollectionSerializer(collection)
         return Response(serializer.data)
 
     def update(self, request, pk=None):
-        uri = URIRef(pk)
-        collection = self._get_collection(uri)
+        collection = self.get_object()
         self._check_access(request.user, collection, True)
 
         serializer = CollectionSerializer(collection, request.data)
@@ -71,8 +81,7 @@ class CollectionViewSet(ViewSet):
         return Response(serializer.data)
 
     def destroy(self, request, pk=None):
-        uri = URIRef(pk)
-        collection = self._get_collection(uri)
+        collection = self.get_object()
         self._check_access(request.user, collection, True)
         collection.delete()
         return Response(None)
@@ -93,16 +102,6 @@ class CollectionViewSet(ViewSet):
             raise PermissionDenied('You do not have permission to edit data in this project.')
 
         return project
-
-    
-    def _get_collection(self, uri):
-        if not collection_exists(uri):
-            raise NotFound(f'Collection does not exist')
-
-        store = settings.RDFLIB_STORE
-        context = next(store.contexts((uri, RDF.type, EDPOPCOL.Collection)))
-        graph = Graph(store, context)
-        return EDPOPCollection(graph, uri)
 
 
     def _check_access(self, user: User, collection: EDPOPCollection, is_update = False):
