@@ -7,6 +7,7 @@ from typing import Dict
 
 from triplestore.constants import EDPOPCOL
 from collect.api import _collection_uri
+from projects.models import Project
 
 def example_collection_data(project_name) -> Dict:
     return {
@@ -98,3 +99,17 @@ def test_update_collection(db, user, project, client: Client):
     update_response = client.put(detail_url, data, content_type='application/json')
     assert is_success(update_response.status_code)
     assert update_response.data['summary'] == 'I don\'t like these anymore'
+
+
+def test_project_validation(db, user, client: Client):
+    client.force_login(user)
+
+    Project.objects.create(name='secret', display_name='Top secret records')
+
+    response = client.post('/api/collections/', {
+        'name': 'new collection',
+        'summary': None,
+        'project': 'secret',
+    }, content_type='application/json')
+
+    assert is_client_error(response.status_code)
