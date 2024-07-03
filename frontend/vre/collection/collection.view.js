@@ -4,6 +4,9 @@ import { AdditionsToCollections } from '../additions/additions-to-collections';
 import { GlobalVariables } from '../globals/variables';
 import collectionTemplate from './collection.view.mustache';
 
+/**
+ * View to add a record to a specific collection.
+ */
 export var VRECollectionView = View.extend({
     template: collectionTemplate,
     events: {
