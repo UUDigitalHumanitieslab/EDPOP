@@ -8,17 +8,13 @@ from django.contrib.auth.models import User
 from projects.api import user_projects
 from projects.models import Project
 from collect.rdf_models import EDPOPCollection
-from collect.utils import name_to_slug, collection_exists
+from collect.utils import _name_to_slug, collection_exists
 from triplestore.constants import EDPOPCOL
-
-def _validate_required_keys(data, keys):
-    for key in keys:
-        if not key in data:
-            raise ValidationError(f'Key {key} is required')
+from collect.serializers import CollectionSerializer
 
 
 def _collection_uri(name: str):
-    id = name_to_slug(name)
+    id = _name_to_slug(name)
     return URIRef(settings.RDF_NAMESPACE_ROOT + 'collections/' + id)
 
 
@@ -41,38 +37,38 @@ class CollectionViewSet(ViewSet):
             for project in projects
             for uri in project.rdf_model().collections
         ]
-        serialized = list(map(self._serialize_collection, collections))
-        return Response(serialized)
+        serializer = CollectionSerializer(collections, many=True)
+        return Response(serializer.data)
     
     def create(self, request):
-        _validate_required_keys(request.data, ['name', 'summary', 'project'])
-        project = self._get_project(request.data, request.user)
-        graph = project.graph()
         uri = _collection_uri(request.data['name'])
 
         if collection_exists(uri):
             raise ValidationError(f'Collection {uri} already exists')
 
-        collection = EDPOPCollection(graph, uri)
-        self._update_from_request_data(collection, request.data, request.user)
+        serializer = CollectionSerializer(data = request.data)
+        serializer.is_valid(raise_exception=True)
+        collection = serializer.save()
         collection.save()
-
-        return Response(self._serialize_collection(collection))
+        return Response(serializer.data)
 
     def retrieve(self, request, pk=None):
         uri = URIRef(pk)
         collection = self._get_collection(uri)
         self._check_access(request.user, collection, False)
-        return Response(self._serialize_collection(collection))
+        serializer = CollectionSerializer(collection)
+        return Response(serializer.data)
 
     def update(self, request, pk=None):
-        _validate_required_keys(request.data, ['name', 'summary', 'project'])
         uri = URIRef(pk)
         collection = self._get_collection(uri)
         self._check_access(request.user, collection, True)
-        self._update_from_request_data(collection, request.data, request.user)
+
+        serializer = CollectionSerializer(collection, request.data)
+        serializer.is_valid(raise_exception=True)
+        collection = serializer.save()
         collection.save()
-        return Response(self._serialize_collection(collection))
+        return Response(serializer.data)
 
     def destroy(self, request, pk=None):
         uri = URIRef(pk)
@@ -97,18 +93,6 @@ class CollectionViewSet(ViewSet):
             raise PermissionDenied('You do not have permission to edit data in this project.')
 
         return project
-   
-
-    def _serialize_collection(self, collection: EDPOPCollection):
-        project_uri = str(collection.project)
-        project = Project.objects.get(uri=project_uri)
-
-        return {
-            'uri': str(collection.uri),
-            'name': collection.name,
-            'summary': collection.summary,
-            'project': project.name,
-        }
 
     
     def _get_collection(self, uri):
@@ -130,11 +114,3 @@ class CollectionViewSet(ViewSet):
 
         if is_update and not project.permit_update_by(user):
             raise PermissionDenied('You do not have permission to edit data in this project')
-
-
-    def _update_from_request_data(self, collection: EDPOPCollection, data, user):
-        project = self._get_project(data, user)
-        collection.name = data['name']
-        collection.summary = data['summary']
-        collection.project = project.identifier()
-        return collection

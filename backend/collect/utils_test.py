@@ -1,4 +1,4 @@
-from collect.utils import name_to_slug
+from collect.utils import _name_to_slug
 
 
 def test_name_to_slug():
@@ -8,4 +8,4 @@ def test_name_to_slug():
     ]
 
     for value, expected in test_cases:
-        assert name_to_slug(value) == expected
+        assert _name_to_slug(value) == expected
