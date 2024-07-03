@@ -11,7 +11,7 @@ from collect.rdf_models import EDPOPCollection
 from collect.utils import _name_to_slug, collection_exists
 from triplestore.constants import EDPOPCOL
 from collect.serializers import CollectionSerializer
-
+from collect.permissions import CollectionPermission
 
 def _collection_uri(name: str):
     id = _name_to_slug(name)
@@ -25,6 +25,7 @@ class CollectionViewSet(ViewSet):
 
     lookup_value_regex = '.+'
 
+    permission_classes = [CollectionPermission]
 
     def get_queryset(self):
         projects = user_projects(self.request.user)
@@ -66,13 +67,13 @@ class CollectionViewSet(ViewSet):
 
     def retrieve(self, request, pk=None):
         collection = self.get_object()
-        self._check_access(request.user, collection, False)
+        self.check_object_permissions(request, collection)
         serializer = CollectionSerializer(collection)
         return Response(serializer.data)
 
     def update(self, request, pk=None):
         collection = self.get_object()
-        self._check_access(request.user, collection, True)
+        self.check_object_permissions(request, collection)
 
         serializer = CollectionSerializer(collection, request.data)
         serializer.is_valid(raise_exception=True)
@@ -82,7 +83,7 @@ class CollectionViewSet(ViewSet):
 
     def destroy(self, request, pk=None):
         collection = self.get_object()
-        self._check_access(request.user, collection, True)
+        self.check_object_permissions(request, collection)
         collection.delete()
         return Response(None)
 
@@ -102,14 +103,3 @@ class CollectionViewSet(ViewSet):
             raise PermissionDenied('You do not have permission to edit data in this project.')
 
         return project
-
-
-    def _check_access(self, user: User, collection: EDPOPCollection, is_update = False):
-        project_uri = collection.project
-        project = Project.objects.get(uri=project_uri)
-
-        if not project.permit_query_by(user):
-            raise PermissionDenied('You do not have permission to view data in this project')
-
-        if is_update and not project.permit_update_by(user):
-            raise PermissionDenied('You do not have permission to edit data in this project')
