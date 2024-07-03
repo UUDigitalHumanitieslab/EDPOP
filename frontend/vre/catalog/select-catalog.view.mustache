@@ -1,8 +1,8 @@
 <a href="" class="dropdown-toggle" data-toggle="dropdown"
-    id="database-menu-title" aria-haspopup="true" aria-expanded="false"> <b>External catalog:</b> {{selected-db}} <span class="caret"></span>
+    id="catalog-menu-title" aria-haspopup="true" aria-expanded="false">External catalogs <span class="caret"></span>
 </a>
 <ul class="dropdown-menu">
     {{#catalogs}}
-        <li> <a href="/catalog/{{identifier}}/" title="{{description}}">{{name}}</a></li>
+        <li {{#selected}}class="active" {{/selected}}> <a href="/catalog/{{identifier}}/" title="{{description}}">{{name}}</a></li>
     {{/catalogs}}
 </ul>

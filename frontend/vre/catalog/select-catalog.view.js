@@ -1,5 +1,6 @@
 import Backbone from 'backbone';
 import selectDBTemplate from './select-catalog.view.mustache';
+import {GlobalVariables} from "../globals/variables";
 
 export var SelectCatalogView = Backbone.View.extend({
     template: selectDBTemplate,
@@ -12,7 +13,12 @@ export var SelectCatalogView = Backbone.View.extend({
         this.render();
     },
     getCatalogs: function() {
-        return _.sortBy(this.collection.toJSON(), (x) => (x.name));
+        const catalogs = _.sortBy(this.collection.toJSON(), 'name');
+        const currentCatalog = GlobalVariables.currentCatalog;
+        if (currentCatalog) {
+            catalogs.find((el) => el["@id"] === currentCatalog.get("@id")).selected = true;
+        }
+        return catalogs;
     },
     render: function() {
         var context = {
@@ -24,7 +30,6 @@ export var SelectCatalogView = Backbone.View.extend({
         event.preventDefault();
         var href = $(event.target).attr('href');
         Backbone.history.navigate(href, true);
-        var selectedDB = event.target.innerText;
-        this.$el.html(this.template({'selected-db': selectedDB, 'catalogs': this.getCatalogs()}));
+        this.render();
     },
 });

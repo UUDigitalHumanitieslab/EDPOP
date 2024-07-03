@@ -42,42 +42,36 @@ const SRUIDS = ['hpb', 'vd16', 'vd17', 'vd18', 'gallica', 'cerl-thesaurus'];
 
 var VRERouter = Backbone.Router.extend({
     routes: {
-        ':id/': 'showDatabase',
+        'collection/:id/': 'showCollection',
         'catalog/:id/': 'showCatalog',
     },
-    showDatabase: function(id) {
+    showCollection: function(id) {
         GlobalVariables.searchView.source = id;
         GlobalVariables.searchView.render();
-        if (SRUIDS.includes(id)) {
-            //$('#content').empty();
-            var sruView = new CollectionSearchView();
-            GlobalVariables.searchView.$el.appendTo(sruView.$('.page-header'));
-            $('#content').replaceWith(sruView.$el);
-            var advancedSearchView = new AdvancedSearchView();
-            advancedSearchView.render();
-            GlobalVariables.searchView.listenTo(advancedSearchView, 'fill', GlobalVariables.searchView.fill);
-        }
-        else {
-            // We are not on the HPB search page, so display the
-            // records in the current collection.
-            $('#HPB-info').hide();
-            GlobalVariables.currentVRECollection = GlobalVariables.myCollections.get(id);
-            var collectionView = new BrowseCollectionView({model:GlobalVariables.currentVRECollection});
-            GlobalVariables.searchView.$el.appendTo(collectionView.$('.page-header'));
-            $('#content').replaceWith(collectionView.$el);
-            GlobalVariables.records = GlobalVariables.currentVRECollection.getRecords();
-            GlobalVariables.recordsList.remove();
-            GlobalVariables.recordsList = new RecordListManagingView({
-                collection: GlobalVariables.records,
-            });
-            GlobalVariables.recordsList.render().$el.insertAfter($('.page-header'));
-        }
+        // We are not on the HPB search page, so display the
+        // records in the current collection.
+        $('#HPB-info').hide();
+        GlobalVariables.currentVRECollection = GlobalVariables.myCollections.get(id);
+        GlobalVariables.currentCatalog = null;
+        GlobalVariables.collectionDropdown.render();
+        GlobalVariables.catalogDropdown.render();
+        var collectionView = new BrowseCollectionView({model:GlobalVariables.currentVRECollection});
+        GlobalVariables.searchView.$el.appendTo(collectionView.$('.page-header'));
+        $('#content').replaceWith(collectionView.$el);
+        GlobalVariables.records = GlobalVariables.currentVRECollection.getRecords();
+        GlobalVariables.recordsList.remove();
+        GlobalVariables.recordsList = new RecordListManagingView({
+            collection: GlobalVariables.records,
+        });
+        GlobalVariables.recordsList.render().$el.insertAfter($('.page-header'));
     },
     showCatalog: function(id) {
-        console.log("Hoi " + id);
         GlobalVariables.currentCatalog = GlobalVariables.catalogs.findWhere({
             identifier: id,
         });
+        GlobalVariables.currentVRECollection = null;
+        GlobalVariables.collectionDropdown.render();
+        GlobalVariables.catalogDropdown.render();
         const catalogView = new CollectionSearchView({
             model: GlobalVariables.currentCatalog,
         });
