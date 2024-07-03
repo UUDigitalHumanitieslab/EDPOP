@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 from projects.api import user_projects
 from projects.models import Project
 from collect.rdf_models import EDPOPCollection
-from collect.utils import name_to_slug
+from collect.utils import name_to_slug, collection_exists
 from triplestore.constants import EDPOPCOL
 
 def _validate_required_keys(data, keys):
@@ -49,6 +49,9 @@ class CollectionViewSet(ViewSet):
         project = self._get_project(request.data, request.user)
         graph = project.graph()
         uri = _collection_uri(request.data['name'])
+
+        if collection_exists(uri):
+            raise ValidationError(f'Collection {uri} already exists')
 
         collection = EDPOPCollection(graph, uri)
         self._update_from_request_data(collection, request.data, request.user)
@@ -106,18 +109,17 @@ class CollectionViewSet(ViewSet):
             'summary': collection.summary,
             'project': project.name,
         }
+
     
     def _get_collection(self, uri):
-        store = settings.RDFLIB_STORE
-        triples = store.triples((uri, RDF.type, EDPOPCOL.Collection))
-        result, _ = next(triples, (None, None))
-
-        if not result:
+        if not collection_exists(uri):
             raise NotFound(f'Collection does not exist')
 
-        context = next(store.contexts(result))
+        store = settings.RDFLIB_STORE
+        context = next(store.contexts((uri, RDF.type, EDPOPCOL.Collection)))
         graph = Graph(store, context)
         return EDPOPCollection(graph, uri)
+
 
     def _check_access(self, user: User, collection: EDPOPCollection, is_update = False):
         project_uri = collection.project
@@ -128,6 +130,7 @@ class CollectionViewSet(ViewSet):
 
         if is_update and not project.permit_update_by(user):
             raise PermissionDenied('You do not have permission to edit data in this project')
+
 
     def _update_from_request_data(self, collection: EDPOPCollection, data, user):
         project = self._get_project(data, user)
