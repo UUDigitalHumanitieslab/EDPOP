@@ -29,8 +29,8 @@ export var VRECollections = APICollection.extend({
     /**
      * Class method for retrieving only the collections the user can manage.
      */
-    mine: function() {
-        var myCollections = new VRECollections();
+    mine: function(myCollections) {
+        myCollections = myCollections || new VRECollections();
         myCollections.fetch({url: myCollections.url + 'mine/'});
         return myCollections;
     },
