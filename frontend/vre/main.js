@@ -31,6 +31,8 @@ GlobalVariables.allGroups = new ResearchGroups();
 GlobalVariables.results = new SearchResults();
 GlobalVariables.searchView  = new SearchView({model: GlobalVariables.results});
 GlobalVariables.blankRecordButton = new BlankRecordButtonView();
+GlobalVariables.myCollections = new VRECollections();
+GlobalVariables.catalogs = new Catalogs();
 
 const SRUIDS = ['hpb', 'vd16', 'vd17', 'vd18', 'gallica', 'cerl-thesaurus'];
 
@@ -85,8 +87,7 @@ var VRERouter = Backbone.Router.extend({
 // 2. the CSRF cookie has been obtained.
 function prepareCollections() {
     $('#result-detail').modal({show: false});
-    GlobalVariables.myCollections = VRECollections.mine();
-    GlobalVariables.catalogs = new Catalogs();
+    VRECollections.mine(GlobalVariables.myCollections);
     GlobalVariables.catalogs.fetch();
     GlobalVariables.recordsList = new RecordListManagingView({
         collection: GlobalVariables.records,
