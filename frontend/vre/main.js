@@ -23,6 +23,7 @@ import './globals/user';
 import { accountMenu } from './globals/accountMenu';
 import {Catalogs} from "./catalog/catalog.model";
 import {SelectCatalogView} from "./catalog/select-catalog.view";
+import { StateModel } from './utils/state.model.js';
 
 
 // Global variables
@@ -33,6 +34,14 @@ GlobalVariables.searchView  = new SearchView({model: GlobalVariables.results});
 GlobalVariables.blankRecordButton = new BlankRecordButtonView();
 GlobalVariables.myCollections = new VRECollections();
 GlobalVariables.catalogs = new Catalogs();
+
+var navigationState = new StateModel;
+
+// Focus/blur semantics for the catalog or collection currently being viewed.
+navigationState.on({
+    'enter:browsingContext': (model, newValue) => newValue.trigger('focus', newValue),
+    'exit:browsingContext': (model, oldValue) => oldValue.trigger('blur', oldValue),
+});
 
 const SRUIDS = ['hpb', 'vd16', 'vd17', 'vd18', 'gallica', 'cerl-thesaurus'];
 
