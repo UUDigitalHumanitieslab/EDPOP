@@ -23,6 +23,7 @@ import './globals/user';
 import { accountMenu } from './globals/accountMenu';
 import {Catalogs} from "./catalog/catalog.model";
 import {SelectCatalogView} from "./catalog/select-catalog.view";
+import { StateModel } from './utils/state.model.js';
 
 
 // Global variables
@@ -33,6 +34,14 @@ GlobalVariables.searchView  = new SearchView({model: GlobalVariables.results});
 GlobalVariables.blankRecordButton = new BlankRecordButtonView();
 GlobalVariables.myCollections = new VRECollections();
 GlobalVariables.catalogs = new Catalogs();
+
+var navigationState = new StateModel;
+
+// Focus/blur semantics for the catalog or collection currently being viewed.
+navigationState.on({
+    'enter:browsingContext': (model, newValue) => newValue.trigger('focus', newValue),
+    'exit:browsingContext': (model, oldValue) => oldValue.trigger('blur', oldValue),
+});
 
 // Override Backbone.sync so it always includes the CSRF token in requests.
 Backbone.sync = wrapWithCSRF(Backbone.sync, 'X-CSRFToken', 'csrftoken');
@@ -61,6 +70,7 @@ var VRERouter = Backbone.Router.extend({
             collection: GlobalVariables.records,
         });
         GlobalVariables.recordsList.render().$el.insertAfter($('.page-header'));
+        navigationState.set('browsingContext', GlobalVariables.currentVRECollection);
     },
     showCatalog: function(id) {
         GlobalVariables.currentCatalog = GlobalVariables.catalogs.findWhere({
@@ -76,6 +86,7 @@ var VRERouter = Backbone.Router.extend({
         });
         GlobalVariables.searchView.$el.appendTo(catalogView.$('.page-header'));
         $('#content').replaceWith(catalogView.$el);
+        navigationState.set('browsingContext', GlobalVariables.currentCatalog);
     },
 });
 
