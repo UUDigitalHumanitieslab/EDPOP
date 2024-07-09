@@ -66,15 +66,8 @@ var VRERouter = Backbone.Router.extend({
         GlobalVariables.currentCatalog = null;
         GlobalVariables.collectionDropdown.render();
         GlobalVariables.catalogDropdown.render();
-        var collectionView = new BrowseCollectionView({model:GlobalVariables.currentVRECollection});
-        GlobalVariables.searchView.$el.appendTo(collectionView.$('.page-header'));
-        $('#content').replaceWith(collectionView.$el);
-        GlobalVariables.records = GlobalVariables.currentVRECollection.getRecords();
         GlobalVariables.recordsList.remove();
-        GlobalVariables.recordsList = new RecordListManagingView({
-            collection: GlobalVariables.records,
-        });
-        GlobalVariables.recordsList.render().$el.insertAfter($('.page-header'));
+        navigationState.set('browsingContext', GlobalVariables.currentVRECollection);
     },
     showCatalog: function(id) {
         GlobalVariables.currentCatalog = GlobalVariables.catalogs.findWhere({
@@ -83,13 +76,26 @@ var VRERouter = Backbone.Router.extend({
         GlobalVariables.currentVRECollection = null;
         GlobalVariables.collectionDropdown.render();
         GlobalVariables.catalogDropdown.render();
-        const catalogView = new CollectionSearchView({
-            model: GlobalVariables.currentCatalog,
-        });
-        GlobalVariables.searchView.$el.appendTo(catalogView.$('.page-header'));
-        $('#content').replaceWith(catalogView.$el);
+        navigationState.set('browsingContext', GlobalVariables.currentCatalog);
     },
 });
+
+function revealCollection(vreCollection) {
+    var collectionView = new BrowseCollectionView({model: vreCollection});
+    GlobalVariables.searchView.$el.appendTo(collectionView.$('.page-header'));
+    $('#content').replaceWith(collectionView.$el);
+    GlobalVariables.records = vreCollection.getRecords();
+    GlobalVariables.recordsList = new RecordListManagingView({
+        collection: GlobalVariables.records,
+    });
+    GlobalVariables.recordsList.render().$el.insertAfter($('.page-header'));
+}
+
+function revealCatalog(catalog) {
+    const catalogView = new CollectionSearchView({model: catalog});
+    GlobalVariables.searchView.$el.appendTo(catalogView.$('.page-header'));
+    $('#content').replaceWith(catalogView.$el);
+}
 
 // We want this code to run after two conditions are met:
 // 1. The DOM has fully loaded;
