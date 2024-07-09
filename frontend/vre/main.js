@@ -75,6 +75,7 @@ var VRERouter = Backbone.Router.extend({
             collection: GlobalVariables.records,
         });
         GlobalVariables.recordsList.render().$el.insertAfter($('.page-header'));
+        navigationState.set('browsingContext', GlobalVariables.currentVRECollection);
     },
     showCatalog: function(id) {
         GlobalVariables.currentCatalog = GlobalVariables.catalogs.findWhere({
@@ -88,6 +89,7 @@ var VRERouter = Backbone.Router.extend({
         });
         GlobalVariables.searchView.$el.appendTo(catalogView.$('.page-header'));
         $('#content').replaceWith(catalogView.$el);
+        navigationState.set('browsingContext', GlobalVariables.currentCatalog);
     },
 });
 
