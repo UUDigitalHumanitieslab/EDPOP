@@ -36,7 +36,7 @@ export var SearchView = CompositeView.extend({
         var searchTerm = this.$('input').val();
         var searchPromise = this.collection.query({
             params: {
-                catalog: this.source,
+                catalog: this.model.id,
                 query: searchTerm,
                 start: startRecord,
             },
