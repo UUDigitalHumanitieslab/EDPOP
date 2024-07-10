@@ -13,12 +13,9 @@ export var SearchView = CompositeView.extend({
         view: 'alert',
         method: 'prepend',
     }],
-    /**
-     * The identifier of the source that will be used to search in, either
-     * a catalogue or a collection.
-     * @type {?string}
-     */
-    source: null,
+    initialize: function() {
+        this.render();
+    },
     renderContainer: function() {
         this.$el.html(this.template());
         return this;
