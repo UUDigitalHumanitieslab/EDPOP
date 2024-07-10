@@ -1,6 +1,6 @@
 import { CompositeView } from 'backbone-fractal';
+
 import { AlertView } from '../alert/alert.view';
-import { GlobalVariables } from '../globals/variables';
 import searchViewTemplate from './search.view.mustache';
 import failedSearchTemplate from './failed.search.message.mustache';
 
@@ -14,7 +14,9 @@ export var SearchView = CompositeView.extend({
         method: 'prepend',
     }],
     initialize: function() {
-        this.render();
+        this.render().listenTo(this.collection, {
+            moreRequested: this.nextSearch,
+        });
     },
     renderContainer: function() {
         this.$el.html(this.template());
@@ -38,6 +40,7 @@ export var SearchView = CompositeView.extend({
                 start: startRecord,
             },
             error: _.bind(this.alertError, this),
+            remove: startRecord === 1,
         });
         searchPromise.always(this.showIdle.bind(this));
         return searchPromise;
@@ -57,30 +60,22 @@ export var SearchView = CompositeView.extend({
         // Start with record 0, which is what the EDPOP VRE API expects
         this.submitSearch(0).then(_.bind(function() {
             $('#more-records').show();
-            GlobalVariables.records.reset(this.collection.models);
-            if (!document.contains(GlobalVariables.recordsList.$el[0])) {
-                // records list is initialized and rendered but not yet added to DOM
-                GlobalVariables.recordsList.$el.insertAfter($('.page-header'));
-            }
             this.feedback();
         }, this));
     },
     nextSearch: function(event) {
         event.preventDefault();
         $('#more-records').hide();
-        var startRecord = GlobalVariables.records.length;
-        this.submitSearch(startRecord).then( _.bind(function() {
-            GlobalVariables.records.add(this.collection.models);
-            this.feedback();
-        }, this));
+        var startRecord = this.collection.length;
+        this.submitSearch(startRecord).then(this.feedback.bind(this));
     },
     feedback: function() {
-        if (GlobalVariables.records.length === this.collection.totalResults) {
-            GlobalVariables.records.trigger('complete');
+        if (this.collection.length >= this.collection.totalResults) {
+            this.collection.trigger('complete');
         } else {
             $('#more-records').show();
         }
-        $('#search-feedback').text("Showing " + GlobalVariables.records.length + " of " + this.collection.totalResults + " results");
+        $('#search-feedback').text("Showing " + this.collection.length + " of " + this.collection.totalResults + " results");
     },
     fill: function(fillText) {
         this.$('#query-input').val(fillText);

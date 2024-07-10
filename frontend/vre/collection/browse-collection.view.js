@@ -2,6 +2,7 @@ import { CompositeView } from 'backbone-fractal';
 
 import { SearchResults } from '../search/search.model.js';
 import { SearchView } from '../search/search.view.js';
+import { RecordListManagingView } from '../record/record.list.managing.view.js';
 import collectionTemplate from './browse-collection.view.mustache';
 
 export var BrowseCollectionView = CompositeView.extend({
@@ -9,13 +10,18 @@ export var BrowseCollectionView = CompositeView.extend({
     id: 'content',
     subviews: [
         {view: 'searchView', selector: '.page-header'},
+        'recordsManager',
     ],
     initialize: function() {
-        this.results = new SearchResults;
+        this.collection = this.collection || new SearchResults;
         this.searchView = new SearchView({
             model: this.model,
-            collection: this.results,
+            collection: this.collection,
         });
+        this.recordsManager = new RecordListManagingView({
+            collection: this.collection
+        });
+        this.model.getRecords(this.collection);
         this.render();
     },
     renderContainer: function() {
