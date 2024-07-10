@@ -8,7 +8,7 @@ var CatalogOptionView = Backbone.View.extend({
     template: optionDBTemplate,
     tagName: 'li',
     events: {
-        'click li': 'select',
+        'click': 'select',
     },
     initialize: function() {
         this.render().listenTo(this.model, {
@@ -18,6 +18,7 @@ var CatalogOptionView = Backbone.View.extend({
     },
     render: function() {
         this.$el.html(this.template(this.model.toJSON()));
+        return this;
     },
     markSelected: function() {
         this.$el.addClass('active');
@@ -44,5 +45,6 @@ export var SelectCatalogView = AggregateView.extend({
     },
     renderContainer: function() {
         this.$el.html(this.template());
+        return this;
     },
 });
