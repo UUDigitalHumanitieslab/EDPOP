@@ -63,15 +63,12 @@ var VRERouter = Backbone.Router.extend({
         'catalog/:id/': 'showCatalog',
     },
     showCollection: function(id) {
-        GlobalVariables.searchView.source = id;
-        GlobalVariables.searchView.render();
         // We are not on the HPB search page, so display the
         // records in the current collection.
         $('#HPB-info').hide();
         GlobalVariables.currentVRECollection = GlobalVariables.myCollections.get(id);
         GlobalVariables.currentCatalog = null;
         var collectionView = new BrowseCollectionView({model:GlobalVariables.currentVRECollection});
-        GlobalVariables.searchView.$el.appendTo(collectionView.$('.page-header'));
         $('#content').replaceWith(collectionView.$el);
         GlobalVariables.records = GlobalVariables.currentVRECollection.getRecords();
         GlobalVariables.recordsList.remove();
@@ -89,7 +86,6 @@ var VRERouter = Backbone.Router.extend({
         const catalogView = new CollectionSearchView({
             model: GlobalVariables.currentCatalog,
         });
-        GlobalVariables.searchView.$el.appendTo(catalogView.$('.page-header'));
         $('#content').replaceWith(catalogView.$el);
         navigationState.set('browsingContext', GlobalVariables.currentCatalog);
     },

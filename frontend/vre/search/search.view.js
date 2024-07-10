@@ -32,7 +32,7 @@ export var SearchView = CompositeView.extend({
         var searchPromise = this.collection.query({
             params: {
                 search: searchTerm,
-                source: this.source,
+                source: this.model.id,
                 startRecord: startRecord,
             },
             error: _.bind(this.alertError, this),
