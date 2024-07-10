@@ -5,17 +5,12 @@ import Cookies from 'jscookie';
 
 import './record/record.opening.aspect';
 import { vreChannel } from './radio';
-import { Records } from './record/record.model';
-import { RecordListManagingView } from './record/record.list.managing.view';
 import { BlankRecordButtonView } from './record/blank.record.button.view';
 import { VRECollections } from './collection/collection.model';
 import { CollectionSearchView } from './catalog/collection.search.view';
 import { BrowseCollectionView } from './collection/browse-collection.view';
 import { ResearchGroups } from './group/group.model';
 import { GroupMenuView } from './group/group.menu.view';
-import { SearchResults } from './search/search.model';
-import { SearchView } from './search/search.view';
-import { AdvancedSearchView } from './search/advanced.search.view';
 import { SelectCollectionView } from './collection/select-collection.view';
 import { addCSRFToken } from './utils/generic-functions';
 import { GlobalVariables } from './globals/variables';
@@ -27,10 +22,7 @@ import { StateModel } from './utils/state.model.js';
 
 
 // Global variables
-GlobalVariables.records = new Records();
 GlobalVariables.allGroups = new ResearchGroups();
-GlobalVariables.results = new SearchResults();
-GlobalVariables.searchView  = new SearchView({collection: GlobalVariables.results});
 GlobalVariables.blankRecordButton = new BlankRecordButtonView();
 GlobalVariables.myCollections = new VRECollections();
 GlobalVariables.catalogs = new Catalogs([], {comparator: 'name'});
@@ -67,21 +59,20 @@ var VRERouter = Backbone.Router.extend({
         // records in the current collection.
         $('#HPB-info').hide();
         GlobalVariables.currentVRECollection = GlobalVariables.myCollections.get(id);
-        GlobalVariables.currentCatalog = null;
         var collectionView = new BrowseCollectionView({model:GlobalVariables.currentVRECollection});
         $('#content').replaceWith(collectionView.$el);
         navigationState.set('browsingContext', GlobalVariables.currentVRECollection);
     },
     showCatalog: function(id) {
-        GlobalVariables.currentCatalog = GlobalVariables.catalogs.findWhere({
+        var currentCatalog = GlobalVariables.catalogs.findWhere({
             identifier: id,
         });
         GlobalVariables.currentVRECollection = null;
         const catalogView = new CollectionSearchView({
-            model: GlobalVariables.currentCatalog,
+            model: currentCatalog,
         });
         $('#content').replaceWith(catalogView.$el);
-        navigationState.set('browsingContext', GlobalVariables.currentCatalog);
+        navigationState.set('browsingContext', currentCatalog);
     },
 });
 
@@ -92,9 +83,6 @@ function prepareCollections() {
     $('#result-detail').modal({show: false});
     VRECollections.mine(GlobalVariables.myCollections);
     GlobalVariables.catalogs.fetch();
-    GlobalVariables.recordsList = new RecordListManagingView({
-        collection: GlobalVariables.records,
-    });
     GlobalVariables.allGroups.fetch();
     var myGroups = ResearchGroups.mine();
     GlobalVariables.groupMenu = new GroupMenuView({collection: myGroups});
