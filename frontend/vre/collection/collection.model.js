@@ -6,19 +6,17 @@ import { Records } from '../record/record.model.js';
  * Representation of a single VRE collection.
  */
 export var VRECollection = APIModel.extend({
-    getRecords: function() {
-        if (!this.records) {
-            var records = this.records = new Records();
-            records.query({
-                params: {collection__id: this.id},
-            }).then(function() {
-                records.trigger('complete');
-            });
+    getRecords: function(records) {
+        if (!records) {
+            if (this.records) return this.records;
+            records = this.records = new Records();
         }
-        else {
-            var records = this.records;
-        }
-        return this.records;
+        records.query({
+            params: {collection__id: this.id},
+        }).then(function() {
+            records.trigger('complete');
+        });
+        return records;
     },
 });
 
