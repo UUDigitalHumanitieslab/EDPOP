@@ -18,7 +18,8 @@ export var RecordListManagingView = CompositeView.extend({
     events: {
         'submit': function(event) {
             event.preventDefault();
-            this.vreCollectionsSelect.submitForm(event);
+            var selection = this.recordListView.currentSelection();
+            this.vreCollectionsSelect.submitForm(event, selection);
         },
         'click .more-records': 'loadMore',
     },
