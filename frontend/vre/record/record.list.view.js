@@ -26,6 +26,14 @@ export var RecordListView = CollectionView.extend({
         }, this);
     },
 
+    currentSelection: function() {
+        return _.chain(this.items)
+            .filter({selected: true})
+            .map('model')
+            .invokeMap('toJSON')
+            .value();
+    },
+
     checkOne: function() {
         if (++this.checkedCount === this.collection.length) {
             this.trigger('allChecked');

@@ -48,15 +48,12 @@ export var VRECollectionView = View.extend({
             this.$('button').addClass("disabled");
         }
     },
-    submitForm: function(event) {
+    submitForm: function(event, selected_records) {
         event.preventDefault();
-        var selected_records = [];
+        selected_records = selected_records || [];
         if (this.model) {
             // adding to array as the api expects an array.
             selected_records.push(this.model.toJSON());
-        }
-        else {
-            selected_records = _(GlobalVariables.recordsList.items).filter({selected: true}).invokeMap('model.toJSON').value();
         }
         var selected_collections = this.$('select').val();
         var records_and_collections = new AdditionsToCollections({
