@@ -70,12 +70,6 @@ var VRERouter = Backbone.Router.extend({
         GlobalVariables.currentCatalog = null;
         var collectionView = new BrowseCollectionView({model:GlobalVariables.currentVRECollection});
         $('#content').replaceWith(collectionView.$el);
-        GlobalVariables.records = GlobalVariables.currentVRECollection.getRecords();
-        GlobalVariables.recordsList.remove();
-        GlobalVariables.recordsList = new RecordListManagingView({
-            collection: GlobalVariables.records,
-        });
-        GlobalVariables.recordsList.render().$el.insertAfter($('.page-header'));
         navigationState.set('browsingContext', GlobalVariables.currentVRECollection);
     },
     showCatalog: function(id) {

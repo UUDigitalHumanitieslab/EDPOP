@@ -38,7 +38,7 @@ export var RecordListManagingView = CompositeView.extend({
     },
 
     loadMore: function(event) {
-        GlobalVariables.searchView.nextSearch(event);
+        this.collection.trigger('moreRequested', event);
     },
 
     bindSelectAll: function() {

@@ -13,6 +13,10 @@ export var VRECollection = APIModel.extend({
         }
         records.query({
             params: {collection__id: this.id},
+            // records could be either a Results or a Records. The next two
+            // options ensure behavior consistent with a Records.
+            url: Records.prototype.url,
+            parse: false,
         }).then(function() {
             records.trigger('complete');
         });
