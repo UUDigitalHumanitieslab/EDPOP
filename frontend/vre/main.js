@@ -34,6 +34,9 @@ GlobalVariables.searchView  = new SearchView({model: GlobalVariables.results});
 GlobalVariables.blankRecordButton = new BlankRecordButtonView();
 GlobalVariables.myCollections = new VRECollections();
 GlobalVariables.catalogs = new Catalogs();
+GlobalVariables.collectionDropdown = new SelectCollectionView({
+    collection: GlobalVariables.myCollections
+});
 
 var navigationState = new StateModel;
 
@@ -64,7 +67,6 @@ var VRERouter = Backbone.Router.extend({
         $('#HPB-info').hide();
         GlobalVariables.currentVRECollection = GlobalVariables.myCollections.get(id);
         GlobalVariables.currentCatalog = null;
-        GlobalVariables.collectionDropdown.render();
         GlobalVariables.catalogDropdown.render();
         var collectionView = new BrowseCollectionView({model:GlobalVariables.currentVRECollection});
         GlobalVariables.searchView.$el.appendTo(collectionView.$('.page-header'));
@@ -82,7 +84,6 @@ var VRERouter = Backbone.Router.extend({
             identifier: id,
         });
         GlobalVariables.currentVRECollection = null;
-        GlobalVariables.collectionDropdown.render();
         GlobalVariables.catalogDropdown.render();
         const catalogView = new CollectionSearchView({
             model: GlobalVariables.currentCatalog,
@@ -107,7 +108,6 @@ function prepareCollections() {
     var myGroups = ResearchGroups.mine();
     GlobalVariables.groupMenu = new GroupMenuView({collection: myGroups});
     GlobalVariables.router = new VRERouter();
-    GlobalVariables.myCollections.on('update', finish);
     GlobalVariables.allGroups.on('update', finish);
     GlobalVariables.catalogs.on('update', finish);
 
@@ -122,9 +122,6 @@ function startRouting() {
     GlobalVariables.catalogDropdown = new SelectCatalogView({
         collection: GlobalVariables.catalogs
     });
-    GlobalVariables.collectionDropdown = new SelectCollectionView({
-        collection: GlobalVariables.myCollections
-    });
     $('.nav').first().append(
         GlobalVariables.catalogDropdown.el,
         GlobalVariables.collectionDropdown.el,
@@ -138,7 +135,7 @@ function startRouting() {
 
 // _.after ensures that a function runs only after a given number of calls.
 var kickoff = _.after(2, prepareCollections);
-var finish = _.after(3, startRouting);
+var finish = _.after(2, startRouting);
 
 // Ensure we have a CSRF cookie.
 if (Cookies.get('csrftoken')) {
