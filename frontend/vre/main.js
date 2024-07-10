@@ -34,6 +34,9 @@ GlobalVariables.searchView  = new SearchView({model: GlobalVariables.results});
 GlobalVariables.blankRecordButton = new BlankRecordButtonView();
 GlobalVariables.myCollections = new VRECollections();
 GlobalVariables.catalogs = new Catalogs([], {comparator: 'name'});
+GlobalVariables.catalogDropdown = new SelectCatalogView({
+    collection: GlobalVariables.catalogs
+});
 GlobalVariables.collectionDropdown = new SelectCollectionView({
     collection: GlobalVariables.myCollections
 });
@@ -67,7 +70,6 @@ var VRERouter = Backbone.Router.extend({
         $('#HPB-info').hide();
         GlobalVariables.currentVRECollection = GlobalVariables.myCollections.get(id);
         GlobalVariables.currentCatalog = null;
-        GlobalVariables.catalogDropdown.render();
         var collectionView = new BrowseCollectionView({model:GlobalVariables.currentVRECollection});
         GlobalVariables.searchView.$el.appendTo(collectionView.$('.page-header'));
         $('#content').replaceWith(collectionView.$el);
@@ -84,7 +86,6 @@ var VRERouter = Backbone.Router.extend({
             identifier: id,
         });
         GlobalVariables.currentVRECollection = null;
-        GlobalVariables.catalogDropdown.render();
         const catalogView = new CollectionSearchView({
             model: GlobalVariables.currentCatalog,
         });
@@ -119,9 +120,6 @@ function prepareCollections() {
 // GlobalVariables.myCollections and GlobalVariables.allGroups have fully
 // loaded.
 function startRouting() {
-    GlobalVariables.catalogDropdown = new SelectCatalogView({
-        collection: GlobalVariables.catalogs
-    });
     $('.nav').first().append(
         GlobalVariables.catalogDropdown.el,
         GlobalVariables.collectionDropdown.el,
