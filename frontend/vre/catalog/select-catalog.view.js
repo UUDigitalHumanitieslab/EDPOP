@@ -13,7 +13,7 @@ export var SelectCatalogView = Backbone.View.extend({
         this.render();
     },
     getCatalogs: function() {
-        const catalogs = _.sortBy(this.collection.toJSON(), 'name');
+        const catalogs = this.collection.toJSON();
         const currentCatalog = GlobalVariables.currentCatalog;
         if (currentCatalog) {
             catalogs.find((el) => el["@id"] === currentCatalog.get("@id")).selected = true;
