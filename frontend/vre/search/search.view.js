@@ -34,7 +34,7 @@ export var SearchView = CompositeView.extend({
     submitSearch: function(startRecord) {
         this.showPending();
         var searchTerm = this.$('input').val();
-        var searchPromise = GlobalVariables.results.query({
+        var searchPromise = this.collection.query({
             params: {
                 catalog: this.source,
                 query: searchTerm,
@@ -60,7 +60,7 @@ export var SearchView = CompositeView.extend({
         // Start with record 0, which is what the EDPOP VRE API expects
         this.submitSearch(0).then(_.bind(function() {
             $('#more-records').show();
-            GlobalVariables.records.reset(GlobalVariables.results.models);
+            GlobalVariables.records.reset(this.collection.models);
             if (!document.contains(GlobalVariables.recordsList.$el[0])) {
                 // records list is initialized and rendered but not yet added to DOM
                 GlobalVariables.recordsList.$el.insertAfter($('.page-header'));
@@ -73,17 +73,17 @@ export var SearchView = CompositeView.extend({
         $('#more-records').hide();
         var startRecord = GlobalVariables.records.length;
         this.submitSearch(startRecord).then( _.bind(function() {
-            GlobalVariables.records.add(GlobalVariables.results.models);
+            GlobalVariables.records.add(this.collection.models);
             this.feedback();
         }, this));
     },
     feedback: function() {
-        if (GlobalVariables.records.length === GlobalVariables.results.totalResults) {
+        if (GlobalVariables.records.length === this.collection.totalResults) {
             GlobalVariables.records.trigger('complete');
         } else {
             $('#more-records').show();
         }
-        $('#search-feedback').text("Showing " + GlobalVariables.records.length + " of " + GlobalVariables.results.totalResults + " results");
+        $('#search-feedback').text("Showing " + GlobalVariables.records.length + " of " + this.collection.totalResults + " results");
     },
     fill: function(fillText) {
         this.$('#query-input').val(fillText);

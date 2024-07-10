@@ -30,7 +30,7 @@ import { StateModel } from './utils/state.model.js';
 GlobalVariables.records = new Records();
 GlobalVariables.allGroups = new ResearchGroups();
 GlobalVariables.results = new SearchResults();
-GlobalVariables.searchView  = new SearchView({model: GlobalVariables.results});
+GlobalVariables.searchView  = new SearchView({collection: GlobalVariables.results});
 GlobalVariables.blankRecordButton = new BlankRecordButtonView();
 GlobalVariables.myCollections = new VRECollections();
 GlobalVariables.catalogs = new Catalogs([], {comparator: 'name'});
