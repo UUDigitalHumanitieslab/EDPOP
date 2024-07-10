@@ -21,18 +21,19 @@ import {SelectCatalogView} from "./catalog/select-catalog.view";
 import { StateModel } from './utils/state.model.js';
 
 
-// Global variables
+// Dangerously global variables (accessible from dependency modules).
 GlobalVariables.allGroups = new ResearchGroups();
-GlobalVariables.blankRecordButton = new BlankRecordButtonView();
 GlobalVariables.myCollections = new VRECollections();
-GlobalVariables.catalogs = new Catalogs([], {comparator: 'name'});
-GlobalVariables.catalogDropdown = new SelectCatalogView({
-    collection: GlobalVariables.catalogs
+
+// Regular global variables, only visible in this module.
+var blankRecordButton = new BlankRecordButtonView();
+var catalogs = new Catalogs([], {comparator: 'name'});
+var catalogDropdown = new SelectCatalogView({
+    collection: catalogs
 });
-GlobalVariables.collectionDropdown = new SelectCollectionView({
+var collectionDropdown = new SelectCollectionView({
     collection: GlobalVariables.myCollections
 });
-
 var navigationState = new StateModel;
 
 // Focus/blur semantics for the catalog or collection currently being viewed.
@@ -64,7 +65,7 @@ var VRERouter = Backbone.Router.extend({
         navigationState.set('browsingContext', GlobalVariables.currentVRECollection);
     },
     showCatalog: function(id) {
-        var currentCatalog = GlobalVariables.catalogs.findWhere({
+        var currentCatalog = catalogs.findWhere({
             identifier: id,
         });
         GlobalVariables.currentVRECollection = null;
@@ -76,33 +77,34 @@ var VRERouter = Backbone.Router.extend({
     },
 });
 
+var router = new VRERouter();
+
 // We want this code to run after two conditions are met:
 // 1. The DOM has fully loaded;
 // 2. the CSRF cookie has been obtained.
 function prepareCollections() {
     $('#result-detail').modal({show: false});
     VRECollections.mine(GlobalVariables.myCollections);
-    GlobalVariables.catalogs.fetch();
+    catalogs.fetch();
     GlobalVariables.allGroups.fetch();
     var myGroups = ResearchGroups.mine();
     GlobalVariables.groupMenu = new GroupMenuView({collection: myGroups});
-    GlobalVariables.router = new VRERouter();
     GlobalVariables.myCollections.on('update', finish);
     GlobalVariables.allGroups.on('update', finish);
-    GlobalVariables.catalogs.on('update', finish);
+    catalogs.on('update', finish);
 
     // Add account menu
     accountMenu.$el.appendTo('#navbar-right');
 }
 
 // We want this code to run after prepareCollections has run and both
-// GlobalVariables.myCollections and GlobalVariables.allGroups have fully
+// myCollections and allGroups have fully
 // loaded.
 function startRouting() {
     $('.nav').first().append(
-        GlobalVariables.catalogDropdown.el,
-        GlobalVariables.collectionDropdown.el,
-        GlobalVariables.blankRecordButton.el,
+        catalogDropdown.el,
+        collectionDropdown.el,
+        blankRecordButton.el,
     );
     Backbone.history.start({
         pushState: true,
