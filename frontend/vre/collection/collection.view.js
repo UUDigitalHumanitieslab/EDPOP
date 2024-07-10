@@ -31,6 +31,10 @@ export var VRECollectionView = View.extend({
         this.$('select').select2('destroy');
         return VRECollectionView.__super__.remove.call(this);
     },
+    setRecord: function(model) {
+        this.model = model;
+        return this;
+    },
     clear: function() {
         this.$el.val(null).trigger('change');
         return this;
@@ -46,10 +50,14 @@ export var VRECollectionView = View.extend({
     },
     submitForm: function(event) {
         event.preventDefault();
-        var selected_records = _(GlobalVariables.recordsList.items)
-            .filter({selected: true})
-            .invokeMap('model.toJSON')
-            .value();
+        var selected_records = [];
+        if (this.model) {
+            // adding to array as the api expects an array.
+            selected_records.push(this.model.toJSON());
+        }
+        else {
+            selected_records = _(GlobalVariables.recordsList.items).filter({selected: true}).invokeMap('model.toJSON').value();
+        }
         var selected_collections = this.$('select').val();
         var records_and_collections = new AdditionsToCollections({
             'records': selected_records,
