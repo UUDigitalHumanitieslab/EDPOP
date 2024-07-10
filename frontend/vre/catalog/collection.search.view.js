@@ -15,7 +15,7 @@ export var CollectionSearchView = CompositeView.extend({
         this.searchView = new SearchView({
             model: this.model,
             collection: this.results,
-        }).render();
+        });
         this.render();
     },
     renderContainer: function() {

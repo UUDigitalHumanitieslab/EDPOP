@@ -14,6 +14,9 @@ export var SearchView = CompositeView.extend({
         selector: '.page-header',
         method: 'after',
     }],
+    initialize: function() {
+        this.render();
+    },
     renderContainer: function() {
         this.$el.html(this.template());
         return this;
