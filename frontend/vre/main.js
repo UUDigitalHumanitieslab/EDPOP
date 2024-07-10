@@ -33,7 +33,7 @@ GlobalVariables.results = new SearchResults();
 GlobalVariables.searchView  = new SearchView({model: GlobalVariables.results});
 GlobalVariables.blankRecordButton = new BlankRecordButtonView();
 GlobalVariables.myCollections = new VRECollections();
-GlobalVariables.catalogs = new Catalogs();
+GlobalVariables.catalogs = new Catalogs([], {comparator: 'name'});
 GlobalVariables.collectionDropdown = new SelectCollectionView({
     collection: GlobalVariables.myCollections
 });
