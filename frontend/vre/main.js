@@ -109,6 +109,7 @@ function prepareCollections() {
     var myGroups = ResearchGroups.mine();
     GlobalVariables.groupMenu = new GroupMenuView({collection: myGroups});
     GlobalVariables.router = new VRERouter();
+    GlobalVariables.myCollections.on('update', finish);
     GlobalVariables.allGroups.on('update', finish);
     GlobalVariables.catalogs.on('update', finish);
 
@@ -133,7 +134,7 @@ function startRouting() {
 
 // _.after ensures that a function runs only after a given number of calls.
 var kickoff = _.after(2, prepareCollections);
-var finish = _.after(2, startRouting);
+var finish = _.after(3, startRouting);
 
 // Ensure we have a CSRF cookie.
 if (Cookies.get('csrftoken')) {
