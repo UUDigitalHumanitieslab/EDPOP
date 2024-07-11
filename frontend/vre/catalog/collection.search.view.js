@@ -7,7 +7,6 @@ import collectionSearchTemplate from './collection.search.view.mustache';
 
 export var CollectionSearchView = CompositeView.extend({
     template: collectionSearchTemplate,
-    id: "content",
     subviews: [
         {view: 'searchView', selector: '.page-header'},
         'recordsManager',
