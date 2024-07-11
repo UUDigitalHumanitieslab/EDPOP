@@ -2,6 +2,7 @@ import _ from 'lodash';
 import $ from 'jquery';
 import Backbone from 'backbone';
 import Cookies from 'jscookie';
+import { wrapWithCSRF } from '@uu-cdh/backbone-util';
 
 import './record/record.opening.aspect';
 import { vreChannel } from './radio';
@@ -17,7 +18,6 @@ import { SearchResults } from './search/search.model';
 import { SearchView } from './search/search.view';
 import { AdvancedSearchView } from './search/advanced.search.view';
 import { SelectCollectionView } from './collection/select-collection.view';
-import { addCSRFToken } from './utils/generic-functions';
 import { GlobalVariables } from './globals/variables';
 import './globals/user';
 import { accountMenu } from './globals/accountMenu';
@@ -35,10 +35,7 @@ GlobalVariables.blankRecordButton = new BlankRecordButtonView();
 const SRUIDS = ['hpb', 'vd16', 'vd17', 'vd18', 'gallica', 'cerl-thesaurus'];
 
 // Override Backbone.sync so it always includes the CSRF token in requests.
-(function() {
-    var id = _.identity;
-    Backbone.sync = _.overArgs(Backbone.sync, [id, id, addCSRFToken]);
-}());
+Backbone.sync = wrapWithCSRF(Backbone.sync, 'X-CSRFToken', 'csrftoken');
 
 var VRERouter = Backbone.Router.extend({
     routes: {

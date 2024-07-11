@@ -1,5 +1,4 @@
 import _ from 'lodash';
-import Cookies from 'jscookie';
 
 /**
  * Perform the following transformation:
@@ -8,12 +7,6 @@ import Cookies from 'jscookie';
  */
 export function objectAsUrlParams(object) {
     return _(object).entries().invokeMap('join', '=').join('&');
-}
-
-export function addCSRFToken(ajaxOptions) {
-    return _.defaultsDeep({
-        headers: {'X-CSRFToken': Cookies.get('csrftoken')},
-    }, ajaxOptions);
 }
 
 export function canonicalSort(key) {
