@@ -19,6 +19,7 @@ import { accountMenu } from './globals/accountMenu';
 import {Catalogs} from "./catalog/catalog.model";
 import {SelectCatalogView} from "./catalog/select-catalog.view";
 import { StateModel } from './utils/state.model.js';
+import { WelcomeView } from './utils/welcome.view.js';
 
 
 // Dangerously global variables (accessible from dependency modules).
@@ -36,12 +37,6 @@ var collectionDropdown = new SelectCollectionView({
 });
 var navigationState = new StateModel;
 
-// Focus/blur semantics for the catalog or collection currently being viewed.
-navigationState.on({
-    'enter:browsingContext': (model, newValue) => newValue.trigger('focus', newValue),
-    'exit:browsingContext': (model, oldValue) => oldValue.trigger('blur', oldValue),
-});
-
 // Override Backbone.sync so it always includes the CSRF token in requests.
 Backbone.sync = wrapWithCSRF(Backbone.sync, 'X-CSRFToken', 'csrftoken');
 
@@ -50,31 +45,47 @@ var VRERouter = Backbone.Router.extend({
         'collection/:id/': 'showCollection',
         'catalog/:id/': 'showCatalog',
     },
-    showCollection: function(id) {
-        // We are not on the HPB search page, so display the
-        // records in the current collection.
-        $('#HPB-info').hide();
-        GlobalVariables.currentVRECollection = GlobalVariables.myCollections.get(id);
-        var collectionView = new BrowseCollectionView({model:GlobalVariables.currentVRECollection});
-        $('#content').replaceWith(collectionView.$el);
-        navigationState.set('browsingContext', GlobalVariables.currentVRECollection);
-    },
-    showCatalog: function(id) {
-        var currentCatalog = catalogs.findWhere({
-            identifier: id,
-        });
-        GlobalVariables.searchView.source = GlobalVariables.currentCatalog.id;
-        GlobalVariables.searchView.render();
-        GlobalVariables.currentVRECollection = null;
-        const catalogView = new CollectionSearchView({
-            model: currentCatalog,
-        });
-        $('#content').replaceWith(catalogView.$el);
-        navigationState.set('browsingContext', currentCatalog);
-    },
 });
 
 var router = new VRERouter();
+
+// We create some hooks between triggers and effects.
+// Firstly, route changes should lead to different models moving to the center
+// of attention.
+router.on({
+    'route:showCollection': id => navigationState.set(
+        'browsingContext', GlobalVariables.myCollections.get(id)),
+    'route:showCatalog': id => navigationState.set(
+        'browsingContext', catalogs.findWhere({identifier: id})),
+});
+
+// Focus/blur semantics for the catalog or collection currently being viewed.
+navigationState.on({
+    'enter:browsingContext': (model, newValue) => newValue.trigger('focus', newValue),
+    'exit:browsingContext': (model, oldValue) => oldValue.trigger('blur', oldValue),
+    'enter:browser': (model, newValue) => newValue.$el.appendTo('#content'),
+    'exit:browser': (model, oldValue) => oldValue.remove(),
+});
+
+// We use different browser views depending on whether the model currently under
+// attention is a catalog or a (VRE) collection. Also, there is still some
+// residual code that depends on there being a global variable holding the
+// currently selected collection.
+catalogs.on({
+    focus: catalog => navigationState.set(
+        'browser', new CollectionSearchView({model: catalog})),
+});
+
+function showCollection(vreCollection) {
+    GlobalVariables.currentVRECollection = vreCollection;
+    navigationState.set(
+        'browser', new BrowseCollectionView({model: vreCollection}));
+}
+
+GlobalVariables.myCollections.on({
+    focus: showCollection,
+    blur: () => GlobalVariables.currentVRECollection = null,
+});
 
 // We want this code to run after two conditions are met:
 // 1. The DOM has fully loaded;
@@ -92,6 +103,8 @@ function prepareCollections() {
 
     // Add account menu
     accountMenu.$el.appendTo('#navbar-right');
+    // Show the welcome view
+    navigationState.set('browser', new WelcomeView);
 }
 
 // We want this code to run after prepareCollections has run and both
