@@ -196,11 +196,12 @@ class RDFQuadField(RDFField):
     This variant of an RDFField can be used when the modelled triples may have multiple
     contexts in the store.
 
-    This means the field has to model a set of quads, rather than triples.
+    This means the field has to model a set of quads, rather than triples. Particularly
+    useful for cross-graph lookups.
 
     Child classes should implement `_quads_to_store` and `_stored_quads`; these are
     analogous to `_triples_to_store`/`_stored_triples` but return quads instead of
-    triples.
+    triples. (`_triples_to_store`/`_stored_triples` need not be implemented.)
     '''
 
     def set(self, instance, value) -> None:
