@@ -16,41 +16,41 @@ def test_predicate_field(empty_graph):
     g = empty_graph
     instance = Example(g, BNode())
 
-    assert Example.named_bob.get(g, instance) == False
+    assert Example.named_bob.get(instance) == False
     
-    Example.named_bob.set(g, instance, True)
+    Example.named_bob.set(instance, True)
     assert triple_exists(g, (instance.uri, Test.name, Literal('Bob')))
 
-    Example.named_bob.clear(g, instance)
+    Example.named_bob.clear(instance)
     assert not triple_exists(g, (instance.uri, Test.name, Literal('Bob')))
 
 def test_property_field(empty_graph):
     g = empty_graph
     instance = Example(g, BNode())
 
-    assert Example.lucky_numbers.get(g, instance) == []
+    assert Example.lucky_numbers.get(instance) == []
 
     g.add((instance.uri, Test.luckyNumber, Literal(13)))
-    assert Example.lucky_numbers.get(g, instance) == [13]
+    assert Example.lucky_numbers.get(instance) == [13]
 
-    Example.lucky_numbers.set(g, instance, [7, 15])
+    Example.lucky_numbers.set(instance, [7, 15])
     assert triple_exists(g, (instance.uri, Test.luckyNumber, Literal(7)))
     assert triple_exists(g, (instance.uri, Test.luckyNumber, Literal(15)))
 
-    Example.lucky_numbers.clear(g, instance)
+    Example.lucky_numbers.clear(instance)
     assert not triple_exists(g, (instance.uri, Test.luckyNumber, None))
 
 def test_unique_property_field(empty_graph):
     g = empty_graph
     instance = Example(g, BNode())
 
-    assert Example.location.get(g, instance) is None
+    assert Example.location.get(instance) is None
 
     x = BNode()
     g.add((instance.uri, Test.location, x))
-    assert Example.location.get(g, instance) == x
+    assert Example.location.get(instance) == x
 
     y = BNode()
-    Example.location.set(g, instance, y)
+    Example.location.set(instance, y)
     assert not triple_exists(g, (instance.uri, Test.location, x))
     assert triple_exists(g, (instance.uri, Test.location, y))

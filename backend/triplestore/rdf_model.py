@@ -41,7 +41,7 @@ class RDFModel():
         self.graph.addN(triples_to_quads(self._class_triples(), self.graph))
 
         for name, field in self._fields().items():
-            field.set(self.graph, self, getattr(self, name))
+            field.set(self, getattr(self, name))
 
         self.store.commit()
 
@@ -54,14 +54,14 @@ class RDFModel():
             self.graph.remove(triple)
 
         for field in self._fields().values(): 
-            field.clear(self.graph, self)
+            field.clear(self)
         
         self.store.commit()
 
 
     def refresh_from_store(self):
         for name, field in self._fields().items():
-            value = field.get(self.graph, self)
+            value = field.get(self)
             self.__setattr__(name, value)
 
 

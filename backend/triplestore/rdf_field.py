@@ -17,9 +17,10 @@ class RDFField:
 
     In most cases, a subclass should implement the following methods:
     - `__init__`: optional, can be used to set any parameters that apply.
-    - `get`: takes a graph as input and returns the modelled value of the field.
-    - `_stored_triples`: takes a graph as input and returns the scope of the field; that
-        is, a subset of the graph that the field is modelling.
+    - `get`: takes model instance as input and returns the modelled value of the field
+        based on the graph data.
+    - `_stored_triples`: takes a model instance as input and returns the scope of the
+        field; that is, a subset of the graph that the field is modelling.
     - `_triples_to_store`: returns a collection of triples that represents the modelled
         value.
     
@@ -27,53 +28,72 @@ class RDFField:
     default implementations based on `_stored_triples` and `_triples_to_store`.
     Alternatively, you could implement `set` and `clear` directly; in that case, it's not
     necessary to implement `_stored_triples` and `_triples_to_store`.
+
+    The implementations of the methods listed above should use `self.get_graph()` to
+    fetch the correct graph for reading and writing triples. By default, this will be the
+    graph of the model instance. To use a constant graph, you can pass a `graph` in the
+    initialiser. If the graph is chosen dynamically, you can override the method
+    `get_graph`.
     '''
+
+    def __init__(self, graph: Optional[Graph] = None, **kwargs):
+        self.graph = graph
+
+    def get_graph(self, instance):
+        '''
+        Return the graph in which to save data.
+
+        By default, this will return the graph passed on on initialisation, if any, or
+        the graph of the model instance.
+
+        You can override this method to choose a graph dynamically.
+        '''
+        return self.graph or instance.graph
     
-    def get(self, g: Graph, instance):
+    def get(self, instance):
         '''
         Returns the value currently stored in a graph.
 
         Parameters:
-            g: the graph in which to read data
             instance: the model instance
         '''
         raise NotImplementedError()
 
-    def set(self, g: Graph, instance, value) -> None:
+    def set(self, instance, value) -> None:
         '''
         Store a value for the field in a graph
 
         Parameters:
-            g: the graph in which to read and store data
             instance: the model instance
             value: the value of the field on the model instance
         '''
+        g = self.get_graph(instance)
         utils.replace_triples(
             g,
-            self._stored_triples(g, instance),
-            self._triples_to_store(g, instance, value)
+            self._stored_triples(instance),
+            self._triples_to_store(instance, value)
         )
 
-    def clear(self, g: Graph, instance) -> None:
+    def clear(self, instance) -> None:
         '''
         Clear the field's data in a graph for a given instance of the model.
         
         This is used as cleanup when deleting the model instance.
 
         Parameters:
-            g: the graph in which to read and store data
             instance: the model instance
         '''
-        for triple in self._stored_triples(g, instance):
+        g = self.get_graph(instance)
+        for triple in self._stored_triples(instance):
             g.remove(triple)
 
-    def _stored_triples(self, g: Graph, instance) -> utils.Triples:
+    def _stored_triples(self, instance) -> utils.Triples:
         '''
         Extract the set of relevant triples from a graph representation
         '''
         raise NotImplementedError()
 
-    def _triples_to_store(self, g: Graph, instance, value) -> utils.Triples:
+    def _triples_to_store(self, instance, value) -> utils.Triples:
         '''
         Triples that should be stored to represent the modelled value
         '''
@@ -92,18 +112,20 @@ class RDFPredicateField(RDFField):
     considered irrelevant, and will not be affected when you save the field.
     '''
 
-    def __init__(self, property: URIRef, object: Identifier):
+    def __init__(self, property: URIRef, object: Identifier, **kwargs):
+        super().__init__(**kwargs)
         self.property = property
         self.object = object
 
-    def get(self, g: Graph, instance):
-        return any(self._stored_triples(g, instance))
+    def get(self, instance):
+        return any(self._stored_triples(instance))
 
-    def _stored_triples(self, g: Graph, instance):
+    def _stored_triples(self, instance):
+        g = self.get_graph(instance)
         subject = instance.uri
         return g.triples((subject, self.property, self.object))
     
-    def _triples_to_store(self, g: Graph, instance, value):
+    def _triples_to_store(self, instance, value):
         if value:
             subject = instance.uri
             return [(subject, self.property, self.object)]
@@ -117,13 +139,14 @@ class RDFPropertyField(RDFField):
     configured property.
     '''
 
-    def __init__(self, property: URIRef):
+    def __init__(self, property: URIRef, **kwargs):
+        super().__init__(**kwargs)
         self.property = property
 
-    def get(self, g: Graph, instance):
+    def get(self, instance):
         return [
             self.node_to_value(o)
-            for (s, p, o) in self._stored_triples(g, instance)
+            for (s, p, o) in self._stored_triples(instance)
         ]
 
     def node_to_value(self, node: Identifier):
@@ -143,11 +166,12 @@ class RDFPropertyField(RDFField):
         else:
             return Literal(value)
 
-    def _stored_triples(self, g: Graph, instance):
+    def _stored_triples(self, instance):
+        g = self.get_graph(instance)
         subject = instance.uri
         return g.triples((subject, self.property, None))
 
-    def _triples_to_store(self, g: Graph, instance, value):
+    def _triples_to_store(self, instance, value):
         subject = instance.uri
         return [(subject, self.property, self.value_to_node(o)) for o in value]
 
@@ -157,11 +181,11 @@ class RDFUniquePropertyField(RDFPropertyField):
     Like RDFProperty, but when the property is always unique for the subject.
     '''
 
-    def get(self, g: Graph, instance):
-        values = super().get(g, instance)
+    def get(self, instance):
+        values = super().get(instance)
         if len(values):
             return values[0]
 
 
-    def set(self, g: Graph, instance, object: Optional[Identifier]):
-        return super().set(g, instance, [object])
+    def set(self, instance, object: Optional[Identifier]):
+        return super().set(instance, [object])
