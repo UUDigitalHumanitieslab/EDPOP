@@ -19,6 +19,14 @@ class ProjectField(serializers.Field):
         return project.name
 
 
+class URIRefField(serializers.URLField):
+    def to_internal_value(self, data):
+        return URIRef(data)
+    
+    def to_representation(self, value):
+        return str(value)
+
+
 def can_update_project(data):
     '''
     Validates that the specified project is one the user is allowed to write to.
@@ -47,6 +55,7 @@ class CollectionSerializer(serializers.Serializer):
     project = ProjectField()
     uri = serializers.URLField(read_only=True)
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    records = serializers.ListField(child=URIRefField())
 
     class Meta:
         validators = [can_update_project]
@@ -63,6 +72,7 @@ class CollectionSerializer(serializers.Serializer):
         collection.name = validated_data['name']
         collection.summary = validated_data['summary']
         collection.project = project_uri
+        collection.records = validated_data['records']
         collection.save()
         return collection
 
@@ -70,5 +80,6 @@ class CollectionSerializer(serializers.Serializer):
         instance.name = validated_data['name']
         instance.summary = validated_data['summary']
         instance.project = validated_data['project']
+        instance.records = validated_data['records']
         instance.save()
         return instance
