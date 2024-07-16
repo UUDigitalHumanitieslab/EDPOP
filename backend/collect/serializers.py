@@ -6,7 +6,7 @@ from collect.utils import collection_uri, collection_exists, collection_graph
 from projects.models import Project
 
 
-class ProjectField(serializers.Field):
+class ProjectField(serializers.Field):    
     def __init__(self, **kwargs):
         super().__init__( **kwargs)
 
@@ -23,9 +23,10 @@ def can_update_project(data):
     '''
     Validates that the specified project is one the user is allowed to write to.
 
-    Note: while CollectionPermission checks whether the user has access to a collection
-    its current context, this validator checks the user-submitted data. This is relevant
-    when the user is creating or moving a collection.
+    Note: not to be confused with CollectionPermission. That permission checks whether the
+    user has access to a collection its current context; this validator checks the
+    user-submitted data. This prevents users from adding collections to projects they
+    cannot access.
     '''
 
     project_uri = data['project']
