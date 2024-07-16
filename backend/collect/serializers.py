@@ -17,6 +17,26 @@ class ProjectField(serializers.Field):
         project = Project.objects.get(uri=str(value))
         return project.name
 
+
+def can_update_project(data):
+    '''
+    Validates that the specified project is one the user is allowed to write to.
+
+    Note: while CollectionPermission checks whether the user has access to a collection
+    its current context, this validator checks the user-submitted data. This is relevant
+    when the user is creating or moving a collection.
+    '''
+
+    project_uri = data['project']
+    user = data['user']
+
+    project_obj = Project.objects.get(uri=str(project_uri))
+    if not project_obj.permit_update_by(user):
+        raise serializers.ValidationError(
+            'No permission to write to this project'
+        )
+
+
 class CollectionSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=128)
     summary = serializers.CharField(
@@ -24,6 +44,10 @@ class CollectionSerializer(serializers.Serializer):
     )
     project = ProjectField()
     uri = serializers.URLField(read_only=True)
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+
+    class Meta:
+        validators = [can_update_project]
 
     def create(self, validated_data):
         project_uri = validated_data['project']
@@ -33,7 +57,7 @@ class CollectionSerializer(serializers.Serializer):
         collection = EDPOPCollection(graph, uri)
         collection.name = validated_data['name']
         collection.summary = validated_data['summary']
-        collection.project = URIRef(project_uri)
+        collection.project = project_uri
         collection.save()
         return collection
 

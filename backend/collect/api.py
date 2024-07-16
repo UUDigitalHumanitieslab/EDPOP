@@ -50,7 +50,7 @@ class CollectionViewSet(ViewSet):
 
     def list(self, request):
         collections = self.get_queryset()
-        serializer = CollectionSerializer(collections, many=True)
+        serializer = CollectionSerializer(collections, many=True, context={'request': request})
         return Response(serializer.data)
     
     def create(self, request):
@@ -59,7 +59,7 @@ class CollectionViewSet(ViewSet):
         if collection_exists(uri):
             raise ValidationError(f'Collection {uri} already exists')
 
-        serializer = CollectionSerializer(data = request.data)
+        serializer = CollectionSerializer(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
         collection = serializer.save()
         collection.save()
@@ -68,14 +68,14 @@ class CollectionViewSet(ViewSet):
     def retrieve(self, request, pk=None):
         collection = self.get_object()
         self.check_object_permissions(request, collection)
-        serializer = CollectionSerializer(collection)
+        serializer = CollectionSerializer(collection, context={'request': request})
         return Response(serializer.data)
 
     def update(self, request, pk=None):
         collection = self.get_object()
         self.check_object_permissions(request, collection)
 
-        serializer = CollectionSerializer(collection, request.data)
+        serializer = CollectionSerializer(collection, request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
         collection = serializer.save()
         collection.save()
