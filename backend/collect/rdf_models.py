@@ -1,4 +1,4 @@
-from rdflib import RDFS, IdentifiedNode
+from rdflib import RDFS, IdentifiedNode, URIRef
 from typing import Iterable
 
 from triplestore.utils import Triples

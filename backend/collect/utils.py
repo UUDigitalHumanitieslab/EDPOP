@@ -1,5 +1,5 @@
 from django.conf import settings
-from rdflib import RDF, URIRef
+from rdflib import RDF, URIRef, Graph
 import re
 
 from triplestore.constants import EDPOPCOL
@@ -18,8 +18,12 @@ def collection_uri(name: str):
     return URIRef(settings.RDF_NAMESPACE_ROOT + 'collections/' + id)
 
 
-def collection_exists(uri):
+def collection_exists(uri: URIRef):
     store = settings.RDFLIB_STORE
     triples = store.triples((uri, RDF.type, EDPOPCOL.Collection))
     return any(triples)
 
+
+def collection_graph(uri: URIRef):
+    store = settings.RDFLIB_STORE
+    return Graph(store=store, identifier=uri)

@@ -5,7 +5,7 @@ from django.conf import settings
 
 from projects.api import user_projects
 from collect.rdf_models import EDPOPCollection
-from collect.utils import collection_exists
+from collect.utils import collection_exists, collection_graph
 from triplestore.constants import EDPOPCOL
 from collect.serializers import CollectionSerializer
 from collect.permissions import CollectionPermission
@@ -22,7 +22,7 @@ class CollectionViewSet(ModelViewSet):
     def get_queryset(self):
         projects = user_projects(self.request.user)
         return [
-            EDPOPCollection(project.graph(), uri)
+            EDPOPCollection(collection_graph(uri), uri)
             for project in projects
             for uri in project.rdf_model().collections
         ]

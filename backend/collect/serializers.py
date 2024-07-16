@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rdflib import URIRef
 
 from collect.rdf_models import EDPOPCollection
-from collect.utils import collection_uri, collection_exists
+from collect.utils import collection_uri, collection_exists, collection_graph
 from projects.models import Project
 
 
@@ -52,9 +52,8 @@ class CollectionSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         project_uri = validated_data['project']
-        project = Project.objects.get(uri=str(project_uri))
-        graph = project.graph()
         uri = collection_uri(validated_data['name'])
+        graph = collection_graph(uri)
 
         if collection_exists(uri):
             raise serializers.ValidationError(f'Collection {uri} already exists')

@@ -1,37 +1,37 @@
 from rdflib import Graph, IdentifiedNode
 from typing import Iterable
+from django.conf import settings
 
 from triplestore.constants import AS, EDPOPCOL
 from triplestore.rdf_model import RDFModel
-from triplestore.rdf_field import RDFUniquePropertyField, RDFField
-from triplestore.utils import Triples
+from triplestore.rdf_field import RDFUniquePropertyField, RDFQuadField
+from triplestore.utils import Quads
 
 
-class CollectionsField(RDFField):
-    def get(self, graph: Graph, instance: RDFModel):
+class CollectionsField(RDFQuadField):
+    def get(self, instance: RDFModel):
         return [
             s
-            for (s, p, o) in self._stored_triples(graph, instance)
+            for (s, p, o, g) in self._stored_quads(instance)
         ]
 
-    def _stored_triples(self, g: Graph, instance: RDFModel) -> Triples:
-        results = g.query(f'''
-        SELECT ?s
-        WHERE {{
-            ?s  a edpopcol:Collection ;
+    def _stored_quads(self, instance: RDFModel) -> Quads:
+        store = settings.RDFLIB_STORE
+        results = store.query(f'''
+        SELECT ?col WHERE {{                              
+                ?col a edpopcol:Collection ;
                 as:context <{instance.uri}> .
         }}
         ''', initNs={'as': AS, 'edpopcol': EDPOPCOL})
 
         return [
-            (result, AS.context, instance.uri)
+            (result, AS.context, instance.uri, Graph(store, result))
             for (result, ) in results
         ]
 
-    def _triples_to_store(self, g: Graph, instance: RDFModel, value: Iterable[IdentifiedNode]) -> Triples:
-        # TODO: also include "a edpopcol:Collection" statement?
+    def _quads_to_store(self, instance: RDFModel, value: Iterable[IdentifiedNode]) -> Quads:
         return [
-            (uri, AS.context, instance.uri)
+            (uri, AS.context, instance.uri, uri)
             for uri in value
         ]
 
