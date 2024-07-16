@@ -6,7 +6,7 @@ from urllib.parse import quote
 from typing import Dict
 
 from triplestore.constants import EDPOPCOL
-from collect.api import _collection_uri
+from collect.utils import collection_uri
 from projects.models import Project
 
 def example_collection_data(project_name) -> Dict:
@@ -63,7 +63,7 @@ def test_retrieve_collection(db, user, project, client: Client):
 
     detail_url = lambda uri: '/api/collections/{}/'.format(quote(uri, safe=''))
     correct_url = detail_url(create_response.data['uri'])
-    nonexistent_uri = _collection_uri('does not exist')
+    nonexistent_uri = collection_uri('does not exist')
 
     not_found_response = client.get(detail_url(nonexistent_uri))
     assert not_found_response.status_code == 404
