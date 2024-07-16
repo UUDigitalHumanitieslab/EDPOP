@@ -1,3 +1,5 @@
+from typing import Optional
+
 from rdf.renderers import TurtleRenderer, JsonLdRenderer
 from rest_framework import views
 from rdf.views import RDFView
@@ -13,6 +15,7 @@ class SearchView(RDFView):
     renderer_classes = (JsonLdRenderer,)
     json_ld_context = {
         "edpoprec": "https://dhstatic.hum.uu.nl/edpop-records/latest/",
+        "as": "https://www.w3.org/ns/activitystreams#",
     }
     
     def get_graph(self, request: views.Request, **kwargs) -> Graph:
@@ -20,16 +23,16 @@ class SearchView(RDFView):
             catalog = request.query_params["catalog"]
             query = request.query_params["query"]
             start = request.query_params.get("start", "0")
-            end = request.query_params.get("end", "50")
+            end = request.query_params.get("end", None)
         except KeyError as err:
             raise ParseError(f"Query parameter missing: {err}")
         assert isinstance(catalog, str)
         assert isinstance(query, str)
         assert isinstance(start, str)
-        assert isinstance(end, str)
+        assert end is None or isinstance(end, str)
         catalog_uriref = URIRef(catalog)
         start = int(start)
-        end = int(end)
+        end = int(end) if end is not None else start + 50
         
         try:
             readerclass = get_reader_by_uriref(catalog_uriref)
