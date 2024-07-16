@@ -15,13 +15,30 @@ Including another URLconf
 """
 from django.urls import include, path
 from django.contrib import admin
+from rest_framework import routers
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
+from vre.api import RecordViewSet, AnnotationViewSet, SearchViewSet, AddRecordsViewSet
+from collect.api import CollectionViewSet
+
+api_router = routers.DefaultRouter()
+api_router.register(r'records', RecordViewSet)
+api_router.register(r'annotations', AnnotationViewSet)
+api_router.register(r'search', SearchViewSet, basename='search')
+api_router.register(r'add-selection',
+                    AddRecordsViewSet,
+                    basename='add-selection')
+api_router.register('collections', CollectionViewSet, basename='collections')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api-auth/',
+         include('rest_framework.urls', namespace='rest_framework')),
+    path('api/', include(api_router.urls)),
     path('', include('catalogs.urls')),
     path('', include('vre.urls')),
     path('', include('accounts.urls')),
     path('', include('projects.urls')),
-    path('api/', include('collect.urls'))
 ]
+
+urlpatterns += staticfiles_urlpatterns()
