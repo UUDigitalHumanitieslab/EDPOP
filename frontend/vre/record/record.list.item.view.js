@@ -1,9 +1,19 @@
 import _ from 'lodash';
 import { vreChannel } from '../radio';
 import { SelectableView } from '../utils/selectable.view';
+import { Record } from './record.model';
 import recordListItemTemplate from './record.list.item.view.mustache';
 
+/*
+ * Note: the display of existing annotations has temporarily been
+ * removed from this view. Refer to git history to see how it was implemented.
+ */
+
 export var RecordListItemView = SelectableView.extend({
+    /**
+     * @type Record
+     */
+    model: null,
     tagName: 'tr',
     template: recordListItemTemplate,
     events: {
@@ -11,18 +21,13 @@ export var RecordListItemView = SelectableView.extend({
         'click a': 'display',
     },
     initialize: function() {
-        if (!this.model.get('content').Title) {
-            this.model.getAnnotations().once('sync', this.render, this);
-        }
         this.render();
     },
     render: function() {
         var data = this.model.toJSON();
-        if (!data.content.Title && this.model.annotations) {
-            var annoContent = this.model.annotations.map('content');
-            data.content = _.defaults.apply(null, [{}, data.content].concat(annoContent));
-        }
-        this.$el.html(this.template(data));
+        this.$el.html(this.template({
+            data: data, displayText: this.model.getMainDisplay()
+        }));
         this.$checkbox = this.$('input');
         return this;
     },
