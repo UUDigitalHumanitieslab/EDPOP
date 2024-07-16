@@ -32,8 +32,6 @@ GlobalVariables.results = new SearchResults();
 GlobalVariables.searchView  = new SearchView({model: GlobalVariables.results});
 GlobalVariables.blankRecordButton = new BlankRecordButtonView();
 
-const SRUIDS = ['hpb', 'vd16', 'vd17', 'vd18', 'gallica', 'cerl-thesaurus'];
-
 // Override Backbone.sync so it always includes the CSRF token in requests.
 (function() {
     var id = _.identity;
@@ -69,6 +67,8 @@ var VRERouter = Backbone.Router.extend({
         GlobalVariables.currentCatalog = GlobalVariables.catalogs.findWhere({
             identifier: id,
         });
+        GlobalVariables.searchView.source = GlobalVariables.currentCatalog.get("@id");
+        GlobalVariables.searchView.render();
         GlobalVariables.currentVRECollection = null;
         GlobalVariables.collectionDropdown.render();
         GlobalVariables.catalogDropdown.render();
