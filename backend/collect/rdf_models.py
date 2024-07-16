@@ -1,4 +1,4 @@
-from rdflib import Graph, RDFS, IdentifiedNode
+from rdflib import RDFS, IdentifiedNode
 from typing import Iterable
 
 from triplestore.utils import Triples
@@ -8,18 +8,19 @@ from triplestore.rdf_field import RDFField, RDFUniquePropertyField
 
 
 class CollectionMembersField(RDFField):
-    def get(self, graph: Graph, instance: RDFModel):
+    def get(self, instance: RDFModel):
         return [
             s
-            for (s, p, o) in self._stored_triples(graph, instance)
+            for (s, p, o) in self._stored_triples(instance)
         ]
 
 
-    def _stored_triples(self, g: Graph, instance: RDFModel) -> Triples:
+    def _stored_triples(self,instance: RDFModel) -> Triples:
+        g = self.get_graph(instance)
         return g.triples((None, RDFS.member, instance.uri))
 
 
-    def _triples_to_store(self, g: Graph, instance: RDFModel, value: Iterable[IdentifiedNode]) -> Triples:
+    def _triples_to_store(self, instance: RDFModel, value: Iterable[IdentifiedNode]) -> Triples:
         return [
             (uri, RDFS.member, instance.uri)
             for uri in value
