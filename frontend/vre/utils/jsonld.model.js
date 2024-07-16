@@ -16,6 +16,9 @@ import {APICollection} from "./api.model";
  */
 export var JsonLdCollection = APICollection.extend({
     parse: function(response) {
+        if (!response.hasOwnProperty("@graph")) {
+            throw "Response has no @graph key";
+        }
         return response["@graph"];
     }
 });
@@ -71,6 +74,9 @@ export var JsonLdWithOCCollection = APICollection.extend({
     activityStreamsPrefix: "as:",
     parse: function(response) {
         // Get all subjects of the graph with their predicates and objects as an array
+        if (!response.hasOwnProperty("@graph")) {
+            throw "Response has no @graph key";
+        }
         const allSubjects = response["@graph"];
         const orderedCollection = allSubjects.find((subject) => {return subject["@type"] === `${this.activityStreamsPrefix}OrderedCollection`}, this);
         this.totalResults = orderedCollection[`${this.activityStreamsPrefix}totalItems`] ?? null;
