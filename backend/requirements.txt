@@ -68,7 +68,7 @@ requests==2.32.3
     # via
     #   -r requirements.in
     #   sruthi
-restframework-rdf @ git+https://github.com/UUDigitalHumanitieslab/restframework-rdf@feature/json-ld
+restframework-rdf @ git+https://github.com/UUDigitalHumanitieslab/restframework-rdf@develop
     # via -r requirements.in
 six==1.16.0
     # via
