@@ -1,16 +1,41 @@
-from rdflib import Literal, BNode, Namespace
+from rdflib import Literal, BNode, Namespace, Graph, URIRef
+from triplestore.utils import Quads
 from triplestore.rdf_model import RDFModel
 from triplestore.rdf_field import (
-    RDFPredicateField, RDFPropertyField, RDFUniquePropertyField,
+    RDFPredicateField, RDFPropertyField, RDFUniquePropertyField, RDFQuadField
 )
 from triplestore.utils import triple_exists
+from django.conf import settings
 
 Test = Namespace('https://www.test.org/test#')
+
+class ClubsField(RDFQuadField):
+    def get(self, instance):
+        return [obj for (_, _, obj, _) in self._stored_quads(instance)]
+
+    def _quads_to_store(self, instance, value) -> Quads:
+        return [
+            (instance.uri, Test.member, uri, Graph(settings.RDFLIB_STORE, uri))
+            for uri in value
+        ]
+
+    def _stored_quads(self, instance) -> Quads:
+        store = settings.RDFLIB_STORE
+        query = f'''
+        SELECT ?club {{ GRAPH ?club {{ <{instance.uri}> test:member ?club }} }}
+        '''
+        results = store.query(query, initNs={'test': Test})
+        return [
+            (instance.uri, Test.member, result, Graph(settings.RDFLIB_STORE, result))
+            for (result,) in results
+        ]
+
 
 class Example(RDFModel):
     named_bob = RDFPredicateField(Test.name, Literal('Bob'))
     lucky_numbers = RDFPropertyField(Test.luckyNumber)
     location = RDFUniquePropertyField(Test.location)
+    clubs = ClubsField()
 
 def test_predicate_field(empty_graph):
     g = empty_graph
@@ -54,3 +79,23 @@ def test_unique_property_field(empty_graph):
     Example.location.set(instance, y)
     assert not triple_exists(g, (instance.uri, Test.location, x))
     assert triple_exists(g, (instance.uri, Test.location, y))
+
+
+def test_quads_field(empty_graph):
+    g = empty_graph
+    instance = Example(g, URIRef('bob', Test))
+
+    assert Example.clubs.get(instance) == []
+
+    club_1 = URIRef('tennis', Test)
+    club_2 = URIRef('chess', Test)
+    Example.clubs.set(instance, [club_1, club_2])
+    
+    club_1_graph = Graph(settings.RDFLIB_STORE, club_1)
+    club_2_graph = Graph(settings.RDFLIB_STORE, club_2)
+    assert triple_exists(club_1_graph, (instance.uri, Test.member, club_1))
+    assert triple_exists(club_2_graph, (instance.uri, Test.member, club_2))
+
+    Example.clubs.clear(instance)
+    assert not triple_exists(club_1_graph, (instance.uri, Test.member, club_1))
+    assert not triple_exists(club_2_graph, (instance.uri, Test.member, club_2))

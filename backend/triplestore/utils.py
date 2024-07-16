@@ -109,3 +109,16 @@ def replace_triples(graph: Graph, stored_triples: Triples, triples_to_store: Tri
     
     quads = triples_to_quads(to_add, graph)
     graph.addN(quads)
+
+def replace_quads(stored_quads: Quads, quads_to_store: Quads):
+    '''
+    Replace one set of quads with another
+    '''
+    to_delete = set(stored_quads).difference(quads_to_store)
+    to_add = set(quads_to_store).difference(stored_quads)
+
+    for s, p, o, g in to_delete:
+        g.remove((s, p, o))
+    
+    for s, p, o, g in to_add:
+        g.add((s, p, o))

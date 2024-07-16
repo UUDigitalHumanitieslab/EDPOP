@@ -189,3 +189,57 @@ class RDFUniquePropertyField(RDFPropertyField):
 
     def set(self, instance, object: Optional[Identifier]):
         return super().set(instance, [object])
+
+
+class RDFQuadField(RDFField):
+    '''
+    This variant of an RDFField can be used when the modelled triples may have multiple
+    contexts in the store.
+
+    This means the field has to model a set of quads, rather than triples.
+
+    Child classes should implement `_quads_to_store` and `_stored_quads`; these are
+    analogous to `_triples_to_store`/`_stored_triples` but return quads instead of
+    triples.
+    '''
+
+    def set(self, instance, value) -> None:
+        '''
+        Store a value for the field in a graph
+
+        Parameters:
+            g: the graph in which to read and store data
+            instance: the model instance
+            value: the value of the field on the model instance
+        '''
+        utils.replace_quads(
+            self._stored_quads(instance),
+            self._quads_to_store(instance, value)
+        )
+
+    def clear(self, instance) -> None:
+        '''
+        Clear the field's data in a graph for a given instance of the model.
+        
+        This is used as cleanup when deleting the model instance.
+
+        Parameters:
+            g: the graph in which to read and store data
+            instance: the model instance
+        '''
+        g = self.get_graph(instance)
+        for quad in self._stored_quads(instance):
+            s, p, o, g = quad
+            g.remove((s, p, o))
+
+    def _stored_quads(self, instance) -> utils.Quads:
+        '''
+        Extract the set of relevant quads from a graph representation
+        '''
+        raise NotImplementedError()
+
+    def _quads_to_store(self, instance, value) -> utils.Quads:
+        '''
+        Quads that should be stored to represent the modelled value
+        '''
+        raise NotImplementedError()
