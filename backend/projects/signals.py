@@ -6,7 +6,7 @@ from projects.models import Project
 from projects.rdf_models import RDFProject
 
 @receiver(pre_save, sender=Project)
-def store_project_graph(sender, instance: Project, **kwargs):
+def set_project_uri(sender, instance: Project, **kwargs):
     '''
     Set project URI if it is empty.
     '''
