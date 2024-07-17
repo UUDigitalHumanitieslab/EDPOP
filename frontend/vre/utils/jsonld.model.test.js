@@ -94,4 +94,9 @@ describe('nestSubject', () => {
         const ns = nestSubject(exampleJsonLDGraph, subject);
         assert.equal("http://example.com/s5", ns["owl:sameAs"]["owl:sameAs"]["@id"]);
     });
+    it('detects cycles even if the root subject is not involved', () => {
+        const subject = findById(exampleJsonLDGraph, "http://example.com/s7");
+        const ns = nestSubject(exampleJsonLDGraph, subject);
+        assert.equal("http://example.com/descForS7", ns["dc:description"]["owl:sameAs"]["owl:sameAs"]["@id"]);
+    });
 });
