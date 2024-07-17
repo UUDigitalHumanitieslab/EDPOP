@@ -12,6 +12,7 @@ import {APICollection} from "./api.model";
 
 export var JsonLdModel = Backbone.Model.extend({
     idAttribute: '@id',
+
 })
 
 /**

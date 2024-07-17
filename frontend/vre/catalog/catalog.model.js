@@ -1,10 +1,10 @@
 import { APIModel } from '../utils/api.model'
-import {JsonLdCollection} from "../utils/jsonld.model";
+import {JsonLdCollection, JsonLdModel} from "../utils/jsonld.model";
 
 /**
  * Representation of a single catalogue.
  */
-export var Catalog = APIModel.extend({
+export var Catalog = JsonLdModel.extend({
 });
 
 /**

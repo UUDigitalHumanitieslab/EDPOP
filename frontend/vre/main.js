@@ -67,7 +67,7 @@ var VRERouter = Backbone.Router.extend({
         GlobalVariables.currentCatalog = GlobalVariables.catalogs.findWhere({
             identifier: id,
         });
-        GlobalVariables.searchView.source = GlobalVariables.currentCatalog.get("@id");
+        GlobalVariables.searchView.source = GlobalVariables.currentCatalog.id;
         GlobalVariables.searchView.render();
         GlobalVariables.currentVRECollection = null;
         GlobalVariables.collectionDropdown.render();
