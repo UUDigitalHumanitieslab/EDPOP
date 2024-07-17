@@ -15,14 +15,14 @@ export var JsonLdModel = Backbone.Model.extend({
 })
 
 /**
- * Generic subclass of APICollection that parses incoming JSON-LD to an
+ * Generic subclass of APICollection that parses incoming compacted JSON-LD to an
  * array of all subjects. The contents of subjects are left unchanged.
  */
 export var JsonLdCollection = APICollection.extend({
     model: JsonLdModel,
     parse: function(response) {
         if (!response.hasOwnProperty("@graph")) {
-            throw "Response has no @graph key";
+            throw "Response has no @graph key, is this JSON-LD in compacted form?";
         }
         return response["@graph"];
     }
@@ -61,7 +61,7 @@ export function nestSubject(subjectsByID, subject, parentSubjectIDs=undefined) {
 }
 
 /**
- * Generic subclass of APICollection that parses incoming JSON-LD to an
+ * Generic subclass of APICollection that parses incoming compacted JSON-LD to an
  * ordered array of subjects according to the information of the
  * `OrderedCollection` entity (ActivityStreams ontology) from the same graph.
  * Sets the `totalResults` attribute if available.
@@ -85,7 +85,7 @@ export var JsonLdWithOCCollection = APICollection.extend({
     parse: function(response) {
         // Get all subjects of the graph with their predicates and objects as an array
         if (!response.hasOwnProperty("@graph")) {
-            throw "Response has no @graph key";
+            throw "Response has no @graph key, is this JSON-LD in compacted form?";
         }
         const allSubjects = response["@graph"];
         const orderedCollection = allSubjects.find((subject) => {return subject["@type"] === `${this.activityStreamsPrefix}OrderedCollection`}, this);
