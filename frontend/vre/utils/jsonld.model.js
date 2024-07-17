@@ -10,11 +10,16 @@ import {APICollection} from "./api.model";
  * @typedef {Object} JSONLDSubject
  */
 
+export var JsonLdModel = Backbone.Model.extend({
+    idAttribute: '@id',
+})
+
 /**
  * Generic subclass of APICollection that parses incoming JSON-LD to an
  * array of all subjects. The contents of subjects are left unchanged.
  */
 export var JsonLdCollection = APICollection.extend({
+    model: JsonLdModel,
     parse: function(response) {
         if (!response.hasOwnProperty("@graph")) {
             throw "Response has no @graph key";
@@ -64,12 +69,13 @@ export function nestSubject(subjectsByID, subject, parentSubjectIDs=undefined) {
  * @class
  */
 export var JsonLdWithOCCollection = APICollection.extend({
+    model: JsonLdModel,
     /**
      * The total number of results. This is filled by `parse` if the
      * `OrderedCollection` subject comes with `totalItems`.
      * @type {?number}
      */
-    totalResults: null,
+    totalResults: undefined,
     /**
      * The prefix, used in JSON-LD, for the ActivityStreams namespace.
      * Defaults to `as:` but can be overridden.
@@ -83,7 +89,7 @@ export var JsonLdWithOCCollection = APICollection.extend({
         }
         const allSubjects = response["@graph"];
         const orderedCollection = allSubjects.find((subject) => {return subject["@type"] === `${this.activityStreamsPrefix}OrderedCollection`}, this);
-        this.totalResults = orderedCollection[`${this.activityStreamsPrefix}totalItems`] ?? null;
+        this.totalResults = orderedCollection[`${this.activityStreamsPrefix}totalItems`];
         const orderedItems = orderedCollection[`${this.activityStreamsPrefix}orderedItems`]["@list"]
         const subjectsByID = _.keyBy(allSubjects, '@id'); // NOTE: change to indexBy when migrating to underscore
         const result = orderedItems.map((subject) => {
