@@ -32,7 +32,8 @@ class SearchView(RDFView):
         assert end is None or isinstance(end, str)
         catalog_uriref = URIRef(catalog)
         start = int(start)
-        end = int(end) if end is not None else start + 50
+        if end is not None:
+            end = int(end)
         
         try:
             readerclass = get_reader_by_uriref(catalog_uriref)
