@@ -29,26 +29,27 @@ export var JsonLdCollection = APICollection.extend({
  * The subject passed to this function as an argument is not changed.
  * @param graph{JSONLDGraph} - The full contents of the graph in JSON-LD
  * @param subject{JSONLDSubject} - The subject including its predicates and objects to create a nested version of
+ * @param baseSubject - Argument for internal use in recursive function
  * @returns {Object}
  */
-export function nestSubject(graph, subject) {
-    const recursiveFunction = function(graph, subject, baseSubject) {
-        const transformedSubject = _.clone(subject);
-        for (let property of Object.keys(subject)) {
-            if (subject[property].hasOwnProperty("@id")) {
-                // This is a reference to another subject
-                const refereedSubject = graph.find((thisSubject) => thisSubject["@id"] === subject[property]["@id"]);
-                if (refereedSubject && refereedSubject["@id"] !== baseSubject["@id"]) {
-                    /* If the refereed subject was found in the graph, use it as replacement.
-                       Only do this if the subject is not the same as the one we started with,
-                       to avoid an endless loop. (Alternative would be to create a circular reference) */
-                    transformedSubject[property] = recursiveFunction(graph, refereedSubject, baseSubject);
-                }
+export function nestSubject(graph, subject, baseSubject) {
+    if (typeof baseSubject === "undefined") {
+        baseSubject = subject;
+    }
+    const transformedSubject = _.clone(subject);
+    for (let property of Object.keys(subject)) {
+        if (subject[property].hasOwnProperty("@id")) {
+            // This is a reference to another subject
+            const refereedSubject = graph.find((thisSubject) => thisSubject["@id"] === subject[property]["@id"]);
+            if (refereedSubject && refereedSubject["@id"] !== baseSubject["@id"]) {
+                /* If the refereed subject was found in the graph, use it as replacement.
+                   Only do this if the subject is not the same as the one we started with,
+                   to avoid an endless loop. (Alternative would be to create a circular reference) */
+                transformedSubject[property] = nestSubject(graph, refereedSubject, baseSubject);
             }
         }
-        return transformedSubject;
     }
-    return recursiveFunction(graph, subject, subject);
+    return transformedSubject;
 }
 
 /**
