@@ -29,23 +29,26 @@ export var JsonLdCollection = APICollection.extend({
  * The subject passed to this function as an argument is not changed.
  * @param subjectsByID{Dictionary<JSONLDSubject>} - The full contents of the graph in JSON-LD
  * @param subject{JSONLDSubject} - The subject including its predicates and objects to create a nested version of
- * @param baseSubject - Argument for internal use in recursive function
+ * @param parentSubjectIDs{Array<String>} - For internal use of recursive function; leave undefined
  * @returns {Object}
  */
-export function nestSubject(subjectsByID, subject, baseSubject=undefined) {
-    if (typeof baseSubject === "undefined") {
-        baseSubject = subject;
+export function nestSubject(subjectsByID, subject, parentSubjectIDs=undefined) {
+    if (typeof parentSubjectIDs === "undefined") {
+        parentSubjectIDs = [subject["@id"]];
+    } else {
+        parentSubjectIDs = Array.from(parentSubjectIDs);
+        parentSubjectIDs.push(subject["@id"]);
     }
     const transformedSubject = _.clone(subject);
     for (let property of Object.keys(subject)) {
         if (subject[property].hasOwnProperty("@id")) {
             // This is a reference to another subject
             const refereedSubject = subjectsByID[subject[property]["@id"]];
-            if (refereedSubject && refereedSubject["@id"] !== baseSubject["@id"]) {
+            if (refereedSubject && !(parentSubjectIDs.includes(refereedSubject["@id"]))) {
                 /* If the refereed subject was found in the graph, use it as replacement.
                    Only do this if the subject is not the same as the one we started with,
                    to avoid an endless loop. (Alternative would be to create a circular reference) */
-                transformedSubject[property] = nestSubject(subjectsByID, refereedSubject, baseSubject);
+                transformedSubject[property] = nestSubject(subjectsByID, refereedSubject, parentSubjectIDs);
             }
         }
     }
