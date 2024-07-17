@@ -50,6 +50,22 @@ const exampleJsonLDGraph = [{
 }, {
     "@id": "http://example.com/descForS2",
     "example:value": "Random description",
+}, {
+    "@id": "http://example.com/s7",
+    "dc:title": "Title with undetected cycle",
+    "dc:description": {
+        "@id": "http://example.com/descForS7",
+    },
+}, {
+    "@id": "http://example.com/descForS7",
+    "owl:sameAs": {
+        "@id": "http://example.com/sameDescForS7",
+    },
+}, {
+    "@id": "http://example.com/sameDescForS7",
+    "owl:sameAs": {
+        "@id": "http://example.com/descForS7",
+    },
 }];
 
 describe('nestSubject', () => {
