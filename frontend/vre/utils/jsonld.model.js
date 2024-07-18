@@ -52,7 +52,7 @@ export function nestSubject(subjectsByID, subject, parentSubjectIDs=undefined) {
             const refereedSubject = subjectsByID[subject[property]["@id"]];
             if (refereedSubject && !(parentSubjectIDs.includes(refereedSubject["@id"]))) {
                 /* If the refereed subject was found in the graph, use it as replacement.
-                   Only do this if the subject is not the same as the one we started with,
+                   Only do this if we have not visited the same subject before,
                    to avoid an endless loop. (Alternative would be to create a circular reference) */
                 transformedSubject[property] = nestSubject(subjectsByID, refereedSubject, parentSubjectIDs);
             }
