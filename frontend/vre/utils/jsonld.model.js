@@ -89,7 +89,8 @@ export var JsonLdWithOCCollection = APICollection.extend({
             throw "Response has no @graph key, is this JSON-LD in compacted form?";
         }
         const allSubjects = response["@graph"];
-        const orderedCollection = allSubjects.find((subject) => {return subject["@type"] === `${this.activityStreamsPrefix}OrderedCollection`}, this);
+        const ocType = `${this.activityStreamsPrefix}OrderedCollection`;
+        const orderedCollection = _.find(allSubjects, {"@type": ocType});
         this.totalResults = orderedCollection[`${this.activityStreamsPrefix}totalItems`];
         const orderedItems = orderedCollection[`${this.activityStreamsPrefix}orderedItems`]["@list"]
         const subjectsByID = _.keyBy(allSubjects, '@id'); // NOTE: change to indexBy when migrating to underscore
