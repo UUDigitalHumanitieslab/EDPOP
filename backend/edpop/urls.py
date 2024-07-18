@@ -36,9 +36,9 @@ urlpatterns = [
          include('rest_framework.urls', namespace='rest_framework')),
     path('api/', include(api_router.urls)),
     path('', include('catalogs.urls')),
-    path('', include('vre.urls')),
     path('', include('accounts.urls')),
     path('', include('projects.urls')),
+    path('', include('vre.urls')),
 ]
 
 urlpatterns += staticfiles_urlpatterns()

@@ -10,17 +10,19 @@ import { Projects } from './project/project.model';
 import { RecordListManagingView } from './record/record.list.managing.view';
 import { BlankRecordButtonView } from './record/blank.record.button.view';
 import { VRECollections } from './collection/collection.model';
-import { SRUView } from './database/sru.view';
-import { CollectionView } from './database/collection.view';
 import { ProjectMenuView } from './project/project.menu.view';
+import { CollectionSearchView } from './catalog/collection.search.view';
+import { BrowseCollectionView } from './collection/browse-collection.view';
 import { SearchResults } from './search/search.model';
 import { SearchView } from './search/search.view';
 import { AdvancedSearchView } from './search/advanced.search.view';
-import { SelectDatabaseView } from './database/select-db.view';
+import { SelectCollectionView } from './collection/select-collection.view';
 import { addCSRFToken } from './utils/generic-functions';
 import { GlobalVariables } from './globals/variables';
 import './globals/user';
 import { accountMenu } from './globals/accountMenu';
+import {Catalogs} from "./catalog/catalog.model";
+import {SelectCatalogView} from "./catalog/select-catalog.view";
 
 
 // Global variables
@@ -40,35 +42,41 @@ const SRUIDS = ['hpb', 'vd16', 'vd17', 'vd18', 'gallica', 'cerl-thesaurus'];
 
 var VRERouter = Backbone.Router.extend({
     routes: {
-        ':id/': 'showDatabase',
+        'collection/:id/': 'showCollection',
+        'catalog/:id/': 'showCatalog',
     },
-    showDatabase: function(id) {
+    showCollection: function(id) {
         GlobalVariables.searchView.source = id;
         GlobalVariables.searchView.render();
-        if (SRUIDS.includes(id)) {
-            //$('#content').empty();
-            var sruView = new SRUView();
-            GlobalVariables.searchView.$el.appendTo(sruView.$('.page-header'));
-            $('#content').replaceWith(sruView.$el);
-            var advancedSearchView = new AdvancedSearchView();
-            advancedSearchView.render();
-            GlobalVariables.searchView.listenTo(advancedSearchView, 'fill', GlobalVariables.searchView.fill);
-        }
-        else {
-            // We are not on the HPB search page, so display the
-            // records in the current collection.
-            $('#HPB-info').hide();
-            GlobalVariables.currentVRECollection = GlobalVariables.myCollections.get(id);
-            var collectionView = new CollectionView({model:GlobalVariables.currentVRECollection});
-            GlobalVariables.searchView.$el.appendTo(collectionView.$('.page-header'));
-            $('#content').replaceWith(collectionView.$el);
-            GlobalVariables.records = GlobalVariables.currentVRECollection.getRecords();
-            GlobalVariables.recordsList.remove();
-            GlobalVariables.recordsList = new RecordListManagingView({
-                collection: GlobalVariables.records,
-            });
-            GlobalVariables.recordsList.render().$el.insertAfter($('.page-header'));
-        }
+        // We are not on the HPB search page, so display the
+        // records in the current collection.
+        $('#HPB-info').hide();
+        GlobalVariables.currentVRECollection = GlobalVariables.myCollections.get(id);
+        GlobalVariables.currentCatalog = null;
+        GlobalVariables.collectionDropdown.render();
+        GlobalVariables.catalogDropdown.render();
+        var collectionView = new BrowseCollectionView({model:GlobalVariables.currentVRECollection});
+        GlobalVariables.searchView.$el.appendTo(collectionView.$('.page-header'));
+        $('#content').replaceWith(collectionView.$el);
+        GlobalVariables.records = GlobalVariables.currentVRECollection.getRecords();
+        GlobalVariables.recordsList.remove();
+        GlobalVariables.recordsList = new RecordListManagingView({
+            collection: GlobalVariables.records,
+        });
+        GlobalVariables.recordsList.render().$el.insertAfter($('.page-header'));
+    },
+    showCatalog: function(id) {
+        GlobalVariables.currentCatalog = GlobalVariables.catalogs.findWhere({
+            identifier: id,
+        });
+        GlobalVariables.currentVRECollection = null;
+        GlobalVariables.collectionDropdown.render();
+        GlobalVariables.catalogDropdown.render();
+        const catalogView = new CollectionSearchView({
+            model: GlobalVariables.currentCatalog,
+        });
+        GlobalVariables.searchView.$el.appendTo(catalogView.$('.page-header'));
+        $('#content').replaceWith(catalogView.$el);
     },
 });
 
@@ -78,6 +86,8 @@ var VRERouter = Backbone.Router.extend({
 function prepareCollections() {
     $('#result-detail').modal({show: false});
     GlobalVariables.myCollections = VRECollections.mine();
+    GlobalVariables.catalogs = new Catalogs();
+    GlobalVariables.catalogs.fetch();
     GlobalVariables.recordsList = new RecordListManagingView({
         collection: GlobalVariables.records,
     });
@@ -86,7 +96,7 @@ function prepareCollections() {
     GlobalVariables.projectMenu = new ProjectMenuView({ collection: myProjects });
     GlobalVariables.router = new VRERouter();
     GlobalVariables.myCollections.on('update', finish);
-    GlobalVariables.allProjects.on('update', finish);
+    GlobalVariables.catalogs.on('update', finish);
 
     // Add account menu
     accountMenu.$el.appendTo('#navbar-right');
@@ -96,9 +106,15 @@ function prepareCollections() {
 // GlobalVariables.myCollections and GlobalVariables.allProjects have fully
 // loaded.
 function startRouting() {
-    GlobalVariables.dropDown = new SelectDatabaseView({collection: GlobalVariables.myCollections});
+    GlobalVariables.catalogDropdown = new SelectCatalogView({
+        collection: GlobalVariables.catalogs
+    });
+    GlobalVariables.collectionDropdown = new SelectCollectionView({
+        collection: GlobalVariables.myCollections
+    });
     $('.nav').first().append(
-        GlobalVariables.dropDown.el,
+        GlobalVariables.catalogDropdown.el,
+        GlobalVariables.collectionDropdown.el,
         GlobalVariables.blankRecordButton.el,
     );
     Backbone.history.start({
@@ -109,7 +125,7 @@ function startRouting() {
 
 // _.after ensures that a function runs only after a given number of calls.
 var kickoff = _.after(2, prepareCollections);
-var finish = _.after(2, startRouting);
+var finish = _.after(3, startRouting);
 
 // Ensure we have a CSRF cookie.
 if (Cookies.get('csrftoken')) {

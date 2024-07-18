@@ -1,5 +1,13 @@
 # EDPOP: frontend
 
+This is a [Backbone][backbone] application. It uses [Wontache][wontache] for its templates. Data is exchanged with the backend in [JSON-LD][jsonld].
+
+[backbone]: https://backbonejs.org
+[wontache]: https://www.npmjs.com/package/wontache
+[jsonld]: https://json-ld.org/
+
+## Development
+
 Install the dependencies of the frontend via npm install.
 
 ```bash

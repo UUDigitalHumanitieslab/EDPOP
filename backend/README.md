@@ -1,11 +1,20 @@
 # EDPOP: backend
 
-## Database
+This is a [Django][django] application that also uses [Django REST Framework][drf], [rdflib][rdflib], [restframework-rdf][rest-rdf] and [edpop-explorer][explorer]. It is heavily based on [RDF][rdf] and draws on [Web annotations][oa], [EDPOP Records][records] and [EDPOP Collections][collections] for its main vocabularies.
 
-The project uses PostgreSQL, to make use of JSON fields (the format in which resources from external databases will be imported, and annotated).
+[django]: https://www.djangoproject.com
+[drf]: https://www.django-rest-framework.org
+[rdflib]: https://rdflib.readthedocs.io/en/stable/
+[rest-rdf]: https://pypi.org/project/restframework-rdf/
+[explorer]: https://pypi.org/project/edpop-explorer/
+[rdf]: https://www.w3.org/TR/rdf11-primer/
+[oa]: https://www.w3.org/TR/annotation-vocab/
+[records]: https://github.com/UUDigitalHumanitieslab/edpop-record-ontology
+[collections]: https://github.com/UUDigitalHumanitieslab/edpop-collection-ontology
 
-A guide for setting up PostgreSQL in Django can be found here:
-[][https://www.digitalocean.com/community/tutorials/how-to-use-postgresql-with-your-django-application-on-ubuntu-14-04]
+## Relational database
+
+The project uses [PostgreSQL](https://www.postgresql.org/).
 
 For local development, you need to create a database and database user with the names and password mentioned in `edpop/settings.py`. See the `NAME`, `USER` and `PASSWORD` entries of the `DATABASES['default']`.
 
@@ -14,6 +23,19 @@ For testing in local development (**only!**), the database user needs to have th
 ```sql
 ALTER USER edpopuser CREATEDB;
 ```
+
+## Triplestore
+
+The development settings included with this application assume that you have a Blazegraph server running on port 9999 (the default) and the namespace `edpop` is created. The following steps suffice to make this true.
+
+Follow the [Blazegraph quick start guide](https://github.com/blazegraph/database/wiki/Quick_Start) to download and start the database server and a foreground process.
+While the server is running, you can access its web interface at http://localhost:9999. This lets you upload and download data, try out queries and review statistics about the dataset. The server can be stopped by typing `ctrl-c`.
+
+### Setting up Blazegraph namespaces
+
+Visit the [web interface]( http://localhost:9999), navigate to the `NAMESPACES` tab. Use the `create namespace` form to create a new namespace. Choose `edpop` as a name, and set the mode to `quads`. All other checkboxes should be disabled. A popup is shown with additional settings. Leave these at their default values and choose `Create`. The created namespace should now appear in the list of namespaces. Choose `use` to use the edpop namespace when operating the web interface
+
+In order to support the unittests, visit the Blazegraph web interface and create an additional namespace by the name `edpop_testing`.
 
 ## Installing
 
