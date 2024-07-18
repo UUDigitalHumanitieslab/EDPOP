@@ -12,8 +12,7 @@ import {APICollection} from "./api.model";
 
 export var JsonLdModel = Backbone.Model.extend({
     idAttribute: '@id',
-
-})
+});
 
 /**
  * Generic subclass of APICollection that parses incoming compacted JSON-LD to an
