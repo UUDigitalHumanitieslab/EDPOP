@@ -1,7 +1,6 @@
 import _ from 'lodash';
 import { vreChannel } from '../radio';
 import { SelectableView } from '../utils/selectable.view';
-import { Record } from './record.model';
 import recordListItemTemplate from './record.list.item.view.mustache';
 
 /*
