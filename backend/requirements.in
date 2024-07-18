@@ -8,6 +8,6 @@ lxml
 beautifulsoup4
 sruthi
 rdflib
-restframework-rdf@git+https://github.com/UUDigitalHumanitieslab/restframework-rdf@feature/json-ld
+restframework-rdf@git+https://github.com/UUDigitalHumanitieslab/restframework-rdf@develop
 dj-rest-auth
 edpop-explorer>=0.9.0
