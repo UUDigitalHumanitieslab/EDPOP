@@ -1,7 +1,7 @@
 import { View } from 'backbone';
-import collectionTemplate from './collection.view.mustache';
+import collectionTemplate from './browse-collection.view.mustache';
 
-export var CollectionView = View.extend({
+export var BrowseCollectionView = View.extend({
     template: collectionTemplate,
     id: 'content',
     initialize: function() {
