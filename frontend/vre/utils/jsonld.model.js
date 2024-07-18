@@ -51,7 +51,7 @@ export function nestSubject(subjectsByID, subject, parentSubjectIDs=undefined) {
             const refereedSubject = subjectsByID[subject[property]["@id"]];
             if (refereedSubject && !(parentSubjectIDs.includes(refereedSubject["@id"]))) {
                 /* If the refereed subject was found in the graph, use it as replacement.
-                   Only do this if the subject is not the same as the one we started with,
+                   Only do this if we have not visited the same subject before,
                    to avoid an endless loop. (Alternative would be to create a circular reference) */
                 transformedSubject[property] = nestSubject(subjectsByID, refereedSubject, parentSubjectIDs);
             }
@@ -88,7 +88,8 @@ export var JsonLdWithOCCollection = APICollection.extend({
             throw "Response has no @graph key, is this JSON-LD in compacted form?";
         }
         const allSubjects = response["@graph"];
-        const orderedCollection = allSubjects.find((subject) => {return subject["@type"] === `${this.activityStreamsPrefix}OrderedCollection`}, this);
+        const ocType = `${this.activityStreamsPrefix}OrderedCollection`;
+        const orderedCollection = _.find(allSubjects, {"@type": ocType});
         this.totalResults = orderedCollection[`${this.activityStreamsPrefix}totalItems`];
         const orderedItems = orderedCollection[`${this.activityStreamsPrefix}orderedItems`]["@list"]
         const subjectsByID = _.keyBy(allSubjects, '@id'); // NOTE: change to indexBy when migrating to underscore
