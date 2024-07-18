@@ -43,7 +43,7 @@ def save_collection_managing_group_as_context(apps, schema_editor):
     Collection = apps.get_model('vre', 'Collection')
 
     for obj in Collection.objects.all():
-        matching_name = obj.managing_group.filter(name=obj.name)
+        matching_name = obj.managing_group.filter(name=obj.description)
         if matching_name.exists():
             research_group = matching_name.first()
             project = Project.objects.get(display_name=research_group.name)
