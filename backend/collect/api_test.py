@@ -57,15 +57,19 @@ def test_list_collections(db, user, project, client: Client):
     assert response.data[0]['name'] == 'My collection'
 
 
+def collection_detail_url(collection_uri: str) -> str:
+    return '/api/collections/{}/'.format(quote(collection_uri, safe=''))
+
+
 def test_retrieve_collection(db, user, project, client: Client):
     client.force_login(user)
     create_response = post_collection(client, project.name)
 
-    detail_url = lambda uri: '/api/collections/{}/'.format(quote(uri, safe=''))
-    correct_url = detail_url(create_response.data['uri'])
+    
+    correct_url = collection_detail_url(create_response.data['uri'])
     nonexistent_uri = collection_uri('does not exist')
 
-    not_found_response = client.get(detail_url(nonexistent_uri))
+    not_found_response = client.get(collection_detail_url(nonexistent_uri))
     assert not_found_response.status_code == 404
 
     success_response = client.get(correct_url)
@@ -80,7 +84,7 @@ def test_delete_collection(db, user, project, client: Client):
     client.force_login(user)
     create_response = post_collection(client, project.name)
 
-    detail_url = '/api/collections/{}/'.format(quote(create_response.data['uri'], safe=''))
+    detail_url = collection_detail_url(create_response.data['uri'])
     delete_response = client.delete(detail_url)
     assert is_success(delete_response.status_code)
 
@@ -91,7 +95,7 @@ def test_update_collection(db, user, project, client: Client):
     client.force_login(user)
 
     create_response = post_collection(client, project.name)
-    detail_url = '/api/collections/{}/'.format(quote(create_response.data['uri'], safe=''))
+    detail_url = collection_detail_url(create_response.data['uri'])
 
     data = example_collection_data(project.name)
     data.update({'summary': 'I don\'t like these anymore'})
