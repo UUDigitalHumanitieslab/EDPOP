@@ -37,13 +37,8 @@ export var JsonLdCollection = APICollection.extend({
  * @param parentSubjectIDs{Array<String>} - For internal use of recursive function; leave undefined
  * @returns {Object}
  */
-export function nestSubject(subjectsByID, subject, parentSubjectIDs=undefined) {
-    if (typeof parentSubjectIDs === "undefined") {
-        parentSubjectIDs = [subject["@id"]];
-    } else {
-        parentSubjectIDs = Array.from(parentSubjectIDs);
-        parentSubjectIDs.push(subject["@id"]);
-    }
+export function nestSubject(subjectsByID, subject, parentSubjectIDs=[]) {
+    parentSubjectIDs.push(subject["@id"]);
     const transformedSubject = _.clone(subject);
     for (let property of Object.keys(subject)) {
         if (subject[property].hasOwnProperty("@id")) {
@@ -57,6 +52,7 @@ export function nestSubject(subjectsByID, subject, parentSubjectIDs=undefined) {
             }
         }
     }
+    parentSubjectIDs.pop();
     return transformedSubject;
 }
 
