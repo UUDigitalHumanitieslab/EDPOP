@@ -1,11 +1,11 @@
 from django.test import Client
 from rest_framework.status import is_success, is_client_error
-from rdflib import URIRef, RDF
+from rdflib import URIRef, RDF, Literal
 from django.conf import settings
 from urllib.parse import quote
 from typing import Dict
 
-from triplestore.constants import EDPOPCOL
+from triplestore.constants import EDPOPCOL, AS
 from collect.utils import collection_uri
 from projects.models import Project
 
@@ -28,17 +28,27 @@ def test_create_collection(db, user, project, client: Client):
     uri = URIRef(response.data['uri'])
 
     store = settings.RDFLIB_STORE
-    assert store.triples((uri, RDF.type, EDPOPCOL.Collection))
+    assert any(store.triples((uri, RDF.type, EDPOPCOL.Collection)))
 
 
 def test_create_fails_if_collection_exists(db, user, project, client: Client):
     client.force_login(user)
     success_response = post_collection(client, project.name)
     assert is_success(success_response.status_code)
+    uri = URIRef(success_response.data['uri'])
 
-    # try to create the same collection again
-    fail_response = post_collection(client, project.name)
+    # try to create a collection at the same location
+    fail_response = client.post('/api/collections/', {
+        'name': 'My collection',
+        'summary': 'I like these too',
+        'project': project.name
+    })
     assert is_client_error(fail_response.status_code)
+
+    store = settings.RDFLIB_STORE
+    is_stored = lambda triple: any(store.triples(triple))
+    assert is_stored((uri, AS.summary, Literal('These are my favourite records')))
+    assert not is_stored((uri, AS.summary, Literal('I like these too')))
 
 
 def test_list_collections(db, user, project, client: Client):
