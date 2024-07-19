@@ -20,17 +20,17 @@ class SearchView(RDFView):
     
     def get_graph(self, request: views.Request, **kwargs) -> Graph:
         try:
-            catalog = request.query_params["catalog"]
+            source = request.query_params["source"]
             query = request.query_params["query"]
             start = request.query_params.get("start", "0")
             end = request.query_params.get("end", None)
         except KeyError as err:
             raise ParseError(f"Query parameter missing: {err}")
-        assert isinstance(catalog, str)
+        assert isinstance(source, str)
         assert isinstance(query, str)
         assert isinstance(start, str)
         assert end is None or isinstance(end, str)
-        catalog_uriref = URIRef(catalog)
+        catalog_uriref = URIRef(source)
         start = int(start)
         if end is not None:
             end = int(end)
