@@ -9,6 +9,13 @@ from triplestore.utils import Quads
 
 
 class CollectionsField(RDFQuadField):
+    '''
+    Field containing the collections within a project.
+
+    Collections are linked to projects through `as:context`. The context of a collection
+    is stored in the graph of the collection, not the graph of the project.
+    '''
+    
     def get(self, instance: RDFModel):
         return [
             s
@@ -37,6 +44,10 @@ class CollectionsField(RDFQuadField):
 
 
 class RDFProject(RDFModel):
+    '''
+    RDF representation of a project.
+    '''
+    
     rdf_class = EDPOPCOL.Project
 
     name = RDFUniquePropertyField(AS.name)
