@@ -11,19 +11,24 @@ export var SearchView = CompositeView.extend({
     },
     subviews: [{
         view: 'alert',
-        selector: '.page-header',
-        method: 'after',
+        method: 'prepend',
     }],
+    /**
+     * The identifier of the source that will be used to search in, either
+     * a catalogue or a collection.
+     * @type {?string}
+     */
+    source: null,
     renderContainer: function() {
         this.$el.html(this.template());
         return this;
     },
     showPending: function() {
-        this.$('button').first().text('Searching...');
+        this.$('form button').first().text('Searching...');
         return this;
     },
     showIdle: function() {
-        this.$('button').first().text('Search');
+        this.$('form button').first().text('Search');
         return this;
     },
     submitSearch: function(startRecord) {
@@ -31,9 +36,9 @@ export var SearchView = CompositeView.extend({
         var searchTerm = this.$('input').val();
         var searchPromise = GlobalVariables.results.query({
             params: {
-                search: searchTerm,
-                source: this.source,
-                startRecord: startRecord,
+                catalog: this.source,
+                query: searchTerm,
+                start: startRecord,
             },
             error: _.bind(this.alertError, this),
         });
@@ -44,14 +49,16 @@ export var SearchView = CompositeView.extend({
         this.alert = new AlertView({
             level: 'warning',
             message: failedSearchTemplate(response),
-        }).once('removed', this.deleteAlert, this);
+        });
+        this.alert.once('removed', this.deleteAlert, this);
         this.placeSubviews();
         this.alert.animateIn();
     },
     deleteAlert: function() { delete this.alert; },
     firstSearch: function(event){
         event.preventDefault();
-        this.submitSearch(1).then(_.bind(function() {
+        // Start with record 0, which is what the EDPOP VRE API expects
+        this.submitSearch(0).then(_.bind(function() {
             $('#more-records').show();
             GlobalVariables.records.reset(GlobalVariables.results.models);
             if (!document.contains(GlobalVariables.recordsList.$el[0])) {
@@ -64,19 +71,19 @@ export var SearchView = CompositeView.extend({
     nextSearch: function(event) {
         event.preventDefault();
         $('#more-records').hide();
-        var startRecord = GlobalVariables.records.length+1;
+        var startRecord = GlobalVariables.records.length;
         this.submitSearch(startRecord).then( _.bind(function() {
             GlobalVariables.records.add(GlobalVariables.results.models);
             this.feedback();
         }, this));
     },
     feedback: function() {
-        if (GlobalVariables.records.length === GlobalVariables.results.total_results) {
+        if (GlobalVariables.records.length === GlobalVariables.results.totalResults) {
             GlobalVariables.records.trigger('complete');
         } else {
             $('#more-records').show();
         }
-        $('#search-feedback').text("Showing " + GlobalVariables.records.length + " of " + GlobalVariables.results.total_results + " results");
+        $('#search-feedback').text("Showing " + GlobalVariables.records.length + " of " + GlobalVariables.results.totalResults + " results");
     },
     fill: function(fillText) {
         this.$('#query-input').val(fillText);

@@ -1,10 +1,7 @@
-import { Records } from '../record/record.model';
+import {Record, Records} from '../record/record.model';
+import {JsonLdWithOCCollection} from "../utils/jsonld.model";
 
-export var SearchResults = Records.extend({
-    url:'/api/search',
-    total_results: 0,
-    parse: function(response) {
-        this.total_results = response.total_results;
-        return response.result_list;
-    }
+export var SearchResults = JsonLdWithOCCollection.extend({
+    url: '/api/catalogs/search/',
+    model: Record,
 });
