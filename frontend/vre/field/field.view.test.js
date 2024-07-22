@@ -9,7 +9,7 @@ describe('FieldView', function() {
         this.model = new Model({
             key: 'Color',
             value: 'green',
-            group: 'me, myself and I',
+            context: 'me, myself and I',
         });
         this.view = new FieldView({model: this.model});
     });

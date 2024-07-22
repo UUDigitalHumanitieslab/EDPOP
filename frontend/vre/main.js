@@ -10,8 +10,10 @@ import { BlankRecordButtonView } from './record/blank.record.button.view';
 import { VRECollections } from './collection/collection.model';
 import { CollectionSearchView } from './catalog/collection.search.view';
 import { BrowseCollectionView } from './collection/browse-collection.view';
-import { ResearchGroups } from './group/group.model';
-import { GroupMenuView } from './group/group.menu.view';
+import { Projects } from './project/project.model';
+import { ProjectMenuView } from './project/project.menu.view';
+
+
 import { SelectCollectionView } from './collection/select-collection.view';
 import { GlobalVariables } from './globals/variables';
 import './globals/user';
@@ -23,7 +25,7 @@ import { WelcomeView } from './utils/welcome.view.js';
 
 
 // Dangerously global variables (accessible from dependency modules).
-GlobalVariables.allGroups = new ResearchGroups();
+GlobalVariables.allProjects = new Projects();
 GlobalVariables.myCollections = new VRECollections();
 
 // Regular global variables, only visible in this module.
@@ -94,11 +96,11 @@ function prepareCollections() {
     $('#result-detail').modal({show: false});
     VRECollections.mine(GlobalVariables.myCollections);
     catalogs.fetch();
-    GlobalVariables.allGroups.fetch();
-    var myGroups = ResearchGroups.mine();
-    GlobalVariables.groupMenu = new GroupMenuView({collection: myGroups});
+    GlobalVariables.allProjects.fetch();
+    var myProjects = Projects.mine();
+    GlobalVariables.projectMenu = new ProjectMenuView({ collection: myProjects });
     GlobalVariables.myCollections.on('sync', finish);
-    GlobalVariables.allGroups.on('sync', finish);
+    GlobalVariables.allProjects.on('sync', finish);
     catalogs.on('sync', finish);
 
     // Add account menu
@@ -108,7 +110,7 @@ function prepareCollections() {
 }
 
 // We want this code to run after prepareCollections has run and both
-// myCollections and allGroups have fully
+// GlobalVariables.myCollections and GlobalVariables.allProjects have fully
 // loaded.
 function startRouting() {
     $('.nav').first().append(

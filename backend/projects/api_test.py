@@ -11,3 +11,14 @@ def test_project_list_view_authenticated(db, public_project, private_project, us
     response = client.get('/api/projects/')
     assert response.status_code == 200
     assert len(response.data) == 2
+
+def test_project_mine_view(db, public_project, private_project, user_1, client: Client):
+    response = client.get('/api/projects/mine/')
+    assert response.status_code == 200
+    assert len(response.data) == 0
+
+    client.force_login(user_1)
+
+    response = client.get('/api/projects/mine/')
+    assert response.status_code == 200
+    assert len(response.data) == 2

@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.renderers import JSONRenderer
 
-
+from projects.api import user_projects
 from .serializers import *
 from .models import *
 from .sru_query import SRUError, sru_fetch, SRU_INFO
@@ -23,28 +23,28 @@ class ListMineMixin(object):
 
     Suppose that the normal list route on your viewset returns all animals.
     Then the /mine/ list route will return all animals that are in or belong
-    to one of the resarch groups of the current user. Like this:
+    to one of the projects of the current user. Like this:
 
         /api/animals/       => Cat, Dog, Cow, Pig, Chicken
         /api/animals/mine/  => Cat, Pig, Chicken
 
     In order to use, inherit from this class *before* the ViewSet base class.
     Specify the `queryset` property on the child class. In addition, either
-    specify the `group_field` property or override `get_queryset_mine`.
+    specify the `context_field` property or override `get_queryset_mine`.
 
-    The `group_field` property may be any field name on your model that
-    references a ResearchGroup. It may also span relationships. For example, if
-    each Animal has a Stable and each Stable belongs to a ResearchGroup, then
-    your `group_field` might be `stable__research_group`. For further
+    The `context_field` property may be any field name on your model that
+    references a Project. It may also span relationships. For example, if
+    each Animal has a Stable and each Stable belongs to a Project, then
+    your `context_field` might be `stable__context`. For further
     information on field lookups that span relationships, refer to the Django
     documentation:
 
     https://docs.djangoproject.com/en/1.11/topics/db/queries/#lookups-that-span-relationships
 
-    As an alternative to the `group_field` property, you may override the
+    As an alternative to the `context_field` property, you may override the
     `get_queryset_mine` method. This method takes no arguments other than
     `self` and should return the reduced queryset, containing only the objects
-    that belong to a research group of the current user.
+    that belong to a project of the current user.
     """
 
     @action(detail=False)
@@ -58,13 +58,13 @@ class ListMineMixin(object):
         return self.queryset.all()
 
     def get_queryset_mine(self):
-        groups = self.get_groups()
-        group_filter = {self.group_field + '__in': groups}
-        return self.queryset.filter(**group_filter)
+        projects = self.get_projects()
+        project_filter = {self.context_field + '__in': projects}
+        return self.queryset.filter(**project_filter)
 
-    def get_groups(self):
-        """ Returns the ResearchGroups the current user is a member of. """
-        return self.request.user.researchgroups.all()
+    def get_projects(self):
+        """ Returns the Projects the current user is involved in. """
+        return user_projects(self.request.user)
 
     # We manually enforce application/json for this route, because Safari
     # has a bug that sometimes causes it to send the wrong Accept header.
@@ -94,20 +94,11 @@ class CreateReadModelViewSet(
     """
     pass
 
-
-class ResearchGroupViewSet(ListMineMixin, viewsets.ReadOnlyModelViewSet):
-    serializer_class = ResearchGroupSerializer
-    queryset = ResearchGroup.objects.all()
-
-    def get_queryset_mine(self):
-        return self.get_groups()
-
-
 class CollectionViewSet(ListMineMixin, viewsets.ReadOnlyModelViewSet):
     serializer_class = CollectionSerializer
     queryset = Collection.objects.all()
-    group_field = 'managing_group'
-    filter_fields = ['managing_group__id']
+    context_field = 'context'
+    filter_fields = ['context__id']
 
 
 class RecordViewSet(CreateReadModelViewSet):
