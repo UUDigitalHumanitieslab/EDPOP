@@ -12,7 +12,7 @@ import { RecordAnnotationsView } from './record.annotations.view.js';
 
 var currentContext = 'monsters';
 
-var fakeGroupMenu = {
+var fakeProjectMenu = {
     model: {
         get() {
             return currentContext;
@@ -27,11 +27,11 @@ var TestCollection = Collection.extend({
 var testAnnotations = [{
     key: 'Color',
     value: 'moss',
-    group: 'me, myself and I',
+    context: 'me, myself and I',
 }, {
     key: 'Pet',
     value: 'Slimey',
-    group: currentContext,
+    context: currentContext,
 }];
 
 var numAnnotations = testAnnotations.length;
@@ -118,7 +118,7 @@ function newAnnotationTrashed() {
 describe('RecordAnnotationsView', function() {
     before(function() {
         assert(isEmpty(GlobalVariables));
-        GlobalVariables.groupMenu = fakeGroupMenu;
+        GlobalVariables.projectMenu = fakeProjectMenu;
     });
 
     beforeEach(function() {
@@ -137,7 +137,7 @@ describe('RecordAnnotationsView', function() {
     });
 
     after(function() {
-        delete GlobalVariables.groupMenu;
+        delete GlobalVariables.projectMenu;
     });
 
     it('inherits from RecordFieldsBaseView', function() {
@@ -169,7 +169,7 @@ describe('RecordAnnotationsView', function() {
             this.fieldView = this.view.items[0];
             this.affectedModel = this.fieldView.model;
             assert(this.affectedModel === this.collection.at(0));
-            assert(this.affectedModel.get('group') !== currentContext);
+            assert(this.affectedModel.get('context') !== currentContext);
             this.affectedElement = this.fieldView.$el;
             assert(this.affectedElement.get(0) === this.view.$('tr').get(0));
             this.affectedElement.click();
@@ -186,11 +186,11 @@ describe('RecordAnnotationsView', function() {
 
         it('appends a new AnnotationEditView', assertEditorAppended);
 
-        it('copies key and value but overrides the group', function() {
+        it('copies key and value but overrides the context', function () {
             var newModel = this.editor.model;
             assert(newModel.get('key') === this.affectedModel.get('key'));
             assert(newModel.get('value') === this.affectedModel.get('value'));
-            assert(newModel.get('group') === currentContext);
+            assert(newModel.get('context') === currentContext);
         });
 
         describe('on cancel', newAnnotationCanceled);
@@ -204,7 +204,7 @@ describe('RecordAnnotationsView', function() {
             this.fieldView = this.view.items[this.position];
             this.affectedModel = this.fieldView.model;
             assert(this.affectedModel === this.collection.at(this.position));
-            assert(this.affectedModel.get('group') === currentContext);
+            assert(this.affectedModel.get('context') === currentContext);
             this.affectedElement = this.fieldView.$el;
             assert(this.affectedElement.get(0) === this.view.$('tr').get(this.position));
             this.affectedElement.click();

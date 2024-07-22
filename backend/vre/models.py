@@ -3,30 +3,12 @@ from django.contrib.auth.models import User
 
 from projects.models import Project
 
-class ResearchGroup(models.Model):
-    """ Research group with a given name and project;
-    Users can be part of multiple research groups,
-    research groups have multiple users.
-    """
-    name = models.CharField(max_length=200)
-    project = models.CharField(max_length=200)
-    members = models.ManyToManyField(User, related_name='researchgroups')
-
-    class Meta:
-        permissions = (
-            ("add_user_to_research_group", "Can add user to a research group"),
-        )
-
-    def __str__(self):
-        return self.name
-
 
 class Collection(models.Model):
     """ a collection of records imported from an external resource,
     which can be annotated and extended in the Virtual Research Environment.
     """
     description = models.CharField(max_length=200)
-    managing_group = models.ManyToManyField(ResearchGroup)
     context = models.ForeignKey(Project, on_delete=models.CASCADE)
 
     class Meta:
@@ -55,12 +37,10 @@ class Annotation(models.Model):
     fields, as well as extra information.
     An annotation is related to exactly one record.
     One record can have multiple annotations.
-    An annotation is also linked to exactly one research group,
-    but multiple groups can add annotations."""
+    An annotation is also linked to exactly one Project."""
     record = models.ForeignKey(Record, on_delete=models.CASCADE)
-    managing_group = models.ForeignKey(ResearchGroup, on_delete=models.CASCADE)
     context = models.ForeignKey(Project, on_delete=models.CASCADE)
     content = models.JSONField(dict)
 
     def __str__(self):
-        return '{} ({})'.format(self.record.uri, self.managing_group.name)
+        return '{} ({})'.format(self.record.uri, self.context.name)

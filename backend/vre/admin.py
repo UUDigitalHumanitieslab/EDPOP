@@ -1,20 +1,14 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from django.contrib.auth.models import Group, User
 from django.contrib.postgres import fields
 
 from django_json_widget.widgets import JSONEditorWidget
 
-from .models import Collection, ResearchGroup, Record, Annotation
+from .models import Collection, Record, Annotation
 
-
-class ResearchGroupAdmin(admin.ModelAdmin):
-    filter_horizontal = ('members',)
 
 
 class CollectionAdmin(admin.ModelAdmin):
-    filter_horizontal = ('managing_group',)
-
+    pass
 
 class RecordAdmin(admin.ModelAdmin):
     formfield_overrides = {
@@ -27,6 +21,5 @@ class AnnotationAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Collection, CollectionAdmin)
-admin.site.register(ResearchGroup, ResearchGroupAdmin)
 admin.site.register(Record, RecordAdmin)
 admin.site.register(Annotation, AnnotationAdmin)
