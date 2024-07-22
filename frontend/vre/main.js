@@ -100,7 +100,7 @@ function prepareCollections() {
     var myProjects = Projects.mine();
     GlobalVariables.projectMenu = new ProjectMenuView({ collection: myProjects });
     GlobalVariables.myCollections.on('update', finish);
-    GlobalVariables.allGroups.on('update', finish);
+    GlobalVariables.allProjects.on('update', finish);
     catalogs.on('update', finish);
 
     // Add account menu
