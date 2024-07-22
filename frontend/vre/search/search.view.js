@@ -40,7 +40,7 @@ export var SearchView = CompositeView.extend({
                 start: startRecord,
             },
             error: _.bind(this.alertError, this),
-            remove: startRecord === 1,
+            remove: startRecord === 0, // Remove current records if search starts at zero
         });
         searchPromise.always(this.showIdle.bind(this));
         return searchPromise;
