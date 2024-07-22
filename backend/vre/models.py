@@ -37,8 +37,7 @@ class Annotation(models.Model):
     fields, as well as extra information.
     An annotation is related to exactly one record.
     One record can have multiple annotations.
-    An annotation is also linked to exactly one research group,
-    but multiple groups can add annotations."""
+    An annotation is also linked to exactly one Project."""
     record = models.ForeignKey(Record, on_delete=models.CASCADE)
     context = models.ForeignKey(Project, on_delete=models.CASCADE)
     content = models.JSONField(dict)
