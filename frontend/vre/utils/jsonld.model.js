@@ -34,7 +34,7 @@ export var JsonLdCollection = APICollection.extend({
  * The subject passed to this function as an argument is not changed.
  * @param subjectsByID{Dictionary<JSONLDSubject>} - The full contents of the graph in JSON-LD
  * @param subject{JSONLDSubject} - The subject including its predicates and objects to create a nested version of
- * @param parentSubjectIDs{Array<String>} - For internal use of recursive function; leave undefined
+ * @param parentSubjectIDs{Array<String>} - For internal use of recursive function; leave at default value
  * @returns {Object}
  */
 export function nestSubject(subjectsByID, subject, parentSubjectIDs=[]) {
@@ -88,11 +88,17 @@ export var JsonLdWithOCCollection = APICollection.extend({
         const orderedCollection = _.find(allSubjects, {"@type": ocType});
         this.totalResults = orderedCollection[`${this.activityStreamsPrefix}totalItems`];
         const orderedItems = orderedCollection[`${this.activityStreamsPrefix}orderedItems`]["@list"]
-        const subjectsByID = _.keyBy(allSubjects, '@id'); // NOTE: change to indexBy when migrating to underscore
-        const result = orderedItems.map((subject) => {
-            const orderedSubject = subjectsByID[subject["@id"]];
-            return nestSubject(subjectsByID, orderedSubject);
-        });
+        let result;
+        if (typeof orderedItems === "undefined") {
+            // @list is not present; the list is empty
+            result = [];
+        } else {
+            const subjectsByID = _.keyBy(allSubjects, '@id'); // NOTE: change to indexBy when migrating to underscore
+            result = orderedItems.map((subject) => {
+                const orderedSubject = subjectsByID[subject["@id"]];
+                return nestSubject(subjectsByID, orderedSubject);
+            });
+        }
         return result;
     }
 });
