@@ -8,7 +8,6 @@ import './record/record.opening.aspect';
 import { vreChannel } from './radio';
 import { BlankRecordButtonView } from './record/blank.record.button.view';
 import { VRECollections } from './collection/collection.model';
-import { ProjectMenuView } from './project/project.menu.view';
 import { CollectionSearchView } from './catalog/collection.search.view';
 import { BrowseCollectionView } from './collection/browse-collection.view';
 import { Projects } from './project/project.model';
