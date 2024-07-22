@@ -5,7 +5,6 @@ from .models import Collection, Record, Annotation
 
 
 class CollectionSerializer(serializers.ModelSerializer):
-    managing_group = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 
     class Meta:
         model = Collection
