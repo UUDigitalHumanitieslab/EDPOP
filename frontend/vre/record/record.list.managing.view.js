@@ -18,7 +18,8 @@ export var RecordListManagingView = CompositeView.extend({
     events: {
         'submit': function(event) {
             event.preventDefault();
-            this.vreCollectionsSelect.submitForm(event);
+            var selection = this.recordListView.currentSelection();
+            this.vreCollectionsSelect.submitForm(event, selection);
         },
         'click .more-records': 'loadMore',
     },
@@ -38,7 +39,7 @@ export var RecordListManagingView = CompositeView.extend({
     },
 
     loadMore: function(event) {
-        GlobalVariables.searchView.nextSearch(event);
+        this.collection.trigger('moreRequested', event);
     },
 
     bindSelectAll: function() {

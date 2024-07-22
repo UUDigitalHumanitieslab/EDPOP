@@ -2,82 +2,92 @@ import _ from 'lodash';
 import $ from 'jquery';
 import Backbone from 'backbone';
 import Cookies from 'jscookie';
+import { wrapWithCSRF } from '@uu-cdh/backbone-util';
 
 import './record/record.opening.aspect';
 import { vreChannel } from './radio';
-import { Records } from './record/record.model';
-import { Projects } from './project/project.model';
-import { RecordListManagingView } from './record/record.list.managing.view';
 import { BlankRecordButtonView } from './record/blank.record.button.view';
 import { VRECollections } from './collection/collection.model';
 import { ProjectMenuView } from './project/project.menu.view';
 import { CollectionSearchView } from './catalog/collection.search.view';
 import { BrowseCollectionView } from './collection/browse-collection.view';
-import { SearchResults } from './search/search.model';
-import { SearchView } from './search/search.view';
-import { AdvancedSearchView } from './search/advanced.search.view';
+import { Projects } from './project/project.model';
+import { ProjectMenuView } from './project/project.menu.view';
+
+
 import { SelectCollectionView } from './collection/select-collection.view';
-import { addCSRFToken } from './utils/generic-functions';
 import { GlobalVariables } from './globals/variables';
 import './globals/user';
 import { accountMenu } from './globals/accountMenu';
 import {Catalogs} from "./catalog/catalog.model";
 import {SelectCatalogView} from "./catalog/select-catalog.view";
+import { StateModel } from './utils/state.model.js';
+import { WelcomeView } from './utils/welcome.view.js';
 
 
-// Global variables
-GlobalVariables.records = new Records();
+// Dangerously global variables (accessible from dependency modules).
 GlobalVariables.allProjects = new Projects();
-GlobalVariables.results = new SearchResults();
-GlobalVariables.searchView  = new SearchView({model: GlobalVariables.results});
-GlobalVariables.blankRecordButton = new BlankRecordButtonView();
+GlobalVariables.myCollections = new VRECollections();
 
-const SRUIDS = ['hpb', 'vd16', 'vd17', 'vd18', 'gallica', 'cerl-thesaurus'];
+// Regular global variables, only visible in this module.
+var blankRecordButton = new BlankRecordButtonView();
+var catalogs = new Catalogs([], {comparator: 'name'});
+var catalogDropdown = new SelectCatalogView({
+    collection: catalogs
+});
+var collectionDropdown = new SelectCollectionView({
+    collection: GlobalVariables.myCollections
+});
+var navigationState = new StateModel;
 
 // Override Backbone.sync so it always includes the CSRF token in requests.
-(function() {
-    var id = _.identity;
-    Backbone.sync = _.overArgs(Backbone.sync, [id, id, addCSRFToken]);
-}());
+Backbone.sync = wrapWithCSRF(Backbone.sync, 'X-CSRFToken', 'csrftoken');
 
 var VRERouter = Backbone.Router.extend({
     routes: {
         'collection/:id/': 'showCollection',
         'catalog/:id/': 'showCatalog',
     },
-    showCollection: function(id) {
-        GlobalVariables.searchView.source = id;
-        GlobalVariables.searchView.render();
-        // We are not on the HPB search page, so display the
-        // records in the current collection.
-        $('#HPB-info').hide();
-        GlobalVariables.currentVRECollection = GlobalVariables.myCollections.get(id);
-        GlobalVariables.currentCatalog = null;
-        GlobalVariables.collectionDropdown.render();
-        GlobalVariables.catalogDropdown.render();
-        var collectionView = new BrowseCollectionView({model:GlobalVariables.currentVRECollection});
-        GlobalVariables.searchView.$el.appendTo(collectionView.$('.page-header'));
-        $('#content').replaceWith(collectionView.$el);
-        GlobalVariables.records = GlobalVariables.currentVRECollection.getRecords();
-        GlobalVariables.recordsList.remove();
-        GlobalVariables.recordsList = new RecordListManagingView({
-            collection: GlobalVariables.records,
-        });
-        GlobalVariables.recordsList.render().$el.insertAfter($('.page-header'));
-    },
-    showCatalog: function(id) {
-        GlobalVariables.currentCatalog = GlobalVariables.catalogs.findWhere({
-            identifier: id,
-        });
-        GlobalVariables.currentVRECollection = null;
-        GlobalVariables.collectionDropdown.render();
-        GlobalVariables.catalogDropdown.render();
-        const catalogView = new CollectionSearchView({
-            model: GlobalVariables.currentCatalog,
-        });
-        GlobalVariables.searchView.$el.appendTo(catalogView.$('.page-header'));
-        $('#content').replaceWith(catalogView.$el);
-    },
+});
+
+var router = new VRERouter();
+
+// We create some hooks between triggers and effects.
+// Firstly, route changes should lead to different models moving to the center
+// of attention.
+router.on({
+    'route:showCollection': id => navigationState.set(
+        'browsingContext', GlobalVariables.myCollections.get(id)),
+    'route:showCatalog': id => navigationState.set(
+        'browsingContext', catalogs.findWhere({identifier: id})),
+});
+
+// Focus/blur semantics for the catalog or collection currently being viewed.
+navigationState.on({
+    'enter:browsingContext': (model, newValue) => newValue.trigger('focus', newValue),
+    'exit:browsingContext': (model, oldValue) => oldValue.trigger('blur', oldValue),
+    'enter:browser': (model, newValue) => newValue.$el.appendTo('#content'),
+    'exit:browser': (model, oldValue) => oldValue.remove(),
+});
+
+// We use different browser views depending on whether the model currently under
+// attention is a catalog or a (VRE) collection. Also, there is still some
+// residual code that depends on there being a global variable holding the
+// currently selected collection.
+catalogs.on({
+    focus: catalog => navigationState.set(
+        'browser', new CollectionSearchView({model: catalog})),
+});
+
+function showCollection(vreCollection) {
+    GlobalVariables.currentVRECollection = vreCollection;
+    navigationState.set(
+        'browser', new BrowseCollectionView({model: vreCollection}));
+}
+
+GlobalVariables.myCollections.on({
+    focus: showCollection,
+    blur: () => GlobalVariables.currentVRECollection = null,
 });
 
 // We want this code to run after two conditions are met:
@@ -85,37 +95,29 @@ var VRERouter = Backbone.Router.extend({
 // 2. the CSRF cookie has been obtained.
 function prepareCollections() {
     $('#result-detail').modal({show: false});
-    GlobalVariables.myCollections = VRECollections.mine();
-    GlobalVariables.catalogs = new Catalogs();
-    GlobalVariables.catalogs.fetch();
-    GlobalVariables.recordsList = new RecordListManagingView({
-        collection: GlobalVariables.records,
-    });
+    VRECollections.mine(GlobalVariables.myCollections);
+    catalogs.fetch();
     GlobalVariables.allProjects.fetch();
-    var myProjects = Projects.mine()
+    var myProjects = Projects.mine();
     GlobalVariables.projectMenu = new ProjectMenuView({ collection: myProjects });
-    GlobalVariables.router = new VRERouter();
     GlobalVariables.myCollections.on('update', finish);
-    GlobalVariables.catalogs.on('update', finish);
+    GlobalVariables.allGroups.on('update', finish);
+    catalogs.on('update', finish);
 
     // Add account menu
     accountMenu.$el.appendTo('#navbar-right');
+    // Show the welcome view
+    navigationState.set('browser', new WelcomeView);
 }
 
 // We want this code to run after prepareCollections has run and both
 // GlobalVariables.myCollections and GlobalVariables.allProjects have fully
 // loaded.
 function startRouting() {
-    GlobalVariables.catalogDropdown = new SelectCatalogView({
-        collection: GlobalVariables.catalogs
-    });
-    GlobalVariables.collectionDropdown = new SelectCollectionView({
-        collection: GlobalVariables.myCollections
-    });
     $('.nav').first().append(
-        GlobalVariables.catalogDropdown.el,
-        GlobalVariables.collectionDropdown.el,
-        GlobalVariables.blankRecordButton.el,
+        catalogDropdown.el,
+        collectionDropdown.el,
+        blankRecordButton.el,
     );
     Backbone.history.start({
         pushState: true,

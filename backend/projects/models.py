@@ -54,14 +54,8 @@ class Project(models.Model):
         RDF graph for the project.
         '''
         store = settings.RDFLIB_STORE
-        return Graph(store=store, identifier=self._graph_identifier())
+        return Graph(store=store, identifier=self.identifier())
 
-
-    def _graph_identifier(self) -> URIRef:
-        '''
-        Identifier for the graph of this project.
-        '''
-        return URIRef(settings.RDF_NAMESPACE_ROOT + 'project/' + self.name + '/')
 
     @admin.display()
     def identifier(self) -> URIRef:
@@ -72,7 +66,7 @@ class Project(models.Model):
         project.
         '''
         if self.name:
-            return URIRef(self.name, base=self._graph_identifier())
+            return URIRef(settings.RDF_NAMESPACE_ROOT + 'projects/' + self.name)
 
 
     def permit_query_by(self, user: User) -> bool:

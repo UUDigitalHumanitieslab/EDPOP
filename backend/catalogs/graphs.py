@@ -93,7 +93,7 @@ class SearchGraphBuilder:
             self,
             query: str,
             start: int = 0,
-            end: int = 50
+            end: Optional[int] = None
     ) -> Graph:
         """Convenience method that subsequently calls the ``set_query``,
         ``perform_fetch`` and ``get_result_graph`` methods."""
@@ -105,12 +105,12 @@ class SearchGraphBuilder:
             self,
             query: str,
             start: int = 0,
-            end: int = 50
+            end: Optional[int] = None
     ):
         """Set the query. Should be called before calling
         ``perform_fetch()``."""
         self._start = start
-        self._end = end
+        self._end = end if end is not None else start + 50
         self.reader.prepare_query(query)
 
     def perform_fetch(self):
