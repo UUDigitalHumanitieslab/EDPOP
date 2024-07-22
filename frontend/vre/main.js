@@ -97,9 +97,9 @@ function prepareCollections() {
     GlobalVariables.allGroups.fetch();
     var myGroups = ResearchGroups.mine();
     GlobalVariables.groupMenu = new GroupMenuView({collection: myGroups});
-    GlobalVariables.myCollections.on('update', finish);
-    GlobalVariables.allGroups.on('update', finish);
-    catalogs.on('update', finish);
+    GlobalVariables.myCollections.on('sync', finish);
+    GlobalVariables.allGroups.on('sync', finish);
+    catalogs.on('sync', finish);
 
     // Add account menu
     accountMenu.$el.appendTo('#navbar-right');
