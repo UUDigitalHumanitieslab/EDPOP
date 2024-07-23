@@ -1,8 +1,8 @@
 import { APIModel } from '../utils/api.model';
 import { Annotations } from '../annotation/annotation.model';
-import { JsonLdWithOCCollection } from "../utils/jsonld.model";
+import {JsonLdModel, JsonLdWithOCCollection} from "../utils/jsonld.model";
 
-export var Record = APIModel.extend({
+export var Record = JsonLdModel.extend({
     urlRoot: '/api/records',
     /**
      * Get the contents of the main display field, usually title or name
@@ -17,7 +17,12 @@ export var Record = APIModel.extend({
         } else if (this.get("@type") === "edpoprec:BiographicalRecord") {
             field = this.get("edpoprec:name");
         }
-        return field["edpoprec:originalText"];
+        if (typeof field !== "undefined") {
+            return field["edpoprec:originalText"];
+        } else {
+            // Cannot determine which field has the main text; return subject URI instead
+            return `<${this.id}>`;
+        }
     },
     getAnnotations: function() {
         if (!this.annotations) {
