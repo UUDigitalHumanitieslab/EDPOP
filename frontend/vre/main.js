@@ -99,9 +99,9 @@ function prepareCollections() {
     GlobalVariables.allProjects.fetch();
     var myProjects = Projects.mine();
     GlobalVariables.projectMenu = new ProjectMenuView({ collection: myProjects });
-    GlobalVariables.myCollections.on('update', finish);
-    GlobalVariables.allProjects.on('update', finish);
-    catalogs.on('update', finish);
+    GlobalVariables.myCollections.on('sync', finish);
+    GlobalVariables.allProjects.on('sync', finish);
+    catalogs.on('sync', finish);
 
     // Add account menu
     accountMenu.$el.appendTo('#navbar-right');
