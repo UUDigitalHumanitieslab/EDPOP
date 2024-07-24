@@ -1,6 +1,6 @@
 from typing import Optional
 import pytest
-from edpop_explorer import readers, Reader, Record
+from edpop_explorer import readers, Reader, Record, BibliographicalRecord
 from rdflib import URIRef
 
 from .graphs import SearchGraphBuilder, _get_reader_dict, get_reader_by_uriref, get_catalogs_graph, \
@@ -24,7 +24,7 @@ class MockReader(Reader):
 
     @classmethod
     def get_by_id(cls, identifier: str) -> Record:
-        record = Record(cls)
+        record = BibliographicalRecord(cls)
         record.identifier = identifier
         return record
 
