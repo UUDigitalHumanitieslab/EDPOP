@@ -2,7 +2,7 @@
 // Generated on Wed Oct 05 2022 17:04:26 GMT+0200 (Central European Summer Time)
 
 module.exports = function(config) {
-  config.set({
+  const configuration = {
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: '',
@@ -93,7 +93,7 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://www.npmjs.com/search?q=keywords:karma-launcher
-    browsers: [],
+    browsers: ['ChromeHeadless'],
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
@@ -101,6 +101,24 @@ module.exports = function(config) {
 
     // Concurrency level
     // how many browser instances should be started simultaneously
-    concurrency: Infinity
-  })
-}
+    concurrency: Infinity,
+
+    customLaunchers: {
+      ChromeHeadless: {
+        base: 'Chrome',
+        flags: [
+          '--headless',
+          '--remote-debugging-port=9222',
+        ],
+      }
+    },
+
+  };
+  
+  if (process.env.CI) {
+    configuration.browsers = ['ChromeHeadless'];
+    configuration.singleRun = true;
+  }
+
+  config.set(configuration);
+};
