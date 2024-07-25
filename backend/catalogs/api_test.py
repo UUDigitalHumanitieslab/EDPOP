@@ -19,22 +19,22 @@ def mockreader_installed(settings):
 def test_search_view_happy_path(client, mockreader_installed):
     # Assert that view works correctly in normal situations. Special
     # situations are mostly tested in the tests for SearchGraphBuilder.
-    response = client.get("/api/catalogs/search/?catalog=http://example.com/reader&query=test")
+    response = client.get("/api/catalogs/search/?source=http://example.com/reader&query=test")
     assert response.status_code == 200
     # Assert that a valid graph is returned
-    _ = Graph().parse(response.content)
+    _ = Graph().parse(response.content, format="json-ld")
 
 
 
 def test_search_view_nonexisting_reader(client):
-    response = client.get("/api/catalogs/search/?catalog=http://example.com&query=test")
+    response = client.get("/api/catalogs/search/?source=http://example.com&query=test")
     assert response.status_code == 400
-    assert "text/turtle" in response.headers['Content-Type']
+    assert "application/ld+json" in response.headers['Content-Type']
 
 
 def test_catalogs_view(client, mockreader_installed):
     response = client.get("/api/catalogs/catalogs/")
     assert response.status_code == 200
-    assert "text/turtle" in response.headers['Content-Type']
+    assert "application/ld+json" in response.headers['Content-Type']
 
 
