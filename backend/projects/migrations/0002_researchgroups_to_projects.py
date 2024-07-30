@@ -2,7 +2,7 @@
 
 from django.db import migrations
 from projects.migration_utils import name_to_slug
-from projects.signals import store_project_graph, delete_project_graph
+from projects.signals import store_project_graph, delete_project_graph, set_project_uri
 from projects.models import Project as ProjectCurrent
 
 def research_groups_to_projects(apps, schema_editor):
@@ -30,6 +30,7 @@ def research_groups_to_projects(apps, schema_editor):
             summary=project.summary
         )
 
+        set_project_uri(ProjectCurrent, project_with_rdf_methods)
         store_project_graph(ProjectCurrent, project_with_rdf_methods, created=False)
 
 
@@ -53,6 +54,7 @@ def projects_to_research_groups(apps, schema_editor):
             summary=project.summary
         )
 
+        set_project_uri(ProjectCurrent, project_with_rdf_methods)
         delete_project_graph(ProjectCurrent, project_with_rdf_methods)
 
 class Migration(migrations.Migration):
