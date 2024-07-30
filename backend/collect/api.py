@@ -1,6 +1,8 @@
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.views import Request
 from rest_framework.exceptions import NotFound
-from rdflib import URIRef, RDF, Graph
+from rdf.views import RDFView
+from rdflib import URIRef, RDF, Graph, RDFS
 from django.conf import settings
 
 from projects.api import user_projects
@@ -12,7 +14,7 @@ from collect.permissions import CollectionPermission
 
 class CollectionViewSet(ModelViewSet):
     '''
-    Viewset for listing or retrieving collections
+    Viewset for listing or retrieving collection metadata
     '''
 
     lookup_value_regex = '.+'
@@ -41,3 +43,22 @@ class CollectionViewSet(ModelViewSet):
         self.check_object_permissions(self.request, collection)
         return collection
 
+
+class CollectionRecordsView(RDFView):
+    '''
+    View the records inside a collection
+    '''
+
+    def get_graph(self, request: Request, collection: str, **kwargs) -> Graph:
+        collection_uri = URIRef(collection)
+
+        if not collection_exists(collection_uri):
+            raise NotFound('Collection does not exist')
+
+        collection_obj = EDPOPCollection(collection_graph(collection_uri), collection_uri)
+
+        g = Graph()
+        g += collection_obj._class_triples()
+        g += EDPOPCollection.records._stored_triples(collection_obj)
+
+        return g
