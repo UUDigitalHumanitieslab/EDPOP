@@ -8,6 +8,7 @@ def fill_project_uri(apps, schema_editor):
 
     for project in Project.objects.all():
         set_project_uri(Project, project)
+        project.save()
 
 def clear_project_uri(apps, schema_editor):
     Project = apps.get_model('projects', 'Project')
