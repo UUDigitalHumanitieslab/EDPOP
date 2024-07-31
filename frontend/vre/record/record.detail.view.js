@@ -49,7 +49,10 @@ export var RecordDetailView = CompositeView.extend({
     },
 
     renderContainer: function() {
-        this.$el.html(this.template(this.model.toJSON()));
+        console.log(this.model);
+        this.$el.html(this.template({
+            title: this.model.getMainDisplay(),
+        }));
         return this;
     },
 
