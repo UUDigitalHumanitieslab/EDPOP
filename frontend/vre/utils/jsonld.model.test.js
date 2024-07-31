@@ -1,6 +1,6 @@
 import assert from 'assert';
 import sinon from 'sinon';
-import {nestSubject} from "./jsonld.model";
+import {getStringLiteral, nestSubject} from "./jsonld.model";
 
 function findById(graph, id) {
     return graph.find((subject) => subject["@id"] === id);
@@ -104,5 +104,35 @@ describe('nestSubject', () => {
         const subject = subjectsByID["http://example.com/s7"];
         const ns = nestSubject(subjectsByID, subject);
         assert.equal("http://example.com/descForS7", ns["dc:description"]["owl:sameAs"]["owl:sameAs"]["@id"]);
+    });
+});
+
+describe('getStringLiteral', () => {
+    it ('returns null in case of an empty array', () => {
+        assert(getStringLiteral([]) === null);
+    });
+    it ('returns the string in case of just a string', () => {
+        assert(getStringLiteral("hoi") === "hoi");
+    });
+    it ('returns the string in case of just a langString', () => {
+        assert(getStringLiteral({
+            "@language": "nl",
+            "@value": "hallo",
+        }) === "hallo");
+    });
+    it ('returns the first string in case of an array of two strings', () => {
+        assert(getStringLiteral(['hoi', 'hallo']) === 'hoi');
+    });
+    it ('returns the English string in case of an array of multiple langString, including one in English', () => {
+        assert(getStringLiteral([{
+            "@language": "nl",
+            "@value": "hallo",
+        }]), getStringLiteral([{
+            "@language": "en",
+            "@value": "hello",
+        }]), getStringLiteral([{
+            "@language": "fr",
+            "@value": "bonjour",
+        }]) === "hello");
     });
 });
