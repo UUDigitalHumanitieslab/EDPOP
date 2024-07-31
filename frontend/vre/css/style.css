@@ -35,3 +35,16 @@ table#hpb-info-table td:nth-child(odd) {
 		width: 636px;
 	}
 }
+
+ul.inline-list {
+	padding-left: 0;
+}
+
+ul.inline-list li {
+	display: inline;
+	text-decoration: none;
+}
+
+ul.inline-list li:not(:first-child)::before {
+	content: " • "
+}

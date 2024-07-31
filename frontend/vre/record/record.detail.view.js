@@ -52,6 +52,9 @@ export var RecordDetailView = CompositeView.extend({
         console.log(this.model);
         this.$el.html(this.template({
             title: this.model.getMainDisplay(),
+            uri: this.model.id,
+            databaseId: this.model.get("edpoprec:identifier"),
+            publicURL: this.model.get("edpoprec:publicURL"),
         }));
         return this;
     },
