@@ -29,7 +29,7 @@ export function getStringLiteral(literalObject) {
         if (typeof item === "string" && agg === null) {
             // If a string (data type xsd:string), only prefer this value if no other value was chosen yet.
             return item;
-        } else if (Object.hasOwn(item, "@language") && Object.hasOwn(item, "@value")) {
+        } else if (typeof(item) === "object" && Object.hasOwn(item, "@language") && Object.hasOwn(item, "@value")) {
             // This is a language-tagged string. Prefer it if no other value was chosen yet, OR if it matches
             // the language of the user interface. Only support English for now.
             const language = item["@language"];

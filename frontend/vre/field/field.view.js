@@ -17,7 +17,19 @@ export var FieldView = View.extend({
     },
 
     render: function() {
-        this.$el.html(this.template(this.model.attributes));
+        const templateData = {
+            field: this.model.get('key'),
+        };
+        // Check if model is of Field model before using these methods, because
+        // there are some tests relating to old-style annotations that assign
+        // custom models
+        if (typeof this.model.getMainDisplay === 'function') {
+            Object.assign(templateData, {
+                displayText: this.model.getMainDisplay(),
+                fieldInfo: this.model.getFieldInfo(),
+            });
+        }
+        this.$el.html(this.template(templateData));
         return this;
     },
 
