@@ -13,9 +13,11 @@
                 data-dismiss="modal"
                 aria-label="Close"
             ><span aria-hidden="true">&times;</span></button>
-            <a id="uri-link" target="blank" href="{{&uri}}">
-                <h4 class="modal-title">{{uri}}</h4>
-            </a>
+            <h4 class="modal-title">{{title}}</h4>
+            <ul class="inline-list">
+                {{#databaseId}}<li>ID in database: {{databaseId}}</li>{{/databaseId}}
+                {{#publicURL}}<li><a href="{{publicURL}}" target="_blank">Show record in original database</a></li>{{/publicURL}}
+            </ul>
         </div>
         <div class="modal-body"></div>
         <div class="modal-footer">

@@ -10,6 +10,38 @@ import {APICollection} from "./api.model";
  * @typedef {Object} JSONLDSubject
  */
 
+
+/**
+ * Get a string literal from JSON-LD. This function probes whether the literal
+ * is of xsd:string or rdf:langString format and if multiple string literals
+ * are given. In the latter case, return only one string with a preference
+ * for an rdf:langString that matches the user interface's language.
+ * If no string literal is found, return null.
+ * @param literalObject
+ * @return {?string}
+ */
+export function getStringLiteral(literalObject) {
+    // If the property occurs multiple time, literalObject is an array. Normalize to array.
+    if (!Array.isArray(literalObject)) {
+        literalObject = [literalObject];
+    }
+    return literalObject.reduce((agg, item) => {
+        if (typeof item === "string" && agg === null) {
+            // If a string (data type xsd:string), only prefer this value if no other value was chosen yet.
+            return item;
+        } else if (typeof(item) === "object" && Object.hasOwn(item, "@language") && Object.hasOwn(item, "@value")) {
+            // This is a language-tagged string. Prefer it if no other value was chosen yet, OR if it matches
+            // the language of the user interface. Only support English for now.
+            const language = item["@language"];
+            if (agg === null || language.startsWith("en")) {
+                return item["@value"];
+            }
+        } else {
+            return agg;
+        }
+    }, null);
+}
+
 export var JsonLdModel = Backbone.Model.extend({
     idAttribute: '@id',
 });
@@ -55,6 +87,33 @@ export function nestSubject(subjectsByID, subject, parentSubjectIDs=[]) {
     parentSubjectIDs.pop();
     return transformedSubject;
 }
+
+/**
+ * Generic subclass of APICollection that parses incoming compacted JSON-LD to an
+ * array of subjects that are of RDF class `targetClass`. If these subjects
+ * refer to other objects, these are nested
+ */
+export var JsonLdNestedCollection = APICollection.extend({
+    model: JsonLdModel,
+    /**
+     * The RDF class (as it is named in JSON-LD) of which nested subjects have to be
+     * put in the collection array when incoming data is parsed.
+     * @type {string}
+     */
+    targetClass: undefined,
+    parse: function(response) {
+        if (!response.hasOwnProperty("@graph")) {
+            throw "Response has no @graph key, is this JSON-LD in compacted form?";
+        }
+        if (typeof this.targetClass === "undefined") {
+            throw "targetClass should not be undefined"
+        }
+        const allSubjects = response["@graph"];
+        const subjectsByID = _.keyBy(allSubjects, '@id'); // NOTE: change to indexBy when migrating to underscore
+        const targetedSubjectIDs = allSubjects.filter(subject => subject["@type"] === this.targetClass).map(subject => subject["@id"]);
+        return targetedSubjectIDs.map(subjectID => nestSubject(subjectsByID, subjectsByID[subjectID]));
+    }
+})
 
 /**
  * Generic subclass of APICollection that parses incoming compacted JSON-LD to an

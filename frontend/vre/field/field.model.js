@@ -1,9 +1,30 @@
 import Backbone from 'backbone';
 import { canonicalSort } from '../utils/generic-functions';
+import {properties} from "../utils/record-ontology";
+import {getStringLiteral} from "../utils/jsonld.model";
 
 // A single field of a single record.
 export var Field = Backbone.Model.extend({
     idAttribute: 'key',
+    /**
+     * Get the default rendering of the field
+     * @return {string}
+     */
+    getMainDisplay() {
+        // Currently, only normalizedText is supported.
+        return this.get('value')['edpoprec:originalText'];
+    },
+    getFieldInfo() {
+        const property = properties.get(this.id);
+        if (property) {
+            return {
+                name: getStringLiteral(property.get("skos:prefLabel")),
+                description: getStringLiteral(property.get("skos:description")),
+            };
+        } else {
+            return {name: this.id};
+        }
+    },
 });
 
 /**
@@ -25,13 +46,15 @@ export var FlatFields = Backbone.Collection.extend({
     },
     initialize: function(models, options) {
         _.assign(this, _.pick(options, ['record']));
-        if (this.record.has('content')) this.set(this.toFlat(this.record));
+        const fields = this.toFlat(this.record);
+        this.set(fields);
         // Do the above line again when the record changes.
         this.listenTo(this.record, 'change', _.flow([this.toFlat, this.set]));
     },
     toFlat: function(record) {
-        return _.map(record.get('content'), function(value, key) {
-            return {key: key, value: value};
-        });
+        const content = record.toJSON();
+        const fieldNames = Object.keys(content).filter((name) => content[name]["@type"] === 'edpoprec:Field');
+        const fields = fieldNames.map((name) => ({key: name, value: content[name]}));
+        return fields;
     },
 });
