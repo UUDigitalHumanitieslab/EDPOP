@@ -20,27 +20,27 @@ jobs:
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12"]
 
-      steps:
-        - uses: actions/checkout@v4
-        - name: Set up Java 21
-          uses: actions/setup-java@v4
-          with:
-            distribution: 'temurin'
-            java-version: '21'
-        - name: Download and run Blazegraph
-          run: |
-            wget https://github.com/blazegraph/database/releases/download/BLAZEGRAPH_2_1_6_RC/blazegraph.jar
-            java -jar blazegraph.jar &
-            sleep 5
-        - name: Set up Python ${{ matrix.python-version }}
-          uses: actions/setup-python@v4
-          with:
-            python-version: ${{ matrix.python-version }}
-            cache: 'pip'
-        - name: Install Python packages
-          run: |
-            python -m pip install --upgrade pip
-            pip install -r backend/requirements.txt
-        - name: Test with pytest
-          run: |
-            cd backend && pytest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+      - name: Download and run Blazegraph
+        run: |
+          wget https://github.com/blazegraph/database/releases/download/BLAZEGRAPH_2_1_6_RC/blazegraph.jar
+          java -jar blazegraph.jar &
+          sleep 5
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+      - name: Install Python packages
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+      - name: Test with pytest
+        run: |
+          cd backend && pytest
