@@ -22,7 +22,7 @@ where {{
   values ?r {{ {obsolete_records} }}
   ?r ?p1 ?o1;
      ?pt ?f.
-  ?f ?p2 ?o2.
+  optional {{?f ?p2 ?o2.}}
 }}
 '''.format
 

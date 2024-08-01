@@ -52,8 +52,8 @@ def save_collection_managing_group_as_context(apps, schema_editor):
             project = Project.objects.get(display_name=research_group.name)
         else:
             project = Project.objects.create(
-                name=name_to_slug(obj.name),
-                display_name=obj.name,
+                name=name_to_slug(obj.description),
+                display_name=obj.description,
             )
             project.save()
         
