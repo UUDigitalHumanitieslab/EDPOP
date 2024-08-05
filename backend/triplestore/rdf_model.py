@@ -5,16 +5,19 @@ Base class for Django-esque management of RDF data.
 from rdflib import URIRef, Graph, RDF
 from typing import Dict, Optional
 from django.conf import settings
+from abc import ABC
 
 from triplestore.rdf_field import RDFField
 from triplestore.utils import triples_to_quads, Triples
 
-class RDFModel():
+class RDFModel(ABC):
     '''
     Abstract class for RDF data models
 
     Create subclasses to model a data class.
 
+    In most cases, a model class will correspond to an RDF class; this class can be set
+    in the `rdf_class` attribute.
     '''
 
     store = settings.RDFLIB_STORE
@@ -60,6 +63,13 @@ class RDFModel():
 
 
     def refresh_from_store(self):
+        '''
+        Refresh the model state based on the graph.
+
+        Updates field values by reading them from the graph. This method is called when
+        the model is first initialised; you can call it manually if the graph was
+        updated since then.
+        '''
         for name, field in self._fields().items():
             value = field.get(self)
             self.__setattr__(name, value)

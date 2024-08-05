@@ -5,10 +5,11 @@ Base classes for Django-esque management of RDF data; defines field classes.
 from rdflib.term import Identifier, Literal
 from rdflib import URIRef, Graph
 from typing import Optional
+from abc import ABC, abstractmethod
 
 from triplestore import utils
 
-class RDFField:
+class RDFField(ABC):
     '''
     Abstract class for RDF fields.
 
@@ -43,6 +44,9 @@ class RDFField:
         '''
         Return the graph in which to save data.
 
+        Parameters:
+            instance: the RDFModel instance
+
         By default, this will return the graph passed on on initialisation, if any, or
         the graph of the model instance.
 
@@ -50,21 +54,25 @@ class RDFField:
         '''
         return self.graph or instance.graph
     
+    @abstractmethod
     def get(self, instance):
         '''
-        Returns the value currently stored in a graph.
+        Returns the value currently stored in the graph.
 
         Parameters:
-            instance: the model instance
+            instance: the RDFModel instance
+
+        Returns:
+            The modelled value based on the graph. The modelled type is determined by
+            the field implementation; it can be anything that suits the model.
         '''
-        raise NotImplementedError()
 
     def set(self, instance, value) -> None:
         '''
         Store a value for the field in a graph
 
         Parameters:
-            instance: the model instance
+            instance: the RDFModel instance
             value: the value of the field on the model instance
         '''
         g = self.get_graph(instance)
@@ -81,30 +89,46 @@ class RDFField:
         This is used as cleanup when deleting the model instance.
 
         Parameters:
-            instance: the model instance
+            instance: the RDFModel instance
         '''
         g = self.get_graph(instance)
         for triple in self._stored_triples(instance):
             g.remove(triple)
 
+    @abstractmethod
     def _stored_triples(self, instance) -> utils.Triples:
         '''
         Extract the set of relevant triples from a graph representation
-        '''
-        raise NotImplementedError()
 
+        Parameters:
+            instance: the RDFModel instance
+
+        Returns:
+            an iterable of RDF triples, based on the graph
+        '''
+
+    @abstractmethod
     def _triples_to_store(self, instance, value) -> utils.Triples:
         '''
         Triples that should be stored to represent the modelled value
+
+        Parameters:
+            instance: the RDFModel instance
+        
+        Returns:
+            an iterable of RDF triples, based on the modelled value
         '''
-        raise NotImplementedError()
 
 
 class RDFPredicateField(RDFField):
     '''
-    Models a predicate, i.e. a property + object in the graph. This translates to a
-    boolean value in the model.
+    Models a property + object in the graph. It checks whether, for a model identified by
+    `s`, the triple `(s, p, o)` exists in the graph. This is represented as a boolean.
 
+    For instance, you could write a field like this:
+    
+    `knows_alice = RDFPredicateField(FOAF.knows, URIRef('https://example.com/alice'))`
+    
     Note that unlike the RDFPropertyField (and derivatives), this field does not model all
     triples with the provided property. That is, if `A` is an instance of a model with
     `RDFPredicateField(B, C)`, the value of the field represents whether the triple
@@ -134,9 +158,15 @@ class RDFPredicateField(RDFField):
 
 class RDFPropertyField(RDFField):
     '''
-    Models a property relationship. For a given subject, this field represents all triples
-    (s, p, o), where s is the node represented by the model instance, and p is the field's
-    configured property.
+    Models a property relationship. For a model instance identified by `s`, this field
+    represents all triples `(s, p, o)`, where p is the field's configured property.
+
+    The modelled value is a list of all objects. By default, each object is represented
+    as an RDF node, i.e. an `URIRef` or `BNode`, unless it is a `Literal`, in which case
+    it will be represented by its value.
+
+    The methods `node_to_value` and `value_to_node` control the representation of each
+    object node; you can override these methods to change the way objects are represented.
     '''
 
     def __init__(self, property: URIRef, **kwargs):
@@ -151,7 +181,15 @@ class RDFPropertyField(RDFField):
 
     def node_to_value(self, node: Identifier):
         '''
-        Convert an object node to its modelled value
+        Convert an object node to its modelled value.
+
+        If the node is a Literal, its value will be returned. Otherwise, this will return
+        the node itself (as an `URIRef` or `BNode` instance).
+
+        If needed, you can override this method to change the way nodes are represented.
+
+        Parameters:
+            node: an object node in the graph
         '''
         if isinstance(node, Literal):
             return node.value
@@ -159,7 +197,17 @@ class RDFPropertyField(RDFField):
 
     def value_to_node(self, value) -> Identifier:
         '''
-        Convert a modelled value to an object identifier.
+        Convert a modelled value to an identifier in the graph.
+
+        If the value is already an RDF identifier (an `URIRef`, `BNode`, or `Literal`), it
+        will be returned as-is. If not, this will return a `Literal` of the value.
+
+        This behaviour handles the most common cases, but you can override this method
+        if needed.
+
+        Parameters:
+            value: the modelled value of the object. This matches the output of
+                `node_to_value`.
         '''
         if isinstance(value, Identifier):
             return value
@@ -178,7 +226,9 @@ class RDFPropertyField(RDFField):
 
 class RDFUniquePropertyField(RDFPropertyField):
     '''
-    Like RDFProperty, but when the property is always unique for the subject.
+    Like RDFPropertyField, but when the property is always unique for the subject.
+
+    The modelled value represents the object node, or `None` if no triple is present.
     '''
 
     def get(self, instance):
@@ -225,22 +275,28 @@ class RDFQuadField(RDFField):
         This is used as cleanup when deleting the model instance.
 
         Parameters:
-            g: the graph in which to read and store data
-            instance: the model instance
+            instance: the RDFModel instance
         '''
         g = self.get_graph(instance)
         for quad in self._stored_quads(instance):
             s, p, o, g = quad
             g.remove((s, p, o))
 
+    @abstractmethod
     def _stored_quads(self, instance) -> utils.Quads:
         '''
         Extract the set of relevant quads from a graph representation
-        '''
-        raise NotImplementedError()
 
+        Parameters:
+            instance: the RDFModel instance
+        '''
+
+    @abstractmethod
     def _quads_to_store(self, instance, value) -> utils.Quads:
         '''
         Quads that should be stored to represent the modelled value
+
+        Parameters:
+            instance: the RDFModel instance
+            value: the field's modelled value on the model instance
         '''
-        raise NotImplementedError()
