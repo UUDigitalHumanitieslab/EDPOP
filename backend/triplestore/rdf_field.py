@@ -300,3 +300,9 @@ class RDFQuadField(RDFField):
             instance: the RDFModel instance
             value: the field's modelled value on the model instance
         '''
+
+    def _stored_triples(self, instance) -> utils.Triples:
+        return []
+    
+    def _triples_to_store(self, instance, value) -> utils.Triples:
+        return []
