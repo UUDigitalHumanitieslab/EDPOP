@@ -1,61 +1,68 @@
-import _ from 'lodash';
-import { CollectionView } from 'backbone-fractal';
-import { RecordListItemView } from './record.list.item.view';
-import recordListTemplate from './record.list.view.mustache';
+import Backbone from "backbone";
+import {TabulatorFull as Tabulator} from "tabulator-tables";
+import {properties} from "../utils/record-ontology";
+import {getStringLiteral} from "../utils/jsonld.model";
+import {vreChannel} from "../radio";
 
-export var RecordListView = CollectionView.extend({
-    tagName: 'table',
-    className: 'table table-striped',
-    template: recordListTemplate,
-    container: 'tbody',
+export var RecordListView = Backbone.View.extend({
+    tagName: "div",
+    id: "record-list",
+    /**
+     * The Tabulator instance
+     * @type {Tabulator}
+     */
+    table: null,
 
     initialize: function(options) {
-        this.initItems().render().initCollectionEvents();
-        this.checkedCount = 0;
+        this.collection.on("sync", () => {
+            this.updateTable();
+        });
     },
 
-    renderContainer: function() {
-        this.$el.html(this.template({}));
-        return this;
+    createTable: function(initialData) {
+        this.table = new Tabulator("#record-list", {
+            height: 650, // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
+            data: initialData,
+            autoColumns: true,
+            autoColumnsDefinitions: (definitions) => {
+                for (let definition of definitions) {
+                    if (definition.field === "model") {
+                        definition.visible = false;
+                    }
+                    const property = properties.get(definition.field);
+                    if (property) {
+                        definition.title = getStringLiteral(property.get("skos:prefLabel"));
+                    }
+                }
+                return definitions;
+            },
+            layout: "fitColumns",
+            rowHeader: {
+                width: 50,
+                formatter: "rowSelection",
+                titleFormatter: "rowSelection",
+                headerSort: false,
+                resizable: false,
+                frozen:true,
+                headerHozAlign:"center",
+                hozAlign:"center",
+                cellClick:function(e, cell){
+                    cell.getRow().toggleSelect();
+                },
+            },
+        });
+        this.table.on("rowClick", (e, row) => {
+            const model = row.getData().model;
+            vreChannel.trigger('displayRecord', model);
+        });
     },
 
-    makeItem: function(model, collection, options) {
-        return new RecordListItemView({model: model}).on({
-            check: this.checkOne,
-            uncheck: this.uncheckOne,
-        }, this);
-    },
-
-    currentSelection: function() {
-        return _.chain(this.items)
-            .filter({selected: true})
-            .map('model')
-            .invokeMap('toJSON')
-            .value();
-    },
-
-    checkOne: function() {
-        if (++this.checkedCount === this.collection.length) {
-            this.trigger('allChecked');
+    updateTable: function() {
+        const data = this.collection.toTabularData();
+        if (this.table === null) {
+            this.createTable(data);
+        } else {
+            this.table.replaceData(data);
         }
-        return this;
-    },
-
-    uncheckOne: function() {
-        --this.checkedCount;
-        this.trigger('notAllChecked');
-        return this;
-    },
-
-    checkAll: function() {
-        this.checkedCount = this.collection.length;
-        _.invokeMap(this.items, 'check');
-        return this;
-    },
-
-    uncheckAll: function() {
-        this.checkedCount = 0;
-        _.invokeMap(this.items, 'uncheck');
-        return this;
     },
 });

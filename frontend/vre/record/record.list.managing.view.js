@@ -1,9 +1,8 @@
 import { CompositeView } from 'backbone-fractal';
 import { VRECollectionView } from '../collection/collection.view';
-import { RecordListView } from './record.list.view';
 import { GlobalVariables } from '../globals/variables';
 import recordListManagingTemplate from './record.list.managing.view.mustache';
-import {NewRecordListView} from "./new.record.list.view";
+import {RecordListView} from "./record.list.view";
 
 export var RecordListManagingView = CompositeView.extend({
     tagName: 'form',
@@ -27,7 +26,7 @@ export var RecordListManagingView = CompositeView.extend({
         this.vreCollectionsSelect = new VRECollectionView({
             collection: GlobalVariables.myCollections
         }).render();
-        this.recordListView = new NewRecordListView({collection: this.collection});
+        this.recordListView = new RecordListView({collection: this.collection});
         this.render();
         this.recordListView.render();
     },
