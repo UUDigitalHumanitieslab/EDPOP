@@ -1,6 +1,7 @@
 import { APIModel } from '../utils/api.model';
 import { Annotations } from '../annotation/annotation.model';
 import {JsonLdModel, JsonLdWithOCCollection} from "../utils/jsonld.model";
+import {FlatFields} from "../field/field.model";
 
 export var Record = JsonLdModel.extend({
     urlRoot: '/api/records',
@@ -23,6 +24,16 @@ export var Record = JsonLdModel.extend({
             // Cannot determine which field has the main text; return subject URI instead
             return `<${this.id}>`;
         }
+    },
+    toTabularData: function() {
+        const fields = new FlatFields(undefined, {record: this});
+        const data = {
+            model: this,
+        };
+        fields.forEach((field) => {
+            data[field.id] = field.getMainDisplay();
+        });
+        return data;
     },
     getAnnotations: function() {
         if (!this.annotations) {
