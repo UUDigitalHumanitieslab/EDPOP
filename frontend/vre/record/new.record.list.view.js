@@ -57,12 +57,12 @@ export var NewRecordListView = Backbone.View.extend({
         });
     },
 
-    updateTable: async function() {
+    updateTable: function() {
         const data = this.collection.toTabularData();
         if (this.table === null) {
             this.createTable(data);
         } else {
-            this.table.setData(data);
+            this.table.replaceData(data);
         }
     },
 });
