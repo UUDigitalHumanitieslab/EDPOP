@@ -1,0 +1,1417 @@
+{
+  "@context": {
+    "edpoprec": "https://dhstatic.hum.uu.nl/edpop-records/latest/",
+    "title": "edpoprec:title"
+  },
+  "@graph": [
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/42539106X",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "42539106X",
+      "edpoprec:language": {
+        "@id": "_:Ndb70b0e429a645389313d169a342fad2"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=42539106X",
+      "title": {
+        "@id": "_:N7ba547644cce40caa0c0b18f156e530f"
+      }
+    },
+    {
+      "@id": "_:Ndb70b0e429a645389313d169a342fad2",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "_:N7ba547644cce40caa0c0b18f156e530f",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Cat. nr. 98, 1994"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/425391213",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "425391213",
+      "edpoprec:language": {
+        "@id": "_:Nd83fdb7dec6b44d8b093ebb8b5fda1b2"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=425391213",
+      "title": {
+        "@id": "_:N9af657dee92a42978fac90c1c2f81e35"
+      }
+    },
+    {
+      "@id": "_:Nd83fdb7dec6b44d8b093ebb8b5fda1b2",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "_:N9af657dee92a42978fac90c1c2f81e35",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Cat. nr. 119, 1996"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/42549702X",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "42549702X",
+      "edpoprec:language": {
+        "@id": "_:N904a1c6921994cf191f8bdbd9fdebcf3"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=42549702X",
+      "title": {
+        "@id": "_:N84ec8c947fc24f76bb64de422b287e49"
+      }
+    },
+    {
+      "@id": "_:N904a1c6921994cf191f8bdbd9fdebcf3",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "_:N84ec8c947fc24f76bb64de422b287e49",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Het mooie ouderwetse boek, 1976 : Cat. nr. 331, Het mooie ouderwetse boek, 1976"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/42539090X",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "42539090X",
+      "edpoprec:language": {
+        "@id": "_:N5ea464e98f9f40599ed53bc9ab55182c"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=42539090X",
+      "title": {
+        "@id": "_:N98d7bc2cac3f4b7e989737085020e97a"
+      }
+    },
+    {
+      "@id": "_:N98d7bc2cac3f4b7e989737085020e97a",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Cat. nr. 51, 1989"
+    },
+    {
+      "@id": "_:N5ea464e98f9f40599ed53bc9ab55182c",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/425497496",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "425497496",
+      "edpoprec:language": {
+        "@id": "_:Ne297b24b42294694985ff86f7067cf92"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=425497496",
+      "title": {
+        "@id": "_:N75e4728c909149708f140bccc5b71b7a"
+      }
+    },
+    {
+      "@id": "_:N75e4728c909149708f140bccc5b71b7a",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Het geïllustreerde boek, 1981 : Cat. nr. 449, Het geïllustreerde boek, 1981"
+    },
+    {
+      "@id": "_:Ne297b24b42294694985ff86f7067cf92",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/425390861",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "425390861",
+      "edpoprec:language": {
+        "@id": "_:Nedad95003afc481bb56fcf24afe54daf"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=425390861",
+      "title": {
+        "@id": "_:N84a6eeb76a47478b9864e428555930b6"
+      }
+    },
+    {
+      "@id": "_:Nedad95003afc481bb56fcf24afe54daf",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "_:N84a6eeb76a47478b9864e428555930b6",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Cat. nr. 15, 1985"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/425391094",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "425391094",
+      "edpoprec:language": {
+        "@id": "_:Nb9d8c05c4b034dafb93fa99dcb62c38d"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=425391094",
+      "title": {
+        "@id": "_:Ndff4d092c3114f198643d644f3d612cf"
+      }
+    },
+    {
+      "@id": "_:Nb9d8c05c4b034dafb93fa99dcb62c38d",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "_:Ndff4d092c3114f198643d644f3d612cf",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Cat. nr. 101, 1994"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/425390888",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "425390888",
+      "edpoprec:language": {
+        "@id": "_:N044b78fbff6a40f0adb4534e007c8079"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=425390888",
+      "title": {
+        "@id": "_:Nb439abf230f54413b62918d7407ef41a"
+      }
+    },
+    {
+      "@id": "_:N044b78fbff6a40f0adb4534e007c8079",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "_:Nb439abf230f54413b62918d7407ef41a",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Cat. nr. 40, 1988"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/425391159",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "425391159",
+      "edpoprec:language": {
+        "@id": "_:N45100cd9e9854da8ac6d141c8d828a91"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=425391159",
+      "title": {
+        "@id": "_:N68593a91fb5a46f486b4ffdd89b2e5b0"
+      }
+    },
+    {
+      "@id": "_:N68593a91fb5a46f486b4ffdd89b2e5b0",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Cat. nr. 107, 1995"
+    },
+    {
+      "@id": "_:N45100cd9e9854da8ac6d141c8d828a91",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/425391043",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "425391043",
+      "edpoprec:language": {
+        "@id": "_:N6cb18443d5d14c43b1bcc5a9e5aab929"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=425391043",
+      "title": {
+        "@id": "_:N9fab56892c834cc5aa0b951acb0f091d"
+      }
+    },
+    {
+      "@id": "_:N9fab56892c834cc5aa0b951acb0f091d",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Cat. nr. 83, 1993"
+    },
+    {
+      "@id": "_:N6cb18443d5d14c43b1bcc5a9e5aab929",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/401719707",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "401719707",
+      "edpoprec:language": {
+        "@id": "_:N49347b8236184d4e8d8e8e06b72f3364"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=401719707",
+      "title": {
+        "@id": "_:Ndb810af1a06d4ba586de8785b98756e5"
+      }
+    },
+    {
+      "@id": "_:N49347b8236184d4e8d8e8e06b72f3364",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "_:Ndb810af1a06d4ba586de8785b98756e5",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Een belangrijk bol/e-book"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/425390896",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "425390896",
+      "edpoprec:language": {
+        "@id": "_:N9c90683bdc09461fad9425d7d68cc02c"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=425390896",
+      "title": {
+        "@id": "_:Nc712d751914e4ffbaf3a905247866c08"
+      }
+    },
+    {
+      "@id": "_:Nc712d751914e4ffbaf3a905247866c08",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Cat. nr. 46, 1989"
+    },
+    {
+      "@id": "_:N9c90683bdc09461fad9425d7d68cc02c",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/425390926",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "425390926",
+      "edpoprec:language": {
+        "@id": "_:N2ab0f26efce84d2eb08b85d0ca9eafc8"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=425390926",
+      "title": {
+        "@id": "_:Nc2c82ea1485746909f59f67d1e262c61"
+      }
+    },
+    {
+      "@id": "_:N2ab0f26efce84d2eb08b85d0ca9eafc8",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "_:Nc2c82ea1485746909f59f67d1e262c61",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Cat. nr. 59, 1990"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/425391027",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "425391027",
+      "edpoprec:language": {
+        "@id": "_:Nb487bcd409594da69a3af6806a1feb98"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=425391027",
+      "title": {
+        "@id": "_:N67503ae0332b48e68a4f11de586e1e6e"
+      }
+    },
+    {
+      "@id": "_:N67503ae0332b48e68a4f11de586e1e6e",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Cat. nr. 82, 1992"
+    },
+    {
+      "@id": "_:Nb487bcd409594da69a3af6806a1feb98",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/425391167",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "425391167",
+      "edpoprec:language": {
+        "@id": "_:Nd362676dbfbf4732a6f0e1f0168c930d"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=425391167",
+      "title": {
+        "@id": "_:N56eb50b76ec044a8bcdd931bac44446a"
+      }
+    },
+    {
+      "@id": "_:Nd362676dbfbf4732a6f0e1f0168c930d",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "_:N56eb50b76ec044a8bcdd931bac44446a",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Cat. nr. 114, 1995"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/425390950",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "425390950",
+      "edpoprec:language": {
+        "@id": "_:N1efc101361f64647ad09327f87a859a2"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=425390950",
+      "title": {
+        "@id": "_:Ne203b9e59e0e414eaa6dcc12380fa652"
+      }
+    },
+    {
+      "@id": "_:Ne203b9e59e0e414eaa6dcc12380fa652",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Cat. nr. 85, 1992"
+    },
+    {
+      "@id": "_:N1efc101361f64647ad09327f87a859a2",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/425391140",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "425391140",
+      "edpoprec:language": {
+        "@id": "_:Nccf39007ce7b471d906897fc1d2cfc6d"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=425391140",
+      "title": {
+        "@id": "_:N267df42bed954759913b2a9f150a736b"
+      }
+    },
+    {
+      "@id": "_:Nccf39007ce7b471d906897fc1d2cfc6d",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "_:N267df42bed954759913b2a9f150a736b",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Cat. nr. 115, 1995"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/425391019",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "425391019",
+      "edpoprec:language": {
+        "@id": "_:N92fc157401ab45e692920f394f2b0cc2"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=425391019",
+      "title": {
+        "@id": "_:Nbcf35dc0c6d64f8d9e6ef9b80e3b0816"
+      }
+    },
+    {
+      "@id": "_:N92fc157401ab45e692920f394f2b0cc2",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "_:Nbcf35dc0c6d64f8d9e6ef9b80e3b0816",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Cat. nr. 81, 1992"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/425391035",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "425391035",
+      "edpoprec:language": {
+        "@id": "_:Nb8ebf91ebf0e446d97826362a454a670"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=425391035",
+      "title": {
+        "@id": "_:N009f29f663e449d4a619dc6bed1fc934"
+      }
+    },
+    {
+      "@id": "_:Nb8ebf91ebf0e446d97826362a454a670",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "_:N009f29f663e449d4a619dc6bed1fc934",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Cat. nr. 84, 1992"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/425390977",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "425390977",
+      "edpoprec:language": {
+        "@id": "_:N228861157e924f1486b5d9557863d719"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=425390977",
+      "title": {
+        "@id": "_:N20adec9bb40c44b3850a2e820c90a9fb"
+      }
+    },
+    {
+      "@id": "_:N228861157e924f1486b5d9557863d719",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "_:N20adec9bb40c44b3850a2e820c90a9fb",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Cat. nr. 77, 1992"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/425391124",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "425391124",
+      "edpoprec:language": {
+        "@id": "_:Nb4789b50dfe44db18136d5e09bc5920d"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=425391124",
+      "title": {
+        "@id": "_:N51570ba796214dcca7aa1ee18f25800f"
+      }
+    },
+    {
+      "@id": "_:N51570ba796214dcca7aa1ee18f25800f",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Cat. nr. 104, 1994"
+    },
+    {
+      "@id": "_:Nb4789b50dfe44db18136d5e09bc5920d",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/425390993",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "425390993",
+      "edpoprec:language": {
+        "@id": "_:N651469af83904214a52ac05b3b48aec9"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=425390993",
+      "title": {
+        "@id": "_:N8b52dd99bb914a3386af951161c90ea7"
+      }
+    },
+    {
+      "@id": "_:N651469af83904214a52ac05b3b48aec9",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "_:N8b52dd99bb914a3386af951161c90ea7",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Cat. nr. 79, 1992"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/425391132",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "425391132",
+      "edpoprec:language": {
+        "@id": "_:Nce187890030b40e085dfa4dbb3a50b71"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=425391132",
+      "title": {
+        "@id": "_:N741c1efc88ca493eabcc3d3f6e7351c9"
+      }
+    },
+    {
+      "@id": "_:N741c1efc88ca493eabcc3d3f6e7351c9",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Cat. nr. 106, 1995"
+    },
+    {
+      "@id": "_:Nce187890030b40e085dfa4dbb3a50b71",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/425390934",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "425390934",
+      "edpoprec:language": {
+        "@id": "_:Na4742214fbeb4a3aab8a36cc05e32493"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=425390934",
+      "title": {
+        "@id": "_:Nedbc52cfbd764c3d92b7d1af1618ebc3"
+      }
+    },
+    {
+      "@id": "_:Nedbc52cfbd764c3d92b7d1af1618ebc3",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Cat. nr. 61, 1990"
+    },
+    {
+      "@id": "_:Na4742214fbeb4a3aab8a36cc05e32493",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/425390985",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "425390985",
+      "edpoprec:language": {
+        "@id": "_:N3dc6fa1dc99c474da914d05f1a7551d0"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=425390985",
+      "title": {
+        "@id": "_:N99a121623988445aa971cff56a108c75"
+      }
+    },
+    {
+      "@id": "_:N3dc6fa1dc99c474da914d05f1a7551d0",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "_:N99a121623988445aa971cff56a108c75",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Cat. nr. 78, 1992"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/425390837",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "425390837",
+      "edpoprec:language": {
+        "@id": "_:N91bf5dca63974c638c9bf13ba03062b7"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=425390837",
+      "title": {
+        "@id": "_:N7a7d1df82cae4fa3b9da66ed6efc1f15"
+      }
+    },
+    {
+      "@id": "_:N7a7d1df82cae4fa3b9da66ed6efc1f15",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Cat. nr. 2, 1984"
+    },
+    {
+      "@id": "_:N91bf5dca63974c638c9bf13ba03062b7",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/425391116",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "425391116",
+      "edpoprec:language": {
+        "@id": "_:Nad680a7786714cda95ec274a97ce5226"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=425391116",
+      "title": {
+        "@id": "_:N89f6171f0c78466c85b7e88fac1b4b98"
+      }
+    },
+    {
+      "@id": "_:Nad680a7786714cda95ec274a97ce5226",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "_:N89f6171f0c78466c85b7e88fac1b4b98",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Cat. nr. 103, 1994"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/42539087X",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "42539087X",
+      "edpoprec:language": {
+        "@id": "_:Nabb71b81961d44baa20fbb6fd1a02672"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=42539087X",
+      "title": {
+        "@id": "_:N5ed419d7787a425c9707a0adb647fcbc"
+      }
+    },
+    {
+      "@id": "_:Nabb71b81961d44baa20fbb6fd1a02672",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "_:N5ed419d7787a425c9707a0adb647fcbc",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Cat. nr. 11, 1986"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/429796900",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "429796900",
+      "edpoprec:language": {
+        "@id": "_:N71e2a88fa8ad4ad99424714603c8956c"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=429796900",
+      "title": {
+        "@id": "_:N8c403f95643241759c519015073db027"
+      }
+    },
+    {
+      "@id": "_:N71e2a88fa8ad4ad99424714603c8956c",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "_:N8c403f95643241759c519015073db027",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Schakeling : huisorgaan der N.V. de Zuid-Hollandsche Boek- en Handelsdrukkerij, 's Gravenhage"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/425391086",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "425391086",
+      "edpoprec:language": {
+        "@id": "_:N4a22e024714343e8b5bc0a6bc943c8d2"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=425391086",
+      "title": {
+        "@id": "_:N1b76f9b477ab4c8088b21268965c59b9"
+      }
+    },
+    {
+      "@id": "_:N1b76f9b477ab4c8088b21268965c59b9",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Cat. nr. 100, 1994"
+    },
+    {
+      "@id": "_:N4a22e024714343e8b5bc0a6bc943c8d2",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/425391175",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "425391175",
+      "edpoprec:language": {
+        "@id": "_:N8745c2e0614642da9be1c62576231bf4"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=425391175",
+      "title": {
+        "@id": "_:N39e8f823fcb54899871f5481bb5d642b"
+      }
+    },
+    {
+      "@id": "_:N39e8f823fcb54899871f5481bb5d642b",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Cat. nr. 116, 1996"
+    },
+    {
+      "@id": "_:N8745c2e0614642da9be1c62576231bf4",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/099212692",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "099212692",
+      "edpoprec:language": {
+        "@id": "_:Nfed284a6024e4fa8871ea1927140851a"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=099212692",
+      "title": {
+        "@id": "_:N972a56c8c08747c5ba24525d96ee64f3"
+      }
+    },
+    {
+      "@id": "_:Nfed284a6024e4fa8871ea1927140851a",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "_:N972a56c8c08747c5ba24525d96ee64f3",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Schakeling : huisorgaan der N.V. de Zuid-Hollandsche Boek- en Handelsdrukkerij, 's Gravenhage"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/425391000",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "425391000",
+      "edpoprec:language": {
+        "@id": "_:N07e8c169d2464e37b530e98864ee2d98"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=425391000",
+      "title": {
+        "@id": "_:Nd6b6f16843f34220a267fdf7137ed337"
+      }
+    },
+    {
+      "@id": "_:N07e8c169d2464e37b530e98864ee2d98",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "_:Nd6b6f16843f34220a267fdf7137ed337",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Cat. nr. 80, 1992"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/425390918",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "425390918",
+      "edpoprec:language": {
+        "@id": "_:N0dff713ec1264216a59aac7357c84bb8"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=425390918",
+      "title": {
+        "@id": "_:Nedd1956d491b4ce280fd9fcf0cade696"
+      }
+    },
+    {
+      "@id": "_:N0dff713ec1264216a59aac7357c84bb8",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "_:Nedd1956d491b4ce280fd9fcf0cade696",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Cat. nr. 57, 1990"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/425390845",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "425390845",
+      "edpoprec:language": {
+        "@id": "_:Naec52b26a5674da5a01d5ccae8f83f86"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=425390845",
+      "title": {
+        "@id": "_:Nbc8ddcee38774895af2d5f1cef51cd91"
+      }
+    },
+    {
+      "@id": "_:Nbc8ddcee38774895af2d5f1cef51cd91",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Cat. nr. 3, 1984"
+    },
+    {
+      "@id": "_:Naec52b26a5674da5a01d5ccae8f83f86",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "_:Nf7aa702f33434ce6bdc15fa88d9acd8d",
+      "@type": "https://www.w3.org/ns/activitystreams#OrderedCollection",
+      "https://www.w3.org/ns/activitystreams#orderedItems": {
+        "@list": [
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/401719707"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/371408520"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/109791959"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/429796900"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/099212692"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/376549343"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/401446131"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/822365863"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/42549702X"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/425497496"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/425335240"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/425390837"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/425390845"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/425390853"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/425390861"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/42539087X"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/425390888"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/425390896"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/42539090X"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/425390918"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/425390926"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/425390934"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/425390942"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/425390950"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/425390969"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/425390977"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/425390985"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/425390993"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/425391000"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/425391019"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/425391027"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/425391035"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/425391043"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/425391051"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/42539106X"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/425391078"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/425391086"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/425391094"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/425391108"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/425391116"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/425391124"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/425391132"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/425391140"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/425391159"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/425391167"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/425391175"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/425391183"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/425391191"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/425391205"
+          },
+          {
+            "@id": "https://edpop.hum.uu.nl/readers/kb/425391213"
+          }
+        ]
+      },
+      "https://www.w3.org/ns/activitystreams#totalItems": 4805154
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/425391183",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "425391183",
+      "edpoprec:language": {
+        "@id": "_:Ndb9f2c3374ab477a9997cdcc7bc1e4b3"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=425391183",
+      "title": {
+        "@id": "_:N5475c3bf24834a4da63905752fdecf86"
+      }
+    },
+    {
+      "@id": "_:Ndb9f2c3374ab477a9997cdcc7bc1e4b3",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "_:N5475c3bf24834a4da63905752fdecf86",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Cat. nr. 125, 1996"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/376549343",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "376549343",
+      "edpoprec:language": {
+        "@id": "_:N213ae270c69a4b3ba5dc10c46c1bd860"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=376549343",
+      "title": {
+        "@id": "_:Nbfaad8bfa4c94d5d994f082bbcfe74b1"
+      }
+    },
+    {
+      "@id": "_:N213ae270c69a4b3ba5dc10c46c1bd860",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "_:Nbfaad8bfa4c94d5d994f082bbcfe74b1",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Boek en boek : Boek&boek : Boek & boek : 't adressenboek : tweedehands boekbedrijf en antiquariaat in Nederland"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/425390853",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "425390853",
+      "edpoprec:language": {
+        "@id": "_:N0b4a2f6277374bb2ad1b79af9a2a6246"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=425390853",
+      "title": {
+        "@id": "_:N8c791f3490b44a3b890ebf219e12e4f8"
+      }
+    },
+    {
+      "@id": "_:N8c791f3490b44a3b890ebf219e12e4f8",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Cat. nr. 4, 1984"
+    },
+    {
+      "@id": "_:N0b4a2f6277374bb2ad1b79af9a2a6246",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/371408520",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "371408520",
+      "edpoprec:language": {
+        "@id": "_:N309af7bf13e84e4db01a5fcc0ae8d03c"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=371408520",
+      "title": {
+        "@id": "_:Nfdc703c3f4ea4159ade0c00e4515ff1d"
+      }
+    },
+    {
+      "@id": "_:Nfdc703c3f4ea4159ade0c00e4515ff1d",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Basisboeken voor de coach, set 3 delen bevat : Het Coachingsmethoden Boek, Het Coachingstechnieken Boek, Het Coachingsinstrumenten Boek"
+    },
+    {
+      "@id": "_:N309af7bf13e84e4db01a5fcc0ae8d03c",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/109791959",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "109791959",
+      "edpoprec:language": {
+        "@id": "_:N4ca86275494e4e09a4efaf6ca53058f4"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=109791959",
+      "title": {
+        "@id": "_:Ncf4139766da74a9e865e6526d8da69f5"
+      }
+    },
+    {
+      "@id": "_:N4ca86275494e4e09a4efaf6ca53058f4",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "_:Ncf4139766da74a9e865e6526d8da69f5",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Alles in de wind. - Amsterdam : Omega Boek, 1981 : Het reuze sprookjesboek. - Amsterdam : Omega Boek, 1979 : Klaas Vaak : korte verhaaltjes van Nelly Kunst"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/822365863",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "822365863",
+      "edpoprec:language": {
+        "@id": "_:N7d26d73361544e1bbaf71ff712fdb5a1"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=822365863",
+      "title": {
+        "@id": "_:Nd572701c92c04a958f59df604bf5c066"
+      }
+    },
+    {
+      "@id": "_:N7d26d73361544e1bbaf71ff712fdb5a1",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "_:Nd572701c92c04a958f59df604bf5c066",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Boek en mensch : Boek, handwerk en machine : Boek en band : Boek en papier : Boek en bibliotheek : Vijf eeuwen boek in Nederland"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/425391191",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "425391191",
+      "edpoprec:language": {
+        "@id": "_:Nd82965b9ab484ddc83799232b776dbd8"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=425391191",
+      "title": {
+        "@id": "_:N6bc21a24713148598e8a19bfa9ea7d36"
+      }
+    },
+    {
+      "@id": "_:Nd82965b9ab484ddc83799232b776dbd8",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "_:N6bc21a24713148598e8a19bfa9ea7d36",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Cat. nr. 117, 1996"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/425335240",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "425335240",
+      "edpoprec:language": {
+        "@id": "_:Nfa748587c07044a48bee0981f7e8df6b"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=425335240",
+      "title": {
+        "@id": "_:N86456abbbeb94fe1a19ef662b30991dc"
+      }
+    },
+    {
+      "@id": "_:Nfa748587c07044a48bee0981f7e8df6b",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "_:N86456abbbeb94fe1a19ef662b30991dc",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Het compacte boek, 1993 : Cat. nr. nieuwsbrief 2, Het compacte boek, 1993"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/401446131",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "401446131",
+      "edpoprec:language": {
+        "@id": "_:Nd2c61fcb6f7a460d9847990f3557920c"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=401446131",
+      "title": {
+        "@id": "_:N71e77d3999ab4d4bbcbd28b36d8bb719"
+      }
+    },
+    {
+      "@id": "_:N71e77d3999ab4d4bbcbd28b36d8bb719",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Tijdelijke, beknopte G.H.B. collectie : Beknopte GHB collectie"
+    },
+    {
+      "@id": "_:Nd2c61fcb6f7a460d9847990f3557920c",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/425391108",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "425391108",
+      "edpoprec:language": {
+        "@id": "_:Naa3c8008c11c4d25ac359fc6b5838770"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=425391108",
+      "title": {
+        "@id": "_:Nd934fe01d79944e995fe8763b374614d"
+      }
+    },
+    {
+      "@id": "_:Nd934fe01d79944e995fe8763b374614d",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Cat. nr. 102, 1994"
+    },
+    {
+      "@id": "_:Naa3c8008c11c4d25ac359fc6b5838770",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/425391205",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "425391205",
+      "edpoprec:language": {
+        "@id": "_:N8e4687b34f3247bda49bb2d442d6788e"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=425391205",
+      "title": {
+        "@id": "_:N789710eddcce43868e83e576209cc0db"
+      }
+    },
+    {
+      "@id": "_:N789710eddcce43868e83e576209cc0db",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Cat. nr. 118, 1996"
+    },
+    {
+      "@id": "_:N8e4687b34f3247bda49bb2d442d6788e",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/425390942",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "425390942",
+      "edpoprec:language": {
+        "@id": "_:N03893208ee39470c99fe9b834e5b591b"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=425390942",
+      "title": {
+        "@id": "_:N5e811cba1f114eacbecf703e3ef0124b"
+      }
+    },
+    {
+      "@id": "_:N03893208ee39470c99fe9b834e5b591b",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "_:N5e811cba1f114eacbecf703e3ef0124b",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Cat. nr. 74, 1991"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/425391051",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "425391051",
+      "edpoprec:language": {
+        "@id": "_:Ne504a12b7b5543699d30c18542262936"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=425391051",
+      "title": {
+        "@id": "_:N4efe1899c67d4d51b674cbeabdf20a38"
+      }
+    },
+    {
+      "@id": "_:N4efe1899c67d4d51b674cbeabdf20a38",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Cat. nr. 105, 1994"
+    },
+    {
+      "@id": "_:Ne504a12b7b5543699d30c18542262936",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/425391078",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "425391078",
+      "edpoprec:language": {
+        "@id": "_:N814dc155487b4226bfdb88ad9febbedd"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=425391078",
+      "title": {
+        "@id": "_:Nded1806cd27b4a46a427576346d7c01c"
+      }
+    },
+    {
+      "@id": "_:Nded1806cd27b4a46a427576346d7c01c",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Cat. nr. 99, 1994"
+    },
+    {
+      "@id": "_:N814dc155487b4226bfdb88ad9febbedd",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "https://edpop.hum.uu.nl/readers/kb/425390969",
+      "@type": "edpoprec:BibliographicalRecord",
+      "edpoprec:fromCatalog": {
+        "@id": "https://edpop.hum.uu.nl/readers/kb"
+      },
+      "edpoprec:identifier": "425390969",
+      "edpoprec:language": {
+        "@id": "_:Nb04b1a87d2e34d698e4b9252c12e9bf8"
+      },
+      "edpoprec:publicURL": "https://webggc.oclc.org/cbs/DB=2.37/PPN?PPN=425390969",
+      "title": {
+        "@id": "_:Nc8036d297a8f427b8a9a7ef380ef771b"
+      }
+    },
+    {
+      "@id": "_:Nb04b1a87d2e34d698e4b9252c12e9bf8",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "dut"
+    },
+    {
+      "@id": "_:Nc8036d297a8f427b8a9a7ef380ef771b",
+      "@type": "edpoprec:Field",
+      "edpoprec:originalText": "Cat. nr. 76, 1992"
+    }
+  ]
+}
