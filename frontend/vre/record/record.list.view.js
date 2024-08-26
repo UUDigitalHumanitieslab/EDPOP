@@ -5,7 +5,6 @@ import {getStringLiteral} from "../utils/jsonld.model";
 import {vreChannel} from "../radio";
 
 export var RecordListView = Backbone.View.extend({
-    tagName: "div",
     id: "record-list",
     /**
      * The Tabulator instance
