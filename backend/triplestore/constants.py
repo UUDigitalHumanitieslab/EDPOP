@@ -3,7 +3,7 @@ from triplestore.namespaces import _AS, _EDPOPCOL
 
 EDPOPCOL = _EDPOPCOL.EDPOPCOL
 
-EDPOPREC = Namespace('https://dhstatic.hum.uu.nl/edpop-records/0.1.0-SNAPSHOT/')
+EDPOPREC = Namespace('https://dhstatic.hum.uu.nl/edpop-records/0.1.0/')
 '''EDPOP Record Ontology'''
 
 AS =_AS.AS

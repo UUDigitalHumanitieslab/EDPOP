@@ -7,6 +7,7 @@ from rdflib import Graph, URIRef
 from rest_framework.exceptions import ParseError
 from rest_framework.renderers import JSONRenderer
 
+from triplestore.constants import EDPOPREC, AS
 from .graphs import SearchGraphBuilder, get_catalogs_graph, get_reader_by_uriref
 
 
@@ -14,8 +15,8 @@ class SearchView(RDFView):
     """Search in a given external catalog according to a query."""
     renderer_classes = (JsonLdRenderer,)
     json_ld_context = {
-        "edpoprec": "https://dhstatic.hum.uu.nl/edpop-records/latest/",
-        "as": "https://www.w3.org/ns/activitystreams#",
+        "edpoprec": str(EDPOPREC),
+        "as": str(AS),
     }
     
     def get_graph(self, request: views.Request, **kwargs) -> Graph:

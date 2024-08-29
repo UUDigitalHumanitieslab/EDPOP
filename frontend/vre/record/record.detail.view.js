@@ -49,7 +49,6 @@ export var RecordDetailView = CompositeView.extend({
     },
 
     renderContainer: function() {
-        console.log(this.model);
         this.$el.html(this.template({
             title: this.model.getMainDisplay(),
             uri: this.model.id,
