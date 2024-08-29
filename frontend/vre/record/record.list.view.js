@@ -1,5 +1,4 @@
 import Backbone from "backbone";
-import {TabulatorFull as Tabulator} from "tabulator-tables";
 import {properties} from "../utils/record-ontology";
 import {getStringLiteral} from "../utils/jsonld.model";
 import {vreChannel} from "../radio";
