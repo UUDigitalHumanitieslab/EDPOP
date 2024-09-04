@@ -2,6 +2,7 @@ import Backbone from "backbone";
 import {properties} from "../utils/record-ontology";
 import {getStringLiteral} from "../utils/jsonld.model";
 import {vreChannel} from "../radio";
+import Tabulator from "tabulator";
 
 export var RecordListView = Backbone.View.extend({
     id: "record-list",

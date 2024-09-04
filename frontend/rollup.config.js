@@ -9,7 +9,7 @@ var extension = /.js$/;
 
 export default {
     input: 'vre/main.js',
-    external: ['jquery', 'lodash', underscorePattern, 'backbone'],
+    external: ['jquery', 'lodash', underscorePattern, 'backbone', 'tabulator'],
     plugins: [
         wontache(),
         nodeResolve(),
@@ -24,6 +24,7 @@ export default {
                 case 'lodash': return '_';
                 case 'underscore': return '_';
                 case 'backbone': return 'Backbone';
+                case 'tabulator': return 'Tabulator';
             }
             var lastPart = _.last(id.split('/')).replace(extension, '');
             if (lastPart === 'underscore') return '_';
