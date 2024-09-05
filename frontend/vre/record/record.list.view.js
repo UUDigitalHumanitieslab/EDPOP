@@ -32,6 +32,7 @@ export var RecordListView = Backbone.View.extend({
                     if (property) {
                         definition.title = getStringLiteral(property.get("skos:prefLabel"));
                     }
+                    definition.headerFilter = true;
                 }
                 return definitions;
             },
@@ -49,6 +50,7 @@ export var RecordListView = Backbone.View.extend({
                     cell.getRow().toggleSelect();
                 },
             },
+            headerFilterLiveFilterDelay: 0,
         });
         this.table.on("rowClick", (e, row) => {
             const model = row.getData().model;
