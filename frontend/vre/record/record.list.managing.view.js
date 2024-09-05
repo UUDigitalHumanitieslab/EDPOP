@@ -20,6 +20,8 @@ export var RecordListManagingView = CompositeView.extend({
             this.vreCollectionsSelect.submitForm(event, selection);
         },
         'click .more-records': 'loadMore',
+        'click .download-xlsx': 'downloadXLSX',
+        'click .download-csv': 'downloadCSV',
     },
 
     initialize: function(options) {
@@ -38,5 +40,13 @@ export var RecordListManagingView = CompositeView.extend({
 
     loadMore: function(event) {
         this.collection.trigger('moreRequested', event);
+    },
+
+    downloadXLSX: function() {
+        this.recordListView.downloadXLSX();
+    },
+
+    downloadCSV: function() {
+        this.recordListView.downloadCSV();
     },
 });

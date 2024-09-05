@@ -64,4 +64,12 @@ export var RecordListView = Backbone.View.extend({
             this.table.replaceData(data);
         }
     },
+
+    downloadXLSX: function() {
+        this.table.download("xlsx", "edpop.xlsx", {sheetName: "EDPOP"});
+    },
+
+    downloadCSV: function() {
+        this.table.download("csv", "edpop.csv");
+    },
 });
