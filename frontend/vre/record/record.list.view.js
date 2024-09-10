@@ -9,6 +9,7 @@ const columnProperties = {
     'edpoprec:title': {
         visible: true,
         widthGrow: 5,
+        formatter: 'textarea',
     },
     'edpoprec:placeOfPublication': {
         visible: true,
@@ -22,7 +23,10 @@ const columnProperties = {
     },
     'edpoprec:contributor': {
         visible: true,
-    }
+    },
+    'edpoprec:activity': {
+        visible: true,
+    },
 };
 
 export var RecordListView = Backbone.View.extend({
