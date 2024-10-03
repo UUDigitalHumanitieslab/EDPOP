@@ -6,6 +6,7 @@ import { Records } from '../record/record.model.js';
  * Representation of a single VRE collection.
  */
 export var VRECollection = APIModel.extend({
+    idAttribute: 'uri',
     getRecords: function(records) {
         if (!records) {
             if (this.records) return this.records;

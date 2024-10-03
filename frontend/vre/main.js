@@ -58,7 +58,7 @@ var router = new VRERouter();
 // of attention.
 router.on({
     'route:showCollection': id => navigationState.set(
-        'browsingContext', GlobalVariables.myCollections.get(id)),
+        'browsingContext', GlobalVariables.myCollections.find({name: id})),
     'route:showCatalog': id => navigationState.set(
         'browsingContext', catalogs.findWhere({identifier: id})),
 });
