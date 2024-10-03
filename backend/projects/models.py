@@ -4,6 +4,8 @@ from django.contrib import admin
 from rdflib import URIRef, Graph
 from django.conf import settings
 
+from projects.rdf_models import RDFProject
+
 
 class Project(models.Model):
     '''
@@ -17,6 +19,11 @@ class Project(models.Model):
         max_length=64,
         unique=True,
         help_text='Identifier of the project; used in IRIs for the project\'s RDF data',
+    )
+    uri = models.CharField(
+        max_length=256,
+        unique=True,
+        help_text='URI for the project in RDF data',
     )
     display_name = models.CharField(
         max_length=256,
@@ -65,8 +72,8 @@ class Project(models.Model):
         This is a node within the project graph; it can be used to give context to the
         project.
         '''
-        if self.name:
-            return URIRef(settings.RDF_NAMESPACE_ROOT + 'projects/' + self.name)
+        if self.uri:
+            return URIRef(self.uri)
 
 
     def permit_query_by(self, user: User) -> bool:
@@ -91,3 +98,6 @@ class Project(models.Model):
         if user.is_anonymous:
             return False
         return self.users.contains(user) or self.groups.filter(user=user).exists()
+
+    def rdf_model(self):
+        return RDFProject(self.graph(), self.identifier())
