@@ -33,7 +33,7 @@ export var VRECollections = APICollection.extend({
      */
     mine: function(myCollections) {
         myCollections = myCollections || new VRECollections();
-        myCollections.fetch({url: myCollections.url + 'mine/'});
+        myCollections.fetch();
         return myCollections;
     },
 });
