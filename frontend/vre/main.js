@@ -4,6 +4,9 @@ import Backbone from 'backbone';
 import Cookies from 'jscookie';
 import { wrapWithCSRF } from '@uu-cdh/backbone-util';
 
+// Enable alt-click debugging (outcomment to disable).
+window.DEBUGGING = true;
+
 import './record/record.opening.aspect';
 import { vreChannel } from './radio';
 import { BlankRecordButtonView } from './record/blank.record.button.view';
@@ -22,7 +25,6 @@ import {Catalogs} from "./catalog/catalog.model";
 import {SelectCatalogView} from "./catalog/select-catalog.view";
 import { StateModel } from './utils/state.model.js';
 import { WelcomeView } from './utils/welcome.view.js';
-
 
 // Dangerously global variables (accessible from dependency modules).
 GlobalVariables.allProjects = new Projects();
