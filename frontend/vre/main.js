@@ -82,6 +82,8 @@ catalogs.on({
 
 function showCollection(vreCollection) {
     GlobalVariables.currentVRECollection = vreCollection;
+    // The next line is not very MVC, but it works for now.
+    GlobalVariables.projectMenu.select(vreCollection.get('project'));
     navigationState.set(
         'browser', new BrowseCollectionView({model: vreCollection}));
 }

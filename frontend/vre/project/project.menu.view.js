@@ -40,6 +40,8 @@ export var ProjectMenuView = AggregateView.extend({
     },
 
     select: function (model) {
+        model = this.collection.get(model);
+        if (!model) return;
         if (model === this.model) return;
         if (this.model) this.model.trigger('deselect');
         this.model = model;
