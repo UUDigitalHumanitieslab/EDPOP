@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { View } from 'backbone';
+import { View } from '../core/view.js';
 import alertTemplate from './alert.view.mustache';
 
 /**

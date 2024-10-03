@@ -1,4 +1,4 @@
-import { View } from 'backbone';
+import { View } from '../core/view.js';
 import { AlertView } from '../alert/alert.view';
 import { AdditionsToCollections } from '../additions/additions-to-collections';
 import { GlobalVariables } from '../globals/variables';

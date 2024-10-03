@@ -1,4 +1,4 @@
-import { View } from 'backbone';
+import { View } from '../core/view.js';
 import projectMenuItemTemplate from './project.menu.item.view.mustache';
 
 export var ProjectMenuItemView = View.extend({

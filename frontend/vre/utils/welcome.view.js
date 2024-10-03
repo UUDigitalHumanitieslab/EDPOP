@@ -1,4 +1,4 @@
-import { View } from 'backbone';
+import { View } from '../core/view.js';
 
 import welcomeTemplate from './welcome.view.mustache';
 
