@@ -1,4 +1,4 @@
-import { CompositeView } from 'backbone-fractal';
+import { CompositeView } from '../core/view.js';
 import { VRECollectionView } from '../collection/collection.view';
 import { GlobalVariables } from '../globals/variables';
 import recordListManagingTemplate from './record.list.managing.view.mustache';

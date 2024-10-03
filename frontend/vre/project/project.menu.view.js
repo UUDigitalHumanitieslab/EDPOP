@@ -1,9 +1,9 @@
-import { CollectionView } from 'backbone-fractal';
+import { AggregateView } from '../core/view.js';
 
 import { ProjectMenuItemView } from './project.menu.item.view';
 import projectMenuTemplate from './project.menu.view.mustache';
 
-export var ProjectMenuView = CollectionView.extend({
+export var ProjectMenuView = AggregateView.extend({
     el: '#vre-project-menu',
     template: projectMenuTemplate,
     subview: ProjectMenuItemView,

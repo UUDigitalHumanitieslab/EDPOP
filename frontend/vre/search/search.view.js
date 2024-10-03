@@ -1,4 +1,4 @@
-import { CompositeView } from 'backbone-fractal';
+import { CompositeView } from '../core/view.js';
 
 import { AlertView } from '../alert/alert.view';
 import searchViewTemplate from './search.view.mustache';

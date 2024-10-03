@@ -1,5 +1,5 @@
 import Backbone from 'backbone';
-import { CollectionView as AggregateView } from 'backbone-fractal';
+import { AggregateView } from '../core/view.js';
 
 import optionDBTemplate from './select-collection-option.view.mustache';
 import selectDBTemplate from './select-collection.view.mustache';

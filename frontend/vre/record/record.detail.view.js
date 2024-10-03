@@ -1,4 +1,4 @@
-import { CompositeView } from 'backbone-fractal';
+import { CompositeView } from '../core/view.js';
 import { vreChannel } from '../radio';
 import { FlatAnnotations } from '../annotation/annotation.model';
 import { RecordFieldsView } from '../field/record.fields.view';

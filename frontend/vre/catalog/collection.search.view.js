@@ -1,4 +1,4 @@
-import { CompositeView } from 'backbone-fractal';
+import { CompositeView } from '../core/view.js';
 
 import { SearchResults } from '../search/search.model.js';
 import { SearchView } from '../search/search.view.js';

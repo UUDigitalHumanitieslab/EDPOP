@@ -1,8 +1,8 @@
-import { CollectionView } from 'backbone-fractal';
+import { AggregateView } from '../core/view.js';
 import { FieldView } from './field.view';
 import fieldListTemplate from './record.base.view.mustache';
 
-export var RecordFieldsBaseView = CollectionView.extend({
+export var RecordFieldsBaseView = AggregateView.extend({
     template: fieldListTemplate,
     container: 'tbody',
 
