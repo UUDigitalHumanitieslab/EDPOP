@@ -48,3 +48,12 @@ ul.inline-list li {
 ul.inline-list li:not(:first-child)::before {
     content: " • "
 }
+
+@media (prefers-color-scheme: dark) {
+    html {
+        filter: invert(1) hue-rotate(180deg) contrast(0.9) brightness(0.9);
+    }
+    img, video {
+        filter: hue-rotate(180deg) invert(1);
+    }
+}
