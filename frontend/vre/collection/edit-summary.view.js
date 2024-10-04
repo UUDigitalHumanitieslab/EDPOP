@@ -3,7 +3,7 @@ import editSummaryTemplate from './edit-summary.view.mustache';
 
 export var EditSummaryView = View.extend({
     tagName: 'form',
-    className: 'form-inline',
+    className: 'form-inline inline-editor',
     template: editSummaryTemplate,
 
     events: {

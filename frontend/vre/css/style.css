@@ -49,6 +49,10 @@ ul.inline-list li:not(:first-child)::before {
     content: " • "
 }
 
+form.form-inline.inline-editor {
+    display: inline-block;
+}
+
 @media (prefers-color-scheme: dark) {
     html {
         filter: invert(1) hue-rotate(180deg) contrast(0.9) brightness(0.9);
