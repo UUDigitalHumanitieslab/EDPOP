@@ -1,50 +1,50 @@
 .alert {
-	display: none;
+    display: none;
 }
 
 h2 {
-	color: cornflowerblue;
+    color: cornflowerblue;
 }
 
 #result_detail td {
-	cursor: pointer;
+    cursor: pointer;
 }
 
 #result_detail td form {
-	white-space: nowrap;
+    white-space: nowrap;
 }
 
 #more-records {
-	display: none;
+    display: none;
 }
 
 .popover {
-	max-width: 100%;
+    max-width: 100%;
 }
 
 table#hpb-info-table td:nth-child(odd) {
-	font-weight: bold;
+    font-weight: bold;
 }
 
 #search-info{
-	display: none;
+    display: none;
 }
 
 @media (min-width: 768px) {
-	#result_detail .modal-dialog {
-		width: 636px;
-	}
+    #result_detail .modal-dialog {
+        width: 636px;
+    }
 }
 
 ul.inline-list {
-	padding-left: 0;
+    padding-left: 0;
 }
 
 ul.inline-list li {
-	display: inline;
-	text-decoration: none;
+    display: inline;
+    text-decoration: none;
 }
 
 ul.inline-list li:not(:first-child)::before {
-	content: " • "
+    content: " • "
 }
