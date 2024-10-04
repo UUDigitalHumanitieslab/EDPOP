@@ -18,3 +18,8 @@ db*
 
 # Visual Studio Code
 .vscode/
+
+# emacs
+.\#*
+*~
+\#*\#
