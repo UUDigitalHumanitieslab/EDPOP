@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import Backbone from 'backbone';
 import { AnnotationEditView } from '../annotation/annotation.edit.view';
-import { GlobalVariables } from '../globals/variables';
+import { vreChannel } from '../radio.js';
 import { RecordFieldsBaseView } from './record.base.view';
 
 export var RecordAnnotationsView = RecordFieldsBaseView.extend({
@@ -17,7 +17,7 @@ export var RecordAnnotationsView = RecordFieldsBaseView.extend({
     },
 
     edit: function(model) {
-        var project = GlobalVariables.projectMenu.model.get('name'),
+        var project = vreChannel.request('projects:current').get('name'),
             editTarget = model.clone().set('context', project),
             preExisting = this.collection.get(editTarget),
             newRow;
