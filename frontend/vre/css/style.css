@@ -53,6 +53,11 @@ form.form-inline.inline-editor {
     display: inline-block;
 }
 
+.dropdown-menu > li > form {
+    padding: 3px 20px;
+    width: max-content;
+}
+
 @media (prefers-color-scheme: dark) {
     html {
         filter: invert(1) hue-rotate(180deg) contrast(0.9) brightness(0.9);

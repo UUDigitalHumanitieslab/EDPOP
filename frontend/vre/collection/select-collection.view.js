@@ -1,6 +1,8 @@
+import _ from 'lodash';
 import Backbone from 'backbone';
 import { AggregateView } from '../core/view.js';
 
+import { vreChannel } from '../radio.js';
 import optionDBTemplate from './select-collection-option.view.mustache';
 import selectDBTemplate from './select-collection.view.mustache';
 
@@ -40,11 +42,29 @@ export var SelectCollectionView = AggregateView.extend({
     className: 'dropdown',
     subview: CollectionOptionView,
     container: 'ul',
+    events: {
+        'submit .dropdown-menu form': 'createCollection',
+    },
     initialize: function() {
         this.initItems().render().initCollectionEvents();
     },
     renderContainer: function() {
-        this.$el.html(this.template());
+        this.$el.html(this.template(this));
         return this;
+    },
+    placeItems: function() {
+        this._container.prepend(_.map(this.items, 'el'));
+        return this;
+    },
+    createCollection: function(event) {
+        event.preventDefault();
+        var project = vreChannel.request('projects:current');
+        var input = this.$('.dropdown-menu form input');
+        var name = input.val();
+        this.collection.create({
+            name: name,
+            project: project.get('name'),
+        });
+        input.val('');
     },
 });
