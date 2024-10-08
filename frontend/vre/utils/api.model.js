@@ -1,4 +1,5 @@
 import Backbone from 'backbone';
+import { modelSlashUrl } from '@uu-cdh/backbone-util';
 import { objectAsUrlParams } from './generic-functions';
 
 /**
@@ -6,9 +7,7 @@ import { objectAsUrlParams } from './generic-functions';
  * This is required for interop with Django REST Framework.
  */
 export var APIModel = Backbone.Model.extend({
-    url: function() {
-        return Backbone.Model.prototype.url.call(this) + '/';
-    },
+    url: modelSlashUrl(),
 });
 
 /**
