@@ -40,6 +40,9 @@ export var ProjectMenuView = AggregateView.extend({
     },
 
     select: function (model) {
+        // At this point, `model` could either be an instance of `Project` or
+        // just an id. The next line ensures that it is a full-blown instance
+        // (or `undefined`).
         model = this.collection.get(model);
         if (!model) return;
         if (model === this.model) return;
