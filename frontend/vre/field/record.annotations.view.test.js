@@ -2,7 +2,8 @@ import assert from 'assert';
 import sinon from 'sinon';
 import { isEmpty, last, indexOf, find, compact } from 'lodash';
 import { Collection }  from 'backbone';
-import { GlobalVariables } from '../globals/variables';
+
+import { vreChannel } from '../radio.js';
 import { FlatAnnotations } from '../annotation/annotation.model.js';
 import { AnnotationEditView } from '../annotation/annotation.edit.view.js';
 import { RecordFieldsBaseView } from './record.base.view.js';
@@ -117,8 +118,7 @@ function newAnnotationTrashed() {
 
 describe('RecordAnnotationsView', function() {
     before(function() {
-        assert(isEmpty(GlobalVariables));
-        GlobalVariables.projectMenu = fakeProjectMenu;
+        vreChannel.reply('projects:current', () => fakeProjectMenu.model);
     });
 
     beforeEach(function() {
@@ -137,7 +137,7 @@ describe('RecordAnnotationsView', function() {
     });
 
     after(function() {
-        delete GlobalVariables.projectMenu;
+        vreChannel.stopReplying('projects:current');
     });
 
     it('inherits from RecordFieldsBaseView', function() {

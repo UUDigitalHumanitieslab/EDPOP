@@ -1,4 +1,4 @@
-import { View } from 'backbone';
+import { View } from '../core/view.js';
 import advancedSearchTemplate from './advanced.search.view.mustache';
 
 export var AdvancedSearchView = View.extend({

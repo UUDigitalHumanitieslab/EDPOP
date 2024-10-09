@@ -1,4 +1,4 @@
-import { View } from 'backbone';
+import { View } from '../core/view.js';
 import accountMenuTemplate from './account.menu.view.mustache';
 
 export var AccountMenuView = View.extend({

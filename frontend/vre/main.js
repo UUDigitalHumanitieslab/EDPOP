@@ -4,28 +4,27 @@ import Backbone from 'backbone';
 import Cookies from 'jscookie';
 import { wrapWithCSRF } from '@uu-cdh/backbone-util';
 
+// Enable alt-click debugging (outcomment to disable).
+window.DEBUGGING = true;
+
 import './record/record.opening.aspect';
 import { vreChannel } from './radio';
 import { BlankRecordButtonView } from './record/blank.record.button.view';
 import { VRECollections } from './collection/collection.model';
 import { CollectionSearchView } from './catalog/collection.search.view';
 import { BrowseCollectionView } from './collection/browse-collection.view';
-import { Projects } from './project/project.model';
-import { ProjectMenuView } from './project/project.menu.view';
-
 
 import { SelectCollectionView } from './collection/select-collection.view';
 import { GlobalVariables } from './globals/variables';
 import './globals/user';
+import './globals/projects.js';
 import { accountMenu } from './globals/accountMenu';
 import {Catalogs} from "./catalog/catalog.model";
 import {SelectCatalogView} from "./catalog/select-catalog.view";
 import { StateModel } from './utils/state.model.js';
 import { WelcomeView } from './utils/welcome.view.js';
 
-
-// Dangerously global variables (accessible from dependency modules).
-GlobalVariables.allProjects = new Projects();
+// Dangerously global variable (accessible from dependency modules).
 GlobalVariables.myCollections = new VRECollections();
 
 // Regular global variables, only visible in this module.
@@ -56,7 +55,7 @@ var router = new VRERouter();
 // of attention.
 router.on({
     'route:showCollection': id => navigationState.set(
-        'browsingContext', GlobalVariables.myCollections.get(id)),
+        'browsingContext', GlobalVariables.myCollections.find({name: id})),
     'route:showCatalog': id => navigationState.set(
         'browsingContext', catalogs.findWhere({identifier: id})),
 });
@@ -80,6 +79,8 @@ catalogs.on({
 
 function showCollection(vreCollection) {
     GlobalVariables.currentVRECollection = vreCollection;
+    // The next line is not very MVC, but it works for now.
+    vreChannel.request('projects:select', vreCollection.get('project'));
     navigationState.set(
         'browser', new BrowseCollectionView({model: vreCollection}));
 }
@@ -96,11 +97,8 @@ function prepareCollections() {
     $('#result-detail').modal({show: false});
     VRECollections.mine(GlobalVariables.myCollections);
     catalogs.fetch();
-    GlobalVariables.allProjects.fetch();
-    var myProjects = Projects.mine();
-    GlobalVariables.projectMenu = new ProjectMenuView({ collection: myProjects });
+    vreChannel.request('projects:fetch', finish);
     GlobalVariables.myCollections.on('sync', finish);
-    GlobalVariables.allProjects.on('sync', finish);
     catalogs.on('sync', finish);
 
     // Add account menu
@@ -110,8 +108,7 @@ function prepareCollections() {
 }
 
 // We want this code to run after prepareCollections has run and both
-// GlobalVariables.myCollections and GlobalVariables.allProjects have fully
-// loaded.
+// GlobalVariables.myCollections and all projects have fully loaded.
 function startRouting() {
     $('.nav').first().append(
         catalogDropdown.el,

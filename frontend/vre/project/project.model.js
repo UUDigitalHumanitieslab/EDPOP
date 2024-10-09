@@ -1,7 +1,12 @@
-import { APICollection } from '../utils/api.model';
+import { APIModel, APICollection } from '../utils/api.model';
+
+export var Project = APIModel.extend({
+    idAttribute: 'name',
+});
 
 export var Projects = APICollection.extend({
     url: '/api/projects/',
+    model: Project,
 }, {
     mine: function () {
         var myProjects = new Projects();

@@ -1,9 +1,9 @@
-import { CollectionView } from 'backbone-fractal';
+import { AggregateView } from '../core/view.js';
 
 import { ProjectMenuItemView } from './project.menu.item.view';
 import projectMenuTemplate from './project.menu.view.mustache';
 
-export var ProjectMenuView = CollectionView.extend({
+export var ProjectMenuView = AggregateView.extend({
     el: '#vre-project-menu',
     template: projectMenuTemplate,
     subview: ProjectMenuItemView,
@@ -40,11 +40,16 @@ export var ProjectMenuView = CollectionView.extend({
     },
 
     select: function (model) {
+        // At this point, `model` could either be an instance of `Project` or
+        // just an id. The next line ensures that it is a full-blown instance
+        // (or `undefined`).
+        model = this.collection.get(model);
+        if (!model) return;
         if (model === this.model) return;
         if (this.model) this.model.trigger('deselect');
         this.model = model;
         this.renderContainer();
         this.trigger('select', model);
-        localStorage.setItem('project', model.attributes.id);
+        localStorage.setItem('project', model.id);
     },
 });

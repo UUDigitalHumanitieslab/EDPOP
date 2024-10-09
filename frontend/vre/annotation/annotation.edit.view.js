@@ -1,4 +1,4 @@
-import { View } from 'backbone';
+import { View } from '../core/view.js';
 import annotationEditTemplate from './annotation.edit.view.mustache';
 import confirmDeletionTemplate from './annotation.confirm.deletion.mustache';
 

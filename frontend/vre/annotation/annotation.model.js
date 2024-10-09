@@ -1,7 +1,7 @@
 import  Backbone from 'backbone';
 import { APIModel, APICollection } from '../utils/api.model';
 import { canonicalSort } from '../utils/generic-functions';
-import { GlobalVariables } from '../globals/variables';
+import { vreChannel } from '../radio.js';
 
 export var Annotations = APICollection.extend({
     url: '/api/annotations',
@@ -37,7 +37,7 @@ export var FlatAnnotations = APICollection.extend({
         }
         var id = annotation.id,
             projectId = annotation.get('context'),
-            projectName = GlobalVariables.allProjects.get(projectId).get('name'),
+            projectName = vreChannel.request('projects:get', projectId).get('name'),
             content = annotation.get('content'),
             existing = _.map(this.filter({ context: projectName }), 'attributes'),
             replacements = _.map(content, function(value, key) {
@@ -59,7 +59,7 @@ export var FlatAnnotations = APICollection.extend({
             recordId = record.id,
             flatPerProject = flat.groupBy('context');
         var newContent = flat.markedProjects.map('id').map(function (projectName) {
-            var projectId = GlobalVariables.allProjects.findWhere({ name: projectName }).id,
+            var projectId = vreChannel.request('projects:find', { name: projectName }).id,
                 existing = flat.underlying.findWhere({ context: projectId }),
                 id = existing && existing.id,
                 annotations = flatPerProject[projectName],
