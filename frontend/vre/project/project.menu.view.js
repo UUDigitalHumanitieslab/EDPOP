@@ -50,6 +50,6 @@ export var ProjectMenuView = AggregateView.extend({
         this.model = model;
         this.renderContainer();
         this.trigger('select', model);
-        localStorage.setItem('project', model.attributes.id);
+        localStorage.setItem('project', model.id);
     },
 });
