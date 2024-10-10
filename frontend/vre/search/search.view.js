@@ -30,7 +30,7 @@ export var SearchView = CompositeView.extend({
         this.$('form button').first().text('Search');
         return this;
     },
-    submitSearch: function(startRecord) {
+    submitSearch: function(startRecord, number=50) {
         this.showPending();
         var searchTerm = this.$('input').val();
         var searchPromise = this.collection.query({
@@ -38,6 +38,7 @@ export var SearchView = CompositeView.extend({
                 source: this.model.id,
                 query: searchTerm,
                 start: startRecord,
+                end: startRecord + number, // Backend correctly handles overflows here
             },
             error: _.bind(this.alertError, this),
             remove: startRecord === 0, // Remove current records if search starts at zero
@@ -63,11 +64,11 @@ export var SearchView = CompositeView.extend({
             this.feedback();
         }, this));
     },
-    nextSearch: function(event) {
+    nextSearch: function(event, number) {
         event.preventDefault();
         $('#more-records').hide();
         var startRecord = this.collection.length;
-        this.submitSearch(startRecord).then(this.feedback.bind(this));
+        this.submitSearch(startRecord, number).then(this.feedback.bind(this));
     },
     feedback: function() {
         if (this.collection.length >= this.collection.totalResults) {

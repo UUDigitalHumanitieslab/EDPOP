@@ -1,6 +1,6 @@
 import Backbone from 'backbone';
 import { canonicalSort } from '../utils/generic-functions';
-import {properties} from "../utils/record-ontology";
+import {fieldList, properties} from "../utils/record-ontology";
 import {getStringLiteral} from "../utils/jsonld.model";
 
 // A single field of a single record.
@@ -53,7 +53,7 @@ export var FlatFields = Backbone.Collection.extend({
     },
     toFlat: function(record) {
         const content = record.toJSON();
-        const fieldNames = Object.keys(content).filter((name) => content[name]["@type"] === 'edpoprec:Field');
+        const fieldNames = Object.keys(content).filter((name) => fieldList.includes(content[name]["@type"]));
         const fields = fieldNames.map((name) => ({key: name, value: content[name]}));
         return fields;
     },
