@@ -12,7 +12,9 @@ export var Field = Backbone.Model.extend({
      */
     getMainDisplay() {
         // Currently, only normalizedText is supported.
-        return this.get('value')['edpoprec:originalText'];
+        const originalText = this.get('value')['edpoprec:originalText'];
+        const summaryText  = this.get('value')['edpoprec:summaryText'];
+        return summaryText || originalText;
     },
     getFieldInfo() {
         const property = properties.get(this.id);

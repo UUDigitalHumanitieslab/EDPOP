@@ -26,4 +26,5 @@ export const fieldList = [
     'edpoprec:DatingField',
     'edpoprec:LanguageField',
     'edpoprec:LocationField',
+    'edpoprec:ContributorField',
 ];

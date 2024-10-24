@@ -471,6 +471,76 @@
         "@value": "Publisher or printer"
       }
     },
+      {
+          "@id": "edpoprec:bibliographicalFormat",
+          "@type": "rdf:property",
+          "rdfs:domain": {
+              "@id": "edpoprec:BibliographicalRecord"
+          },
+          "rdfs:range": {
+              "@id": "edpoprec:Field"
+          },
+          "skos:prefLabel": {
+              "@language": "en",
+              "@value": "Bibliographical format"
+          }
+      },
+      {
+          "@id": "edpoprec:collationFormula",
+          "@type": "rdf:property",
+          "rdfs:domain": {
+              "@id": "edpoprec:BibliographicalRecord"
+          },
+          "rdfs:range": {
+              "@id": "edpoprec:Field"
+          },
+          "skos:prefLabel": {
+              "@language": "en",
+              "@value": "Collation formula"
+          }
+      },
+      {
+          "@id": "edpoprec:fingerprint",
+          "@type": "rdf:property",
+          "rdfs:domain": {
+              "@id": "edpoprec:BibliographicalRecord"
+          },
+          "rdfs:range": {
+              "@id": "edpoprec:Field"
+          },
+          "skos:prefLabel": {
+              "@language": "en",
+              "@value": "Fingerprint"
+          }
+      },
+      {
+          "@id": "edpoprec:genre",
+          "@type": "rdf:property",
+          "rdfs:domain": {
+              "@id": "edpoprec:BibliographicalRecord"
+          },
+          "rdfs:range": {
+              "@id": "edpoprec:Field"
+          },
+          "skos:prefLabel": {
+              "@language": "en",
+              "@value": "Genre"
+          }
+      },
+      {
+          "@id": "edpoprec:holdings",
+          "@type": "rdf:property",
+          "rdfs:domain": {
+              "@id": "edpoprec:BibliographicalRecord"
+          },
+          "rdfs:range": {
+              "@id": "edpoprec:Field"
+          },
+          "skos:prefLabel": {
+              "@language": "en",
+              "@value": "Holdings"
+          }
+      },
     {
       "@id": "edpoprec:unknown",
       "@type": "rdf:property",
