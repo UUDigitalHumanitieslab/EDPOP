@@ -3,6 +3,31 @@ import {properties} from "../utils/record-ontology";
 import {getStringLiteral} from "../utils/jsonld.model";
 import {vreChannel} from "../radio";
 import Tabulator from "tabulator";
+import {columnChooseMenu} from "../utils/tabulator-utils";
+
+const columnProperties = {
+    'edpoprec:title': {
+        visible: true,
+        widthGrow: 5,
+        formatter: 'textarea',
+    },
+    'edpoprec:placeOfPublication': {
+        visible: true,
+    },
+    'edpoprec:dating': {
+        visible: true,
+        widthGrow: 0.5,
+    },
+    'edpoprec:publisherOrPrinter': {
+        visible: true,
+    },
+    'edpoprec:contributor': {
+        visible: true,
+    },
+    'edpoprec:activity': {
+        visible: true,
+    },
+};
 
 export var RecordListView = Backbone.View.extend({
     id: "record-list",
@@ -25,12 +50,17 @@ export var RecordListView = Backbone.View.extend({
             autoColumns: true,
             autoColumnsDefinitions: (definitions) => {
                 for (let definition of definitions) {
-                    if (definition.field === "model") {
-                        definition.visible = false;
-                    }
+                    // All columns invisible by default
+                    definition.visible = false;
                     const property = properties.get(definition.field);
                     if (property) {
                         definition.title = getStringLiteral(property.get("skos:prefLabel"));
+                    }
+                    definition.headerFilter = true;
+                    definition.headerContextMenu = columnChooseMenu;
+                    const hardcodedProperties = columnProperties[definition.field];
+                    if (hardcodedProperties) {
+                        Object.assign(definition, hardcodedProperties);
                     }
                 }
                 return definitions;
@@ -49,6 +79,7 @@ export var RecordListView = Backbone.View.extend({
                     cell.getRow().toggleSelect();
                 },
             },
+            headerFilterLiveFilterDelay: 0,
         });
         this.table.on("rowClick", (e, row) => {
             const model = row.getData().model;
