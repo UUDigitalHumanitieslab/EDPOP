@@ -25,6 +25,7 @@ function stripAttribute(container) {
  *
  * motivation            ([oa:motivatedBy][@id])
  * tagURL                ([oa:hasBody][@id] if motivation === oa:tagging)
+ * marksDeletion         (true if [oa:hasBody][@id] === edpopcol:incorrectFieldValue)
  * oa:hasSource          ([oa:hasTarget][oa:hasSource][@id])
  * edpopcol:field        ([oa:hasTarget][oa:hasSelector][edpopcol:field][@id])
  * edpopcol:originalText ([oa:hasTarget][oa:hasSelector][edpopcol:originalText])
