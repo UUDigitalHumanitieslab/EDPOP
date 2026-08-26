@@ -161,14 +161,27 @@ export var FlatterFields = FlatFields.extend({
     },
 });
 
+/**
+ * Internal helper for extracting original text values from flattened fields.
+ * @param {Field} model - Instance to retrieve original text from.
+ * @returns {string} The original text.
+ */
 function valueAttribute(model) {
     return model.get('value')['edpoprec:originalText'];
 }
 
+/**
+ * Internal helper for extracting the original text part of the selector of an
+ * {@link Annotation}.
+ * @param {Annotation} correction - Instance to retrieve `edpopcol:originalText`
+ * from.
+ * @returns {string} Content of the original text selector.
+ */
 function originalTextSelector(correction) {
     return correction.get('edpopcol:originalText');
 }
 
+// Order in which we want to display different types of values in the view.
 const fieldEntryTypeOrder = [
     'originalValue',
     'deletion',
@@ -181,11 +194,23 @@ const fieldEntryTypeOrder = [
 
 const alphabet = 'abcdefghijklmnopqrstuvwxyz';
 
+/**
+ * Object of the form `{tagname: letter}`. The tag names are used as mnemonics,
+ * the letters are used as a string prefix for sorting purposes.
+ * @type {Object.<string, string>}
+ */
 export const fieldEntryTag = _.chain(fieldEntryTypeOrder)
     .invert()
     .mapValues(_.propertyOf(alphabet))
     .value();
 
+/**
+ * Attributes for a presentation-oriented model representing an original field
+ * value, correction, deletion, addition, or the field as a whole. The latter
+ * variant exists purely as a slot that the user can interact with in order to
+ * create more additions.
+ * @typedef {Object}
+ */
 function wrapUncorrected(original) {
     var originalText = original.get('value')['edpoprec:originalText'];
     return {
@@ -240,12 +265,56 @@ function wrapAddition(edit) {
     };
 }
 
-export var CombinedFieldValues = Backbone.Collection.extend({
+/**
+ * Common instance properties of {@link CombinedFieldValues} and {@link
+ * RecordField}.
+ * @interface RecordFieldData
+ */
+/**
+ * ID that coincides with the ID of the current field.
+ * @member {string} RecordFieldData#id
+ */
+/**
+ * Original values of the current field in the current record.
+ * @member {FilteredCollection<FlatterFields>} RecordFieldData#values
+ */
+/**
+ * Edits made on the current field in the current record.
+ * @member {FilteredCollection<Annotations>} RecordFieldData#annotations
+ */
+
+/**
+ * Presentation-oriented collection with the field values and edits for a single
+ * field of a given record.
+ * @class
+ * @extends Backbone.Collection
+ * @implements {RecordFieldData}
+ */
+export var CombinedFieldValues = Backbone.Collection.extend(/**
+                            @lends CombinedFieldValues.prototype
+                                                              */{
     comparator: function(model) {
         return model.get('order') + model.id;
     },
 
+    /**
+     * @member model
+     * @class
+     * @extends Backbone.Model
+     */
+    /**
+     * @member {RecordFieldValueAttributes} model#attributes
+     */
+
+    /**
+     * @param {FieldValue[]} [models]
+     * @param {Object} options
+     * @param {RecordField} options.recordField - Model representing the
+     * combination of record and field for which the values and edits are to be
+     * computed.
+     */
     initialize: function(models, options) {
+        /** @member {RecordField} */
         this.recordField = options.recordField;
         _.assign(this, _.pick(options.recordField, ['values', 'annotations', 'id']));
         this.combineValues()
@@ -256,6 +325,13 @@ export var CombinedFieldValues = Backbone.Collection.extend({
             .on('update', this.trackFirst);
     },
 
+    /**
+     * Recompute the contents of the collection, i.e., all attributes of all
+     * models, based on the current {@link #values} and {@link #annotations}.
+     * @listens #values~event:update
+     * @listens #annotations~event:update
+     * @returns {CombinedFieldValues} this
+     */
     combineValues: function() {
         // TODO replace keyBy by indexBy when moving to Underscore
         // (will be able to use Collection#indexBy and 'value' shorthand)
@@ -284,6 +360,12 @@ export var CombinedFieldValues = Backbone.Collection.extend({
         return this;
     },
 
+    /**
+     * Ensure that the first model in the collection has an `{isFirst: true}`
+     * attribute and that the other models lack this attribute.
+     * @listens ~event:update
+     * @returns {CombinedFieldValues} this
+     */
     trackFirst: function() {
         if (this._first === this.first()) return this;
         if (this._first) this._first.unset('isFirst');
@@ -293,7 +375,22 @@ export var CombinedFieldValues = Backbone.Collection.extend({
     },
 });
 
-export var RecordField = Backbone.Model.extend({
+/**
+ * @typedef {Object} RecordFieldAttributes
+ * @property {module:'../utils/jsonld.model.js'.JsonLdModel} field
+ * @property {module:'../record/record.model.js'.Record} record
+ */
+
+/**
+ * Presentation-oriented model representing a specific field within a specific
+ * model.
+ * @class
+ * @extends Backbone.Model
+ * @implements {RecordFieldData}
+ */
+export var RecordField = Backbone.Model.extend(/**
+                                                * @lends RecordField.prototype
+                                                */{
     initialize: function(attributes, options) {
         var field = this.get('field');
         if (field) this.set('id', field.id);
