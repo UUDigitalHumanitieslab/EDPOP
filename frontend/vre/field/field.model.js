@@ -54,8 +54,23 @@ function getMainDisplayOfFieldValue(value, field, annotations = null) {
     return value['edpoprec:summaryText'] || value['edpoprec:originalText'];
 }
 
-// A single field of a single record.
-export var Field = Backbone.Model.extend({
+/**
+ * Original value of a field in a record.
+ * @class
+ * @extends Backbone.Model
+ */
+export var Field = Backbone.Model.extend(/**
+                                          * @lends Field.prototype
+                                          */{
+    /**
+     * @member {string} #attributes.key
+     * @description IRI (prefixed name) of the field.
+     */
+    /**
+     * @member {string|string[]} #attributes.value
+     * @description Original value(s) for the field in the given record.
+     */
+
     idAttribute: 'key',
     /**
      * Get the default rendering of the field
@@ -116,8 +131,12 @@ function selectProperties(record) {
  * Note that we extend directly from Backbone.Collection rather than from
  * APICollection and that we don't set a URL. This is because we only talk
  * to the server through the underlying Record model.
+ * @class
+ * @extends Backbone.Collection
  */
-export var FlatFields = Backbone.Collection.extend({
+export var FlatFields = Backbone.Collection.extend(/**
+                                                    * @lends FlatFields.prototype
+                                                    */{
     model: Field,
     comparator: function(item) {
         return canonicalSort(item.attributes.key);
@@ -143,6 +162,7 @@ export var FlatFields = Backbone.Collection.extend({
  * Like {@link FlatFields}, but even flatter: if a field is repeated, every
  * value is represented with a separate `{key, value}` pair.
  * @class
+ * @extends FlatFields
  */
 export var FlatterFields = FlatFields.extend({
     modelId: function(fieldAttrs) {
@@ -205,12 +225,47 @@ export const fieldEntryTag = _.chain(fieldEntryTypeOrder)
     .value();
 
 /**
- * Attributes for a presentation-oriented model representing an original field
- * value, correction, deletion, addition, or the field as a whole. The latter
- * variant exists purely as a slot that the user can interact with in order to
- * create more additions.
- * @typedef {Object}
+ * Attributes for {@link CombinedFieldValues#model} representing an original
+ * field value, correction, deletion, addition, or the field as a whole. The
+ * latter variant exists purely as a slot that the user can interact with in
+ * order to create more additions.
+ * @typedef {Object} RecordFieldValueAttributes
+ * @property {string} id - Composition of the original text and/or the
+ * corrected/added value, if applicable. Prefixed field IRI if neither is
+ * applicable, i.e., if representing the field as a whole.
+ * @property {string} order - String prefix from {@link fieldEntryTag} for
+ * sorting purposes.
+ * @property {Field} [original] - Original value in the record, either as the
+ * target of representation or as referenced from the edit. May be `undefined`
+ * in case of a dangling edit.
+ * @property {Annotation} [edit] - Correction, addition or deletion. If present,
+ * this is the target of representation.
+ * @property {string} [originalText] - Convenience copy of
+ * `original.get('value')['edpoprec:originalText']` if present, or
+ * `edit.get('edpopcol:originalText')` in case of a dangling edit.
+ * @property {string} [correctedText] - Added or corrected value if applicable.
+ * Convenience copy of `edit.get('oa:hasBody')`.
+ * @property {boolean} [dangling] - `true` if the edit refers to a value that is
+ * no longer present in the original record.
+ * @property {boolean} [uncorrected] - `true` if the instance represents an
+ * unedited original value in the record. Mutually exclusive with `deletion`,
+ * `correction`, `addition` and `field`.
+ * @property {boolean} [deletion] - `true` if the instance represents an edit
+ * that marks an original value as deleted. May be dangling if the marked value
+ * is no longer present in the original record. Mutually exclusive with
+ * `uncorrected`, `correction`, `addition` and `field`.
+ * @property {boolean} [correction] - `true` if the instance represents an edit
+ * that changes an original value into something else. May be dangling if the
+ * marked value is no longer present in the original record. Mutually exclusive
+ * with `uncorrected`, `deletion`, `addition` and `field`.
+ * @property {boolean} [addition] - `true` if the instance represents an edit
+ * that adds a separate new value. Mutually exclusive with `uncorrected`,
+ * `deletion`, `correction` and `field`.
+ * @property {boolean} [field] - `true` if the instance represents the field as
+ * a whole. Mutually exclusive with `uncorrected`, `deletion`, `correction` and
+ * `addition`.
  */
+
 function wrapUncorrected(original) {
     var originalText = original.get('value')['edpoprec:originalText'];
     return {
