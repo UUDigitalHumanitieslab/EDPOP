@@ -266,6 +266,11 @@ export const fieldEntryTag = _.chain(fieldEntryTypeOrder)
  * `addition`.
  */
 
+/**
+ * Convert an original value to presentation attributes.
+ * @param {Field} original
+ * @returns {RecordFieldValueAttributes}
+ */
 function wrapUncorrected(original) {
     var originalText = original.get('value')['edpoprec:originalText'];
     return {
@@ -277,6 +282,13 @@ function wrapUncorrected(original) {
     };
 }
 
+/**
+ * Convert a correction or deletion to presentation attributes.
+ * @param {Array} pair - Tuple of an original value and an edit.
+ * @param {Field} pair[0] - Original value.
+ * @param {Annotation} pair[1] - Edit.
+ * @returns {RecordFieldValueAttributes}
+ */
 function wrapCorrection(pair) {
     const original = pair[0];
     const edit = pair[1];
@@ -309,6 +321,11 @@ function wrapCorrection(pair) {
     };
 }
 
+/**
+ * Convert an addition to presentation attributes.
+ * @param {Annotation} edit
+ * @returns {RecordFieldValueAttributes}
+ */
 function wrapAddition(edit) {
     const addedValue = edit.get('oa:hasBody');
     return {
@@ -321,13 +338,9 @@ function wrapAddition(edit) {
 }
 
 /**
- * Common instance properties of {@link CombinedFieldValues} and {@link
- * RecordField}.
+ * Common properties of {@link CombinedFieldValues} and {@link RecordField}.
+ * Also passed in options to the `RecordField` constructor.
  * @interface RecordFieldData
- */
-/**
- * ID that coincides with the ID of the current field.
- * @member {string} RecordFieldData#id
  */
 /**
  * Original values of the current field in the current record.
@@ -347,11 +360,15 @@ function wrapAddition(edit) {
  */
 export var CombinedFieldValues = Backbone.Collection.extend(/**
                             @lends CombinedFieldValues.prototype
-                                                              */{
+                                                             */{
     comparator: function(model) {
         return model.get('order') + model.id;
     },
 
+    /**
+     * ID that coincides with the ID of the current field.
+     * @member {string} id
+     */
     /**
      * @member model
      * @class
@@ -388,22 +405,34 @@ export var CombinedFieldValues = Backbone.Collection.extend(/**
      * @returns {CombinedFieldValues} this
      */
     combineValues: function() {
+        // Create an index to find original values by their `originalText`.
         // TODO replace keyBy by indexBy when moving to Underscore
-        // (will be able to use Collection#indexBy and 'value' shorthand)
+        // (will be able to use Collection#indexBy)
         const originalIndex = _.keyBy(this.values.models, valueAttribute);
         const getOriginal = _.propertyOf(originalIndex);
+        // Group the edits by which `originaText` they reference.
         const annotationTiers = this.annotations.groupBy('edpopcol:originalText');
         const getAnnotations = _.propertyOf(annotationTiers);
+        // List just the original values that have edits.
         const referencedOriginals = _.chain(annotationTiers)
               .omit('undefined').keys().value();
+        // Version of the original value index without the edited values.
         const uncorrectedOriginals = _.omit(originalIndex, referencedOriginals);
+        // Edits that correct or delete-mark an original value.
         const corrections = _.chain(referencedOriginals)
               .map(getAnnotations).flatten().value();
+        // Additions are edits not associated with an original value.
         const additions = annotationTiers['undefined'];
+        // Original values with edits, in the same order as they appear in
+        // `corrections`. This array may contain duplicates.
         const correctedOriginals = _.chain(corrections)
               .map(originalTextSelector)
               .map(getOriginal).value();
+        // Make pairs of edits with their originals so we can pass them to
+        // `wrapCorrection` together.
         const correctionPairs = _.zip(correctedOriginals, corrections);
+        // Combine everything into a big array of `RecordFieldValueAttributes`.
+        // We always include one entry for the field as a whole.
         const allAttributes = [
             {id: this.id, field: true, order: fieldEntryTag.wholeField},
         ].concat(
@@ -438,7 +467,7 @@ export var CombinedFieldValues = Backbone.Collection.extend(/**
 
 /**
  * Presentation-oriented model representing a specific field within a specific
- * model.
+ * record.
  * @class
  * @extends Backbone.Model
  * @implements {RecordFieldData}
@@ -446,6 +475,10 @@ export var CombinedFieldValues = Backbone.Collection.extend(/**
 export var RecordField = Backbone.Model.extend(/**
                                                 * @lends RecordField.prototype
                                                 */{
+    /**
+     * @param {RecordFieldAttributes} attributes
+     * @param {RecordFieldData} options
+     */
     initialize: function(attributes, options) {
         var field = this.get('field');
         if (field) this.set('id', field.id);
@@ -455,6 +488,7 @@ export var RecordField = Backbone.Model.extend(/**
         this.annotations = new FilteredCollection(options.annotations, {
             'edpopcol:field': this.id,
         });
+        /** @member {CombinedFieldValues} */
         this.content = new CombinedFieldValues(null, {recordField: this});
     },
 
@@ -467,12 +501,32 @@ export var RecordField = Backbone.Model.extend(/**
     },
 });
 
+/**
+ * Given a record with associated data, generate a callback that maps a given
+ * field from the `edpoprec:` ontology to the corresponding {@link RecordField}.
+ * @param {module:'../record/record.model.js'.Record} record
+ * @param {FlatterFields} values
+ * @param {Annotations} annotations
+ * @returns {field2recordField~curried}
+ */
 function field2recordField(record, values, annotations) {
+    /**
+     * @callback field2recordField~curried
+     * @param {JsonLdModel} field - Field property from the `edpoprec:`
+     * ontology.
+     * @returns {RecordField}
+     */
     return function(field) {
         return new RecordField({field, record}, {values, annotations});
     };
 }
 
+/**
+ * Given a record, generate a matching collection of {@link RecordField} for
+ * each applicable field from the `edpoprec:` ontology.
+ * @param {module:'../record/record.model.js'.Record} record
+ * @returns {RecordFields}
+ */
 export function presentableContents(record) {
     const values = new FlatterFields(null, {record});
     const annotations = record.getAnnotations();
@@ -484,3 +538,24 @@ export function presentableContents(record) {
     _.assign(contents, {record, values, annotations});
     return contents;
 }
+
+/**
+ * Collection of {@link RecordField} models with additional properties, intended
+ * as a comprehensive datastructure containing all information a view might need
+ * to render a record's fields and edits.
+ * @typedef {Backbone.Collection} RecordFields
+ */
+/**
+ * @member RecordFields#model
+ * @class
+ * @extends RecordField
+ */
+/**
+ * @member {module:'../record/record.model.js'.Record} RecordFields#record
+ */
+/**
+ * @member {FlatterFields} RecordFields#values
+ */
+/**
+ * @member {Annotations} RecordFields#annotations
+ */

@@ -8,8 +8,11 @@ import { Record } from '../record/record.model.js';
 import { Annotations } from '../annotation/annotation.model.js';
 import { presentableContents, fieldEntryTag } from './field.model.js';
 
+// Quick string-generating function to emulate the backend's bnode: IRIs.
 var bnode = _.partial(_.uniqueId, 'bnode:N');
 
+// Strings that we will be reusing in tests involving the `edpoprec:contributor`
+// field, tagged by their roles in the tests.
 var contributor = {
     value1: {
         original: 'William Shakespur',
