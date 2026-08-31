@@ -20,6 +20,11 @@ export var FieldView = AggregateView.extend(/**
     tagName: 'tbody',
     /** @member {module:'./field.model.js'.RecordField} model */
     /** @member {module:'./field.model.js'.CombinedFieldValues} collection */
+    /**
+     * @member subview
+     * @class
+     * @extends FieldValueView
+     */
 
     initialize: function(options) {
         this.collection = this.collection || this.model && this.model.content;
@@ -39,6 +44,13 @@ export var FieldView = AggregateView.extend(/**
         return FieldView.__super__.remove.call(this);
     },
 
+    /**
+     * Create a correction for the model that triggered an `edit` event and
+     * overlay the corresponding subview with an {@link AnnotationEditView}.
+     * @listens #collection~event:edit
+     * @param {module:'./field.model.js'.CombinedFieldValues#model} model
+     * @param {FieldValueView} view
+     */
     edit: function(model, view) {
         this.cancel();
         var user = vreChannel.request('user'),
@@ -59,6 +71,7 @@ export var FieldView = AggregateView.extend(/**
             model: newEdit,
             defaultText: originalText,
         }).on(_.pick(this, ['save', 'cancel', 'trash']), this);
+        /** @member */
         this.editor = new OverlayView({
             root: view.el,
             target: 'td.vre-field-value',
@@ -67,6 +80,9 @@ export var FieldView = AggregateView.extend(/**
         this.editor.cover();
     },
 
+    /**
+     * Common logic of methods that create edits.
+     */
     makeEdit: function(originalText) {
         var newEdit = new Annotation({
             'context': vreChannel.request('projects:current').id,
@@ -78,6 +94,12 @@ export var FieldView = AggregateView.extend(/**
         return newEdit;
     },
 
+    /**
+     * If one of the subviews currently has an editor overlay, remove the
+     * overlay.
+     * @listens #editor~event:cancel
+     * @returns {FieldView} this
+     */
     cancel: function() {
         if (!this.editor) return;
         this.editor.remove();
@@ -85,6 +107,11 @@ export var FieldView = AggregateView.extend(/**
         return this;
     },
 
+    /**
+     * Save the current edit while removing the editor overlay.
+     * @listens #editor~event:save
+     * @param {AnnotationEditView} editor
+     */
     save: function(editor) {
         var model = editor.model;
         this.cancel();
@@ -92,10 +119,21 @@ export var FieldView = AggregateView.extend(/**
         model.save();
     },
 
+    /**
+     * Delete the current edit while removing the editor overlay.
+     * @listens #editor~event:trash
+     * @param {AnnotationEditView} editor
+     */
     trash: function(editor) {
         this.dropEdit(editor.model);
     },
 
+    /**
+     * Remove an edit OR mark an original value as deleted, depending on the
+     * targeted `model`. Indirect handler for the xmark buttons in the subviews.
+     * @listens #collection~event:discard
+     * @param {module:'./field.model.js'.CombinedFieldValues#model} model
+     */
     discard: function(model) {
         var edit = model.get('edit');
         if (edit) return this.dropEdit(edit);
@@ -106,6 +144,10 @@ export var FieldView = AggregateView.extend(/**
         this.save({model: edit});
     },
 
+    /**
+     * Delete the given edit while removing any editor overlay.
+     * @param {Annotation} model
+     */
     dropEdit: function(model) {
         this.cancel();
         this.model.annotations.underlying.remove(model);
