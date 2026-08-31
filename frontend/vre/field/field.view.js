@@ -7,8 +7,19 @@ import { AnnotationEditView } from '../annotation/annotation.edit.view';
 import { OverlayView } from '../utils/overlay.view.js';
 import { FieldValueView } from './field-value.view.js';
 
-export var FieldView = AggregateView.extend({
+/**
+ * Table section with one or more rows presenting any original value(s) and
+ * edit(s) of a field in a record. Always ends with a single empty row that
+ * enables users to create additions.
+ * @class
+ * @extends AggregateView
+ */
+export var FieldView = AggregateView.extend(/**
+                                             * @lends FieldView.prototype
+                                             */{
     tagName: 'tbody',
+    /** @member {module:'./field.model.js'.RecordField} model */
+    /** @member {module:'./field.model.js'.CombinedFieldValues} collection */
 
     initialize: function(options) {
         this.collection = this.collection || this.model && this.model.content;

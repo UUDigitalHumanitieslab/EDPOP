@@ -380,19 +380,38 @@ var expectedCompoundData = [sinon.match({
     })],
 })];
 
+/**
+ * Generate a callback than checks whether a given instance of {@link Field}
+ * matches the given `edpopcol:originalText`.
+ * @param {string} originalText
+ * @returns {matchOriginalText~curried}
+ */
 function matchOriginalText(originalText) {
+    /**
+     * @callback matchOriginalText~curried
+     * @param {Field} model
+     * @returns {boolean}
+     */
     return function(model) {
         var value = model.get('value');
         return value && value['edpoprec:originalText'] === originalText;
     };
 }
 
+/**
+ * JSONify a {@link RecordField} in a way that is suitable for comparison with
+ * entries from {@link expectedCompoundData}.
+ */
 function recordField2json(recordField) {
     var modelJson = recordField.toJSON();
     var contentJson = recordField.content.toJSON();
     return _.extend({content: contentJson}, modelJson);
 }
 
+/**
+ * Clean up all event bindings involving a {@link RecordField} to enable garbage
+ * collection.
+ */
 function disableRecordFieldListeners(recordField) {
     _.each(['content', 'annotations', 'values'], (collection) => {
         recordField[collection].off().stopListening();
