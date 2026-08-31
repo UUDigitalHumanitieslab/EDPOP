@@ -35,7 +35,7 @@ export var FieldView = AggregateView.extend(/**
     },
 
     remove: function() {
-        this.cancel().clearRelinker();
+        this.cancel();
         return FieldView.__super__.remove.call(this);
     },
 
